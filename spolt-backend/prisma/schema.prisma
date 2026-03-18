@@ -1,0 +1,271 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// USUARIOS
+// ─────────────────────────────────────────────
+model Usuario {
+  id_usuario      Int       @id @default(autoincrement())
+  nombre_usuario  String    @unique @db.VarChar(50)
+  email           String    @unique @db.VarChar(100)
+  contrasena_hash String    @db.VarChar(255)
+  nombre_completo String?   @db.VarChar(100)
+  biografia       String?   @db.Text
+  imagen_perfil   String?   @db.VarChar(255)
+  fecha_nacimiento DateTime? @db.Date
+  fecha_registro  DateTime  @default(now())
+  ultimo_acceso   DateTime?
+  activo          Boolean   @default(true)
+  role            String    @default("user")
+  refresh_token_hash String? @db.VarChar(255)
+
+  // Relaciones
+  //publicaciones           Publicacion[]
+  amistades_solicitadas   Amistad[]              @relation("Solicitante")
+  amistades_recibidas     Amistad[]              @relation("Receptor")
+  eventos_creados         EventoDeportivo[]
+  participaciones_evento  ParticipanteEvento[]
+  participaciones_chat    ParticipanteConversacion[]
+  mensajes_enviados       Mensaje[]
+
+  @@index([nombre_usuario])
+  @@index([email])
+  @@map("usuarios")
+}
+
+// ─────────────────────────────────────────────
+// PUBLICACIONES
+// ─────────────────────────────────────────────
+/*model Publicacion {
+  id_publicacion  Int       @id @default(autoincrement())
+  id_usuario      Int
+  descripcion     String?   @db.Text
+  fecha_creacion  DateTime  @default(now())
+  numero_likes    Int       @default(0)
+  activo          Boolean   @default(true)
+
+  // Relaciones
+  usuario   Usuario               @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+  imagenes  ImagenPublicacion[]
+
+  @@index([id_usuario, fecha_creacion])
+  @@map("publicaciones")
+}*/
+
+// ─────────────────────────────────────────────
+// IMÁGENES DE PUBLICACIONES
+// ─────────────────────────────────────────────
+/*model ImagenPublicacion {
+  id_imagen      Int      @id @default(autoincrement())
+  id_publicacion Int
+  url_imagen     String   @db.VarChar(255)
+  orden          Int?     @db.SmallInt // 1-9
+  fecha_subida   DateTime @default(now())
+
+  // Relaciones
+  publicacion Publicacion @relation(fields: [id_publicacion], references: [id_publicacion], onDelete: Cascade)
+
+  @@index([id_publicacion])
+  @@map("imagenes_publicacion")
+}*/
+
+// ─────────────────────────────────────────────
+// AMISTADES
+// ─────────────────────────────────────────────
+enum EstadoAmistad {
+  pendiente
+  aceptada
+  rechazada
+  bloqueada
+}
+
+model Amistad {
+  id_amistad           Int            @id @default(autoincrement())
+  id_usuario_solicitante Int
+  id_usuario_receptor    Int
+  estado               EstadoAmistad  @default(pendiente)
+  fecha_solicitud      DateTime       @default(now())
+  fecha_respuesta      DateTime?
+
+  // Relaciones
+  solicitante Usuario @relation("Solicitante", fields: [id_usuario_solicitante], references: [id_usuario], onDelete: Cascade)
+  receptor    Usuario @relation("Receptor", fields: [id_usuario_receptor], references: [id_usuario], onDelete: Cascade)
+
+  @@unique([id_usuario_solicitante, id_usuario_receptor])
+  @@index([id_usuario_solicitante])
+  @@index([id_usuario_receptor])
+  @@index([estado])
+  @@map("amistades")
+}
+
+// ─────────────────────────────────────────────
+// DEPORTES
+// ─────────────────────────────────────────────
+model Deporte {
+  id_deporte  Int     @id @default(autoincrement())
+  nombre      String  @unique @db.VarChar(50)
+  descripcion String? @db.Text
+  imagen_icono String? @db.VarChar(255)
+
+  // Relaciones
+  eventos EventoDeportivo[]
+
+  @@index([nombre])
+  @@map("deportes")
+}
+
+// ─────────────────────────────────────────────
+// EVENTOS DEPORTIVOS
+// ─────────────────────────────────────────────
+enum TipoEvento {
+  partido
+  torneo
+}
+
+enum EstadoEvento {
+  abierto
+  cerrado
+  cancelado
+  finalizado
+}
+
+model EventoDeportivo {
+  id_evento                    Int          @id @default(autoincrement())
+  id_creador                   Int
+  id_deporte                   Int
+  titulo                       String       @db.VarChar(100)
+  descripcion                  String?      @db.Text
+  tipo_evento                  TipoEvento
+  fecha_evento                 DateTime     @db.Date
+  hora_inicio                  DateTime     @db.Time
+  hora_fin                     DateTime?    @db.Time
+  ubicacion                    String?      @db.VarChar(255)
+  latitud                      Decimal?     @db.Decimal(10, 8)
+  longitud                     Decimal?     @db.Decimal(11, 8)
+  numero_max_participantes     Int
+  numero_participantes_actuales Int          @default(0)
+  estado                       EstadoEvento @default(abierto)
+  fecha_creacion               DateTime     @default(now())
+
+  // Relaciones
+  creador        Usuario              @relation(fields: [id_creador], references: [id_usuario], onDelete: Cascade)
+  deporte        Deporte              @relation(fields: [id_deporte], references: [id_deporte])
+  participantes  ParticipanteEvento[]
+
+  @@index([fecha_evento])
+  @@index([id_creador])
+  @@index([id_deporte])
+  @@index([estado])
+  @@map("eventos_deportivos")
+}
+
+// ─────────────────────────────────────────────
+// PARTICIPANTES EN EVENTOS
+// ─────────────────────────────────────────────
+enum EstadoParticipacion {
+  pendiente
+  confirmado
+  rechazado
+  retirado
+}
+
+model ParticipanteEvento {
+  id_participacion Int                  @id @default(autoincrement())
+  id_evento        Int
+  id_usuario       Int
+  estado           EstadoParticipacion  @default(pendiente)
+  fecha_solicitud  DateTime             @default(now())
+  fecha_respuesta  DateTime?
+
+  // Relaciones
+  evento  EventoDeportivo @relation(fields: [id_evento], references: [id_evento], onDelete: Cascade)
+  usuario Usuario         @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+
+  @@unique([id_evento, id_usuario])
+  @@index([id_evento])
+  @@index([id_usuario])
+  @@map("participantes_evento")
+}
+
+// ─────────────────────────────────────────────
+// CONVERSACIONES
+// ─────────────────────────────────────────────
+enum TipoConversacion {
+  individual
+  grupo
+}
+
+model Conversacion {
+  id_conversacion  Int               @id @default(autoincrement())
+  tipo             TipoConversacion  @default(individual)
+  nombre_grupo     String?           @db.VarChar(100)
+  fecha_creacion   DateTime          @default(now())
+  ultima_actividad DateTime          @default(now()) @updatedAt
+
+  // Relaciones
+  participantes ParticipanteConversacion[]
+  mensajes      Mensaje[]
+
+  @@index([ultima_actividad])
+  @@map("conversaciones")
+}
+
+// ─────────────────────────────────────────────
+// PARTICIPANTES EN CONVERSACIONES
+// ─────────────────────────────────────────────
+model ParticipanteConversacion {
+  id_participante       Int      @id @default(autoincrement())
+  id_conversacion       Int
+  id_usuario            Int
+  fecha_union           DateTime @default(now())
+  ultimo_mensaje_leido  Int?
+  notificaciones_activas Boolean @default(true)
+
+  // Relaciones
+  conversacion Conversacion @relation(fields: [id_conversacion], references: [id_conversacion], onDelete: Cascade)
+  usuario      Usuario      @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+
+  @@unique([id_conversacion, id_usuario])
+  @@index([id_conversacion])
+  @@index([id_usuario])
+  @@map("participantes_conversacion")
+}
+
+// ─────────────────────────────────────────────
+// MENSAJES
+// ─────────────────────────────────────────────
+enum TipoMensaje {
+  texto
+  imagen
+  archivo
+  ubicacion
+}
+
+model Mensaje {
+  id_mensaje        Int         @id @default(autoincrement())
+  id_conversacion   Int
+  id_usuario_emisor Int
+  contenido         String      @db.Text
+  tipo_mensaje      TipoMensaje @default(texto)
+  url_archivo       String?     @db.VarChar(255)
+  fecha_envio       DateTime    @default(now())
+  editado           Boolean     @default(false)
+  fecha_edicion     DateTime?
+
+  // Relaciones
+  conversacion Conversacion @relation(fields: [id_conversacion], references: [id_conversacion], onDelete: Cascade)
+  emisor       Usuario      @relation(fields: [id_usuario_emisor], references: [id_usuario], onDelete: Cascade)
+
+  @@index([id_conversacion, fecha_envio])
+  @@index([id_usuario_emisor])
+  @@map("mensajes")
+}

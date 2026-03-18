@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # ---------------------------------------------------------------------------
+  # Database Service: PostgreSQL
+  # ---------------------------------------------------------------------------
+  db:
+    container_name: spolt-postgres
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: property_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data:rw
+    ports:
+      - '5432:5432'
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d property_db']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Object Storage Service: MinIO
+  # ---------------------------------------------------------------------------
+  minio:
+    container_name: spolt-minio
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+
+    # Port Mappings:
+    # 9000: The S3 API port (used by the application to upload/download files).
+    # 9001: The Web Console port (used by humans to manage buckets via browser).
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Job Queue System: Redis
+  # ---------------------------------------------------------------------------
+  redis:
+    container_name: spolt-redis
+    image: redis:7.2.4-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redisdata:/data # Enables data persistence
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
+  minio_data:
+    driver: local
+  redisdata:
+    driver: local
