@@ -69,8 +69,20 @@
             }
           </div>
 
-          <button type="submit" class="arcade-btn" [disabled]="registerForm.invalid">
-            <span class="btn-text">REGISTRARSE</span>
+          @if (serverError) {
+            <div class="pixel-error" style="margin-bottom: 20px; font-weight: bold;">
+              * ERROR: {{ serverError }}
+            </div>
+          }
+
+          <button type="submit" class="arcade-btn" [disabled]="registerForm.invalid || loading">
+            <span class="btn-text">
+              @if (loading) {
+                CARGANDO...
+              } @else {
+                REGISTRARSE
+              }
+            </span>
           </button>
         </form>
       </div>

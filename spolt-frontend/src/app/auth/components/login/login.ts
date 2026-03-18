@@ -1,4 +1,4 @@
-import { Component, output } from '@angular/core';
+import { Component, output, Input } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService, LoginDto } from '../../services/auth.service';
 
@@ -11,6 +11,8 @@ import { AuthService, LoginDto } from '../../services/auth.service';
 export class Login {
   loginForm: FormGroup;
   message: string = "";
+  @Input() loading = false;
+  @Input() serverError = "";
   public sendLogin = output<LoginDto>();
 
   constructor(
@@ -28,6 +30,8 @@ export class Login {
       this.message = "Please correct all errors and resubmit the form";
       this.loginForm.markAllAsTouched();
     } else {
+      this.message = "";
+      this.serverError = "";
       const loginData: LoginDto = {
         email: this.loginForm.value.email, // Enviamos el campo 'email' que el backend espera
         password: this.loginForm.value.password

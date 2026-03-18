@@ -14,6 +14,7 @@ export class LoginPage {
   private router = inject(Router);
 
   errorMessage = "";
+  loading = signal(false);
   readonly logingSingnal = signal<LoginDto>({ email: "", password: "" }); // Corregido de identifier a email
 
   login(credentials: LoginDto) {
@@ -22,12 +23,14 @@ export class LoginPage {
     // 1. Actualizamos la señal con los datos ingresados
     this.logingSingnal.set(credentials);
     
-    // 2. Limpiamos cualquier error previo
+    // 2. Limpiamos cualquier error previo y activamos carga
     this.errorMessage = "";
+    this.loading.set(true);
 
     // 3. Hacemos la llamada al backend usando los datos puros y nos suscribimos
     this.authService.login(credentials).subscribe({
       next: (response) => {
+        this.loading.set(false);
         console.log('Login exitoso:', response);
         
         // 4. Guardamos los tokens devueltos por la API en el LocalStorage
@@ -39,6 +42,7 @@ export class LoginPage {
         this.router.navigate(['/']); 
       },
       error: (err) => {
+        this.loading.set(false);
         console.error('Error en el login:', err);
         // 6. Capturamos el error y actualizamos la variable para mostrarla en el HTML
         this.errorMessage = err.error?.message || 'Error al iniciar sesión. Comprueba tus datos.';

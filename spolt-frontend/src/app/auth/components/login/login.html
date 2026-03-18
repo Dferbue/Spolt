@@ -32,9 +32,21 @@
           <div class="pixel-error">* MIN 8 CHARS</div>
         }
       </div>
+
+      @if (serverError) {
+        <div class="pixel-error" style="margin-bottom: 20px; font-weight: bold;">
+          * ERROR: {{ serverError }}
+        </div>
+      }
       
-      <button type="submit" class="arcade-btn" [disabled]="loginForm.invalid">
-        <span class="btn-text">INICIAR SESIÓN</span>
+      <button type="submit" class="arcade-btn" [disabled]="loginForm.invalid || loading">
+        <span class="btn-text">
+          @if (loading) {
+            CARGANDO...
+          } @else {
+            INICIAR SESIÓN
+          }
+        </span>
       </button>
     </form>
   </div>

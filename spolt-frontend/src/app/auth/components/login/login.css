@@ -62,7 +62,7 @@ label {
 }
 
 .pixel-error {
-  color: var(--pink);
+  color: var(--red);
   font-size: 8px;
   margin-top: 10px;
 }

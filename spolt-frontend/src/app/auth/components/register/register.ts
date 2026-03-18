@@ -1,4 +1,4 @@
-import { Component, output } from '@angular/core';
+import { Component, output, Input } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService, RegisterDto } from '../../services/auth.service';
 
@@ -11,6 +11,8 @@ import { AuthService, RegisterDto } from '../../services/auth.service';
 export class Register {
   registerForm: FormGroup;
   message:string="";
+  @Input() loading = false;
+  @Input() serverError = "";
   public sendRegister = output<RegisterDto>();
 
   constructor(
@@ -30,6 +32,8 @@ export class Register {
       this.message= "Please correct all errors and resubmit the form";
       this.registerForm.markAllAsTouched(); // Esto hace que todos los mensajes de error aparezcan
     }else{
+      this.message = "";
+      this.serverError = "";
       const register:RegisterDto = this.registerForm.value;
       this.sendRegister.emit(register);
     }

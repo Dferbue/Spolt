@@ -1,12 +1,13 @@
 <div class="page-container">
   <div class="page-header">
     <h1 class="glitch" data-text="CREAR CUENTA">CREAR CUENTA</h1>
-    @if (errorMessage) {
-      <div class="server-error-banner">> ERROR: {{ errorMessage }}</div>
-    }
   </div>
   
   <div class="component-wrapper">
-    <app-register (sendRegister)="register($event)"></app-register>
+    <app-register 
+      (sendRegister)="register($event)" 
+      [loading]="loading()"
+      [serverError]="errorMessage">
+    </app-register>
   </div>
 </div>

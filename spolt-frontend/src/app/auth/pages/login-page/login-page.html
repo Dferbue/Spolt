@@ -4,6 +4,10 @@
   </div>
   
   <div class="component-wrapper">
-    <app-login (sendLogin)="login($event)"></app-login>
+    <app-login 
+      (sendLogin)="login($event)" 
+      [loading]="loading()"
+      [serverError]="errorMessage">
+    </app-login>
   </div>
 </div>
