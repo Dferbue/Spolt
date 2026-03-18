@@ -1,0 +1,41 @@
+<div class="login-box pixel-frame">
+  <h3 class="pixel-title">{{ message }}</h3>
+  
+  <div class="form-container">
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
+      <div class="input-block">
+        <label for="email">> EMAIL_</label>
+        <input 
+          type="email" 
+          id="email"
+          placeholder="ENTER EMAIL"
+          formControlName="email" 
+          class="pixel-input"
+        />
+        @let email = loginForm.get('email');
+        @if (email?.touched && email?.invalid) {
+          <div class="pixel-error">* INVALID EMAIL</div>
+        }
+      </div>
+      
+      <div class="input-block">
+        <label for="password">> PASSWORD_</label>
+        <input 
+          type="password" 
+          id="password"
+          placeholder="********"
+          formControlName="password" 
+          class="pixel-input"
+        />
+        @let password = loginForm.get('password');
+        @if (password?.touched && password?.invalid) {
+          <div class="pixel-error">* MIN 8 CHARS</div>
+        }
+      </div>
+      
+      <button type="submit" class="arcade-btn" [disabled]="loginForm.invalid">
+        <span class="btn-text">INICIAR SESIÓN</span>
+      </button>
+    </form>
+  </div>
+</div>

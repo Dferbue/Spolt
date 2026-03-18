@@ -1,0 +1,297 @@
+.setup-layout {
+    padding: 60px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.header-section {
+    margin-bottom: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.header-box {
+    padding: 15px 50px;
+    display: inline-block;
+    font-size: 24px;
+    background: var(--dark-gray);
+    box-shadow: 0 0 20px rgba(255, 0, 110, 0.2);
+}
+
+.subtitle {
+    color: #888;
+    font-size: 10px;
+    margin-top: 15px;
+    letter-spacing: 2px;
+    max-width: 400px;
+    text-align: center;
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    perspective: 1000px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    justify-content: center;
+}
+
+.step-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 220px;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: slideUp 0.6s ease forwards;
+    animation-delay: calc(var(--i) * 0.15s);
+}
+
+.step-label {
+    font-size: 9px;
+    padding: 6px 18px;
+    margin-bottom: -1px;
+    z-index: 2;
+    background: var(--black);
+    color: var(--white);
+}
+
+.step-label.highlight {
+    background: var(--pink);
+    border-color: var(--white);
+}
+
+.card-body {
+    width: 100%;
+    background: rgba(20, 20, 20, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 40px 20px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    min-height: 280px;
+}
+
+.card-body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--pink), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.step-card:hover .card-body {
+    transform: translateY(-5px) scale(1.02);
+    background: rgba(30, 30, 30, 0.9);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 0, 110, 0.1);
+}
+
+.step-card:hover .card-body::before {
+    opacity: 1;
+}
+
+.icon-container {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+}
+
+.pixel-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+h3 {
+    font-size: 14px;
+    margin-bottom: 15px;
+    color: var(--white);
+    letter-spacing: 1px;
+}
+
+p {
+    font-size: 10px;
+    color: #aaa;
+    line-height: 1.6;
+    max-width: 200px;
+}
+
+.progress-bar {
+    display: flex;
+    gap: 6px;
+    margin-top: 25px;
+}
+
+.segment {
+    width: 12px;
+    height: 12px;
+    border: 1px solid #333;
+    transition: all 0.3s;
+}
+
+.segment.active.profile {
+    background: #00f2ff;
+    border-color: var(--white);
+    box-shadow: 0 0 8px #00f2ff;
+}
+
+.segment.active.calendar {
+    background: #ffaa00;
+    border-color: var(--white);
+    box-shadow: 0 0 8px #ffaa00;
+}
+
+.segment.active.invite {
+    background: #00ff66;
+    border-color: var(--white);
+    box-shadow: 0 0 8px #00ff66;
+}
+
+.segment.active.play {
+    background: #ff0044;
+    border-color: var(--white);
+    box-shadow: 0 0 8px #ff0044;
+}
+
+/* Specific Glow per Icon */
+.icon-container.profile-step {
+    border-bottom: 2px solid #00f2ff;
+}
+
+.icon-container.calendar-step {
+    border-bottom: 2px solid #ffaa00;
+}
+
+.icon-container.invite-step {
+    border-bottom: 2px solid #00ff66;
+}
+
+.icon-container.play-step {
+    border-bottom: 2px solid #ff0044;
+}
+
+.footer-section {
+    margin-top: 60px;
+}
+
+.start-btn {
+    padding: 15px 45px;
+    font-size: 14px;
+    cursor: pointer;
+    background: #ff006e;
+    /* Strong Pink */
+    color: var(--white);
+    border: 3px solid #ff006e;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 0 15px rgba(255, 0, 110, 0.4);
+}
+
+.start-btn:hover {
+    background: #ffb3d1;
+    /* Light Pink */
+    color: #ff006e;
+    /* Text becomes strong pink */
+    border-color: #ffb3d1;
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 0 25px rgba(255, 179, 209, 0.6);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1.1);
+    }
+
+    50% {
+        transform: translateY(-10px) scale(1.2);
+    }
+}
+
+@keyframes flicker {
+
+    0%,
+    18%,
+    22%,
+    25%,
+    53%,
+    57%,
+    100% {
+        opacity: 1;
+    }
+
+    20%,
+    24%,
+    55% {
+        opacity: 0.5;
+    }
+}
+
+@media (max-width: 1100px) {
+    .steps-grid {
+        grid-template-columns: repeat(2, 1fr);
+        width: fit-content;
+        gap: 40px;
+    }
+
+    .step-card {
+        width: 260px;
+    }
+}
+
+@media (max-width: 600px) {
+    .steps-grid {
+        grid-template-columns: 1fr;
+        width: 100%;
+        gap: 30px;
+    }
+
+    .step-card {
+        width: 100%;
+        max-width: 320px;
+        margin: 0 auto;
+    }
+
+    .header-box {
+        font-size: 18px;
+        padding: 10px 30px;
+    }
+
+    .setup-layout {
+        padding: 40px 15px;
+    }
+}

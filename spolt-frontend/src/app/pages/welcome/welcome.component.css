@@ -1,0 +1,18 @@
+.section-wrapper {
+  padding: 40px 0;
+  background-color: var(--bg);
+  color: var(--fg);
+  border-bottom: 4px solid var(--fg);
+  position: relative;
+  z-index: 1;
+}
+
+.hero-wrapper {
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  .section-wrapper {
+    padding: 40px 0;
+  }
+}

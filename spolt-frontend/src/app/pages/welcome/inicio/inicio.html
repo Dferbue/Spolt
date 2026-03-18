@@ -1,0 +1,45 @@
+<div class="hero-container">
+  <div class="bg-slider">
+    @for (bg of backgrounds; track bg; let i = $index) {
+      <div 
+        class="bg-slide" 
+        [class.active]="currentBgIndex === i"
+        [style.backgroundImage]="'url(' + bg + ')'">
+      </div>
+    }
+    <div class="bg-overlay"></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="main-hero pixel-box">
+      <div class="scanlines"></div>
+      <div class="hero-header">
+        <img src="logo/Logo.png" alt="Spolt Logo" class="logo-img">
+        <h1>Spolt</h1>
+      </div>
+      <p class="hero-text">Organiza quedadas deportivas con tus amigos de forma sencilla... <span class="cursor">█</span></p>
+      
+      <div class="hero-actions">
+        <button class="retro-btn" routerLink="/auth/login">
+          <span class="btn-text">INICIAR SESIÓN</span>
+        </button>
+        <button class="retro-btn" routerLink="/auth/register">
+          <span class="btn-text">REGISTRARSE</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="start-text blink">PRESIONA START PARA COMENZAR</div>
+    
+    <div class="pagination">
+      @for (bg of backgrounds; track bg; let i = $index) {
+        <span 
+          class="dot" 
+          [class.active]="currentBgIndex === i"
+          (click)="setBg(i)"
+          [title]="'Cargar fondo ' + (i + 1)">
+        </span>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,108 @@
+.about-container {
+      max-width: 95%;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: transparent;
+      border: none;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .header-box {
+      display: inline-block;
+      padding: 20px 60px;
+      font-size: 22px;
+      letter-spacing: 8px;
+      background: var(--black);
+      color: var(--white);
+      margin-bottom: 20px;
+    }
+
+    .subtitle {
+      font-size: 10px;
+      color: #888;
+      letter-spacing: 2px;
+      margin: 0;
+    }
+
+    .content-split {
+      display: flex;
+      gap: 50px;
+      align-items: center;
+      padding: 40px;
+      background: rgba(10, 10, 10, 0.8);
+      border: 4px solid var(--white);
+    }
+    .image-side {
+      flex: 0 0 480px; /* Increased from 400px */
+      display: flex;
+      justify-content: center;
+    }
+    .text-side { flex: 1.5; text-align: left; }
+
+    .avatar-frame {
+      width: 480px;
+      height: 480px;
+      padding: 10px;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+      margin: 0;
+    }
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+    }
+    .scanlines {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+      opacity: 0.3;
+    }
+
+    .bio-header { margin-bottom: 25px; }
+    .tag { font-size: 10px; color: var(--pink); letter-spacing: 2px; }
+    h2 { font-size: 28px; margin: 10px 0; letter-spacing: 4px; color: var(--white); }
+    .age-badge { 
+      display: inline-block; 
+      padding: 5px 15px; 
+      background: var(--white); 
+      color: var(--black); 
+      font-size: 10px; 
+      font-weight: bold;
+    }
+
+    .bio-content {
+      padding: 20px;
+      background: rgba(0,0,0,0.5);
+      margin-bottom: 25px;
+    }
+    .bio-content p {
+      font-size: 10px;
+      line-height: 1.8;
+      color: #ccc;
+      margin-bottom: 15px;
+      text-transform: none; /* Let the bio be readable */
+    }
+    .bio-content strong { color: var(--pink); }
+
+    .skills-mini { display: flex; gap: 10px; flex-wrap: wrap; }
+    .skill-pill {
+      padding: 6px 12px;
+      border: 2px solid #333;
+      font-size: 8px;
+      color: #888;
+    }
+    
+    @media (max-width: 768px) {
+      .content-split { flex-direction: column; text-align: center; }
+      .text-side { text-align: center; }
+      .skills-mini { justify-content: center; }
+    }

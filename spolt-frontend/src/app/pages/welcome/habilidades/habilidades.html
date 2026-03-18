@@ -1,0 +1,39 @@
+<div class="container">
+      <div class="header-box pixel-frame">
+        HABILIDADES
+      </div>
+      
+      <div class="main-content">
+        <div class="list-side pixel-frame">
+          <p class="section-title">SELECCIONA UNA HABILIDAD</p>
+          <hr>
+          @for (s of skills; track s.name) {
+            <div (click)="selected = s" class="skill-item" [class.active]="selected === s">
+              @if (selected === s) {
+                <span class="cursor">></span>
+              }
+              {{ s.name }} <span>LV.{{ s.lv }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="detail-side pixel-frame">
+          <h3>{{ selected.name }} <span>LV.{{ selected.lv }}</span></h3>
+          <p class="desc">{{ selected.desc }}</p>
+          
+          <div class="stats">
+            <div class="stat-row">
+              <span>PODER</span>
+              <span class="val">{{selected.pwr}}/100</span>
+            </div>
+            <div class="bar"><div class="fill green" [style.width.%]="selected.pwr"></div></div>
+            
+            <div class="stat-row">
+              <span>VELOCIDAD</span>
+              <span class="val">{{selected.vel}}/100</span>
+            </div>
+            <div class="bar"><div class="fill pink" [style.width.%]="selected.vel"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>

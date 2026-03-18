@@ -1,0 +1,38 @@
+<div class="container">
+      <div class="header-box pixel-frame">
+        LISTA DE DEPORTES
+      </div>
+
+      <div class="main-content">
+        <div class="list-side pixel-frame">
+          <p class="section-title">ELIGE DEPORTE</p>
+          <hr>
+          @for (s of sports; track s.name) {
+            <div (click)="activeSport = s" class="sport-item" [class.active]="activeSport === s">
+               <span class="icon">{{ s.icon }}</span>
+               <span class="name">{{ s.name }}</span>
+               @if (activeSport === s) {
+                 <span class="cursor">></span>
+               }
+            </div>
+          }
+        </div>
+
+        <div class="detail-side pixel-frame">
+          <div class="detail-header">
+            <div class="title-info">
+               <h2>{{ activeSport.name }} <span class="id">{{ activeSport.id }}</span></h2>
+               <span class="tag">{{ activeSport.type }}</span>
+            </div>
+          </div>
+
+          <div class="sport-image-container">
+            <img [src]="'sports/' + activeSport.image" [alt]="activeSport.name" class="sport-photo">
+          </div>
+
+          <div class="description-box">
+            {{ activeSport.desc }}
+          </div>
+        </div>
+      </div>
+    </div>

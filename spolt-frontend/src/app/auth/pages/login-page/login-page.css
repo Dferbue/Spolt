@@ -1,0 +1,28 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: var(--black);
+}
+
+.page-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Glitch effect for the page title */
+.glitch {
+  font-size: 24px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--white);
+  letter-spacing: 4px;
+}
+
+.component-wrapper {
+  width: 100%;
+  max-width: 500px;
+}

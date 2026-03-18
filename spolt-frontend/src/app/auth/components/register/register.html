@@ -1,0 +1,83 @@
+<div class="register-box pixel-frame">
+  <div class="registration-layout">
+    <div class="form-content">
+      <h3 class="pixel-title">{{ message }}</h3>
+      
+      <div class="form-container">
+        <form (ngSubmit)="register()" [formGroup]="registerForm">
+          
+          <div class="input-block">
+            <label for="nombre_usuario">> USERNAME_</label>
+            <input
+              type="text"
+              placeholder="ENTER USERNAME"
+              id="nombre_usuario"
+              formControlName="nombre_usuario"
+              class="pixel-input"
+              required
+            />
+            @let nombre_usuario = registerForm.get('nombre_usuario');
+            @if (nombre_usuario?.touched && nombre_usuario?.invalid) {
+              <div class="pixel-error">* REQUIRED</div>
+            }
+          </div>
+
+          <div class="input-block">
+            <label for="email">> EMAIL_</label>
+            <input
+              type="email"
+              placeholder="ENTER EMAIL"
+              id="email"
+              formControlName="email"
+              class="pixel-input"
+              required
+            />
+            @let email = registerForm.get('email');
+            @if (email?.touched && email?.invalid) {
+              <div class="pixel-error">* INVALID EMAIL</div>
+            }
+          </div>
+
+          <div class="input-block">
+            <label for="password">> PASSWORD_</label>
+            <input
+              type="password"
+              placeholder="********"
+              id="password"
+              formControlName="password"
+              class="pixel-input"
+              required
+            />
+            @let password = registerForm.get('password');
+            @if (password?.touched && password?.invalid) {
+              <div class="pixel-error">* MIN 8 CHARS</div>
+            }
+          </div>
+
+          <div class="input-block">
+            <label for="fecha_nacimiento">> BIRTHDATE_</label>
+            <input
+              type="date"
+              id="fecha_nacimiento"
+              formControlName="fecha_nacimiento"
+              class="pixel-input"
+              required
+            />
+            @let fecha_nacimiento = registerForm.get('fecha_nacimiento');
+            @if (fecha_nacimiento?.touched && fecha_nacimiento?.invalid) {
+              <div class="pixel-error">* REQUIRED</div>
+            }
+          </div>
+
+          <button type="submit" class="arcade-btn" [disabled]="registerForm.invalid">
+            <span class="btn-text">REGISTRARSE</span>
+          </button>
+        </form>
+      </div>
+    </div>
+    
+    <div class="art-content">
+      <img src="sports/registration_art.png" alt="Registration Art" class="internal-art">
+    </div>
+  </div>
+</div>
