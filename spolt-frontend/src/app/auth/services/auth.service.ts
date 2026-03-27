@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, shareReplay } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface LoginDto {
@@ -29,12 +29,25 @@ export class AuthService {
   }
 
   logout(): Observable<{ message: string }> {
+    this.profile$ = null;
     this.clearTokens();
     return this.http.post<{ message: string }>(`${this.apiUrl}/logout`, {});
   }
 
+  private profile$: Observable<any> | null = null;
+
   getProfile(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/profile`);
+    if (!this.profile$) {
+      this.profile$ = this.http.get(`${this.apiUrl}/profile`).pipe(
+        shareReplay(1)
+      );
+    }
+    return this.profile$;
+  }
+
+  // Método para forzar la recarga (útil después de editar el perfil)
+  refreshProfile(): void {
+    this.profile$ = null;
   }
 
   refreshTokens(): Observable<{ accessToken: string, refreshToken: string }> {

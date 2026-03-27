@@ -8,11 +8,12 @@
 
 .register-box {
   width: 100%;
-  max-width: 1100px; /* Increased width percentage/absolute max */
-  background: var(--black);
-  padding: 50px; /* Slightly more padding for the larger box */
-  border: 4px solid var(--white);
-  box-shadow: 12px 12px 0 var(--black), 18px 18px 0 var(--pink);
+  max-width: 1100px;
+  background: var(--bg-dark);
+  padding: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .registration-layout {
@@ -27,7 +28,7 @@
 }
 
 .art-content {
-  flex: 1.2; /* Give more space to the image */
+  flex: 1.2;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -36,19 +37,19 @@
 
 .internal-art {
   width: 100%;
-  max-width: 550px; /* Significantly larger image */
+  max-width: 550px;
   height: auto;
-  image-rendering: pixelated;
-  border: 4px solid var(--white);
-  /* box-shadow removed as requested */
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .pixel-title {
   text-align: center;
-  color: var(--pink);
-  font-size: 20px;
+  color: var(--white);
+  font-size: 24px;
+  font-weight: 600;
   margin-bottom: 40px;
-  letter-spacing: 2px;
+  letter-spacing: normal;
 }
 
 .form-container {
@@ -57,36 +58,38 @@
 }
 
 .input-block {
-  margin-bottom: 25px;
+  margin-bottom: 24px;
 }
 
 label {
   display: block;
-  font-size: 13px;
-  color: var(--white);
-  margin-bottom: 12px;
-  letter-spacing: 1px;
+  font-size: 14px;
+  color: white;
+  margin-bottom: 8px;
+  font-weight: 500;
 }
 
 .pixel-input {
   width: 100%;
-  background: #111;
-  border: 3px solid var(--white);
-  padding: 18px;
+  background: var(--black);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 14px 16px;
   color: var(--white);
-  font-family: var(--font-pixel);
-  font-size: 14px;
+  font-family: var(--font-main);
+  font-size: 15px;
   box-sizing: border-box;
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .pixel-input:focus {
   border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
 .pixel-input::placeholder {
-  color: #444;
+  color: #555;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
@@ -95,43 +98,45 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .pixel-error {
-  color: var(--red);
-  font-size: 8px;
-  margin-top: 10px;
+  color: #ef4444; /* minimalist red */
+  font-size: 13px;
+  margin-top: 8px;
 }
 
 .arcade-btn {
   width: 100%;
   position: relative;
   background: var(--pink);
-  border: 4px solid var(--black);
-  padding: 15px;
+  border: none;
+  border-radius: 6px;
+  padding: 14px;
   cursor: pointer;
-  box-shadow: 4px 4px 0px var(--white);
-  transition: all 0.1s;
+  transition: all 0.2s ease;
   outline: none;
   margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .arcade-btn .btn-text {
   color: var(--white);
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .arcade-btn:hover:not([disabled]) {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px var(--white);
+  background: #0d9668;
+  transform: translateY(-1px);
 }
 
 .arcade-btn:active:not([disabled]) {
-  transform: translate(4px, 4px);
-  box-shadow: 0px 0px 0px var(--white);
+  transform: translateY(0);
 }
 
 .arcade-btn[disabled] {
   background: #333;
-  box-shadow: 4px 4px 0px #111;
+  color: #888;
   cursor: not-allowed;
   opacity: 0.7;
 }
@@ -144,7 +149,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
   
   .art-content {
-    order: -1; /* Image on top in mobile */
+    order: -1;
   }
 
   .internal-art {

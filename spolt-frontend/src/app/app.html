@@ -1,5 +1,9 @@
-<app-header class="theme-dark"></app-header>
+@if (showGlobalLayout) {
+  <app-header class="theme-dark"></app-header>
+}
 
 <router-outlet></router-outlet>
 
-<app-footer class="theme-dark"></app-footer>
+@if (showGlobalLayout) {
+  <app-footer class="theme-dark"></app-footer>
+}

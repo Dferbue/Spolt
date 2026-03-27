@@ -1,26 +1,236 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { throwStatement } from '@babel/types';
 
 @Injectable()
 export class EventsService {
-  create(createEventDto: CreateEventDto) {
-    return 'This action adds a new event';
+  constructor(private prisma:PrismaService){}
+
+
+  //Funcion que crea el evento
+  create(createEventDto: CreateEventDto, id_creador: number) {
+    return this.prisma.eventoDeportivo.create({
+      data: {
+        ...createEventDto,
+        id_creador,
+      },
+    });
   }
 
+
+  //Nos trameos todos los eventos deportivos que existen , depues lo borraremos esto solo es para el desarrollo
   findAll() {
-    return `This action returns all events`;
+    return this.prisma.eventoDeportivo.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} event`;
+
+  //Creamos una funcion que nos traiga los eventos que ha creado ese usuario
+  findYoursEvents(idUser: number) {
+    return this.prisma.eventoDeportivo.findMany({
+      where:{
+        id_creador:idUser
+      }
+    });
   }
 
+  //Traer todos los evetos publicos (este tendra que tener un filtro por cercania)
+
+  //Traer los eventos de los amigos del usuario
+  async findEventsFriends(id_usuario: number) {
+    // Obtener las amistades del usuario
+    const amistades = await this.prisma.amistad.findMany({
+      where: {
+        OR: [
+          { id_usuario_solicitante: id_usuario },
+          { id_usuario_receptor: id_usuario },
+        ],
+        estado: 'aceptada',
+      },
+    });
+
+    // Extraer los IDs de los amigos 
+    const amigosIds = amistades.map(a => 
+      a.id_usuario_solicitante === id_usuario ? a.id_usuario_receptor : a.id_usuario_solicitante
+    );
+
+    //Si no tiene amigos devolvemos un array vacio
+    if (amigosIds.length === 0) return []; 
+
+    // Buscar eventos creados por esos amigos
+    return await this.prisma.eventoDeportivo.findMany({
+      where: {
+        id_creador: { in: amigosIds },
+        estado: 'abierto', 
+      },
+      include: {
+        creador: {
+          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true }
+        },
+        deporte: true
+      },
+      orderBy: {
+        fecha_evento: 'asc' 
+      }
+    });
+  }
+
+
+  //Metodo que actualiza los datos del evemto por si el usuario quiere hacer algun cambio 
   update(id: number, updateEventDto: UpdateEventDto) {
-    return `This action updates a #${id} event`;
+    return this.prisma.eventoDeportivo.update({
+      where:{
+        id_evento:id
+      },
+      data:updateEventDto
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} event`;
+  //Funcion que elimina el evento
+  remove(idEvento: number) {
+    return this.prisma.eventoDeportivo.delete({
+      where:{
+        id_evento:idEvento
+      }
+    });
+  }
+
+  //Metodo por el cual te metes en un evento
+  async unirseEvento(id_usuario: number, id_evento: number) {
+    // Buscamos el evento
+    const evento = await this.prisma.eventoDeportivo.findUnique({
+      where: { id_evento },
+    });
+
+    if (!evento) {
+      throw new NotFoundException('El evento no existe');
+    }
+
+    // Comprobamos que el evento esté abierto
+    if (evento.estado !== 'abierto') {
+      throw new BadRequestException('El evento no está abierto para nuevos participantes');
+    }
+
+    // Comprobamos la gente que hay 
+    if (evento.numero_participantes_actuales >= evento.numero_max_participantes) {
+      throw new ConflictException('El evento ya está lleno');
+    }
+
+    // Verificamos que el usuario no esté ya apuntado
+    const participacionExistente = await this.prisma.participanteEvento.findUnique({
+      where: {
+        id_evento_id_usuario: {
+          id_evento,
+          id_usuario,
+        },
+      },
+    });
+
+    if (participacionExistente) {
+      throw new ConflictException('Ya estás participando o tienes una solicitud pendiente para este evento');
+    }
+
+    // Usamos una Transacción para asegurar la consistencia de los datos
+    return await this.prisma.$transaction(async (tx) => {
+      // Condición de carrera: Volvemos a comprobar el cupo por si alguien más ocupó la plaza en los últimos milisegundos
+      const eventoActual = await tx.eventoDeportivo.findUnique({
+        where: { id_evento },
+      });
+
+      if (!eventoActual) {
+        throw new NotFoundException('El evento ya no existe');
+      }
+
+      if (eventoActual.numero_participantes_actuales >= eventoActual.numero_max_participantes) {
+        throw new ConflictException('El evento se acaba de llenar');
+      }
+
+      // Añadimos al usuario como participante (lo dejamos confirmado directamente)
+      const nuevaParticipacion = await tx.participanteEvento.create({
+        data: {
+          id_evento,
+          id_usuario,
+          estado: 'confirmado', // Cambia a 'pendiente' si el creador debe aceptar la solicitud
+        },
+      });
+
+      // Sumamos 1 al contador de participantes del evento
+      await tx.eventoDeportivo.update({
+        where: { id_evento },
+        data: {
+          numero_participantes_actuales: {
+            increment: 1,
+          },
+        },
+      });
+
+      return nuevaParticipacion;
+    });
+  }
+
+  //Creamos la funcion para abandonar el evento
+  async salirEvento(id_usuario:number,id_evento:number){
+    //Encontramos el evento
+    const evento= await this.prisma.eventoDeportivo.findUnique({
+      where:{
+        id_evento:id_evento
+      }
+    });
+
+    //Hacemos las comporbaciones
+    if(!evento){
+      throw new NotFoundException("Este evento no existe");
+    }
+    if(evento.estado==="cerrado"){
+      throw new BadRequestException("Este evento ya ha terminado");
+    }
+    return await this.prisma.$transaction(async (tx) => {
+      // Condición de carrera: Volvemos a comprobar si el registro sigue ahí 
+      // dentro de la transacción por si hizo doble click súper rápido.
+      const participacion = await tx.participanteEvento.findUnique({
+        where: {
+          id_evento_id_usuario: {
+            id_evento: id_evento,
+            id_usuario: id_usuario
+          }
+        }
+      });
+
+      if (!participacion) {
+        throw new ConflictException("No estás participando en este evento o ya te habías salido");
+      }
+
+      // Eliminamos su participación físicamente de la base de datos
+      await tx.participanteEvento.delete({
+        where: { id_participacion: participacion.id_participacion }
+      });
+
+      // Restamos 1 al número de participantes actuales de forma segura
+      const eventoActualizado = await tx.eventoDeportivo.update({
+        where: { id_evento: id_evento },
+        data: {
+          numero_participantes_actuales: {
+            decrement: 1
+          }
+        }
+      });
+
+      // Devolvemos el evento con el aforo actualizado
+      return eventoActualizado;
+    });
+  }
+
+  //Nos traemos los eventos en los que estas dentro
+  async eventosParticipante(id_usuario:number){
+    return await this.prisma.eventoDeportivo.findMany({
+      where: {
+        participantes: {
+          some: {
+            id_usuario: id_usuario
+          }
+        }
+      }
+    });
   }
 }

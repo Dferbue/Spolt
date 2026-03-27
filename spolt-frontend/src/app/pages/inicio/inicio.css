@@ -1,0 +1,134 @@
+.inicio-layout {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    background-color: #050505;
+    color: var(--white, #ffffff);
+    overflow: hidden;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Contenido Principal */
+.page-content {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background-color: #ffffff;
+}
+
+.content-wrapper {
+    width: 100%;
+    max-width: 1000px;
+    background: #ffffff;
+    padding: 60px;
+    position: relative;
+    color: #1a1a1a;
+}
+
+.welcome-title {
+    font-size: 48px;
+    font-weight: 900;
+    margin-bottom: 10px;
+    letter-spacing: -2px;
+    color: #000000;
+}
+
+.subtitle {
+    color: #666666;
+    font-size: 18px;
+    margin-bottom: 50px;
+    max-width: 600px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+}
+
+.stat-card {
+    background: #f9f9f9;
+    border: 1px solid #eeeeee;
+    padding: 30px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    border-color: var(--pink, #ff2a5f);
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transform: translateY(-5px);
+}
+
+.stat-card .label {
+    font-size: 11px;
+    color: #999;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+}
+
+.stat-card .value {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1a1a1a;
+}
+
+/* Reutilización de animaciones y estilos de welcome */
+.blink {
+    animation: blinker 1.5s linear infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0.3;
+    }
+}
+
+.pixel-box {
+    border: 1px solid #eeeeee;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom,
+            rgba(0, 0, 0, 0),
+            rgba(0, 0, 0, 0) 50%,
+            rgba(0, 0, 0, 0.02) 50%,
+            rgba(0, 0, 0, 0.02));
+    background-size: 100% 4px;
+    z-index: 1;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    .inicio-layout {
+        flex-direction: column;
+    }
+
+    .page-content {
+        padding: 20px;
+    }
+
+    .welcome-title {
+        font-size: 32px;
+    }
+}

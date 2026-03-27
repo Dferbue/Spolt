@@ -23,7 +23,7 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private usersService: UsersService,
-  ) {}
+  ) { }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -33,7 +33,10 @@ export class AuthController {
   ) {
     const tokens = await this.authService.login(loginDto);
     this.setCookies(res, tokens);
-    return { message: 'Logged in successfully' };
+    return {
+      message: 'Logged in successfully',
+      ...tokens
+    };
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -57,7 +60,10 @@ export class AuthController {
     const refreshToken = req.user['refreshToken'];
     const tokens = await this.authService.refreshTokens(userId, refreshToken);
     this.setCookies(res, tokens);
-    return { message: 'Tokens refreshed' };
+    return {
+      message: 'Tokens refreshed',
+      ...tokens
+    };
   }
 
   private setCookies(
@@ -83,8 +89,8 @@ export class AuthController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
-  @HttpCode(HttpStatus.OK)
   async getUserProfile(@Req() req: any) {
-    return { user: req.user };
+    const user = await this.usersService.findById(req.user.id_usuario);
+    return user; // Devuelve el usuario completo sin envolver
   }
 }

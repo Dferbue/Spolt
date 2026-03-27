@@ -16,12 +16,7 @@ export class SportsController {
   findAll() {
     return this.sportsService.findAll();
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.sportsService.findOne(+id);
-  }
-
+  
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSportDto: UpdateSportDto) {
     return this.sportsService.update(+id, updateSportDto);

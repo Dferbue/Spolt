@@ -43,42 +43,6 @@ model Usuario {
 }
 
 // ─────────────────────────────────────────────
-// PUBLICACIONES
-// ─────────────────────────────────────────────
-/*model Publicacion {
-  id_publicacion  Int       @id @default(autoincrement())
-  id_usuario      Int
-  descripcion     String?   @db.Text
-  fecha_creacion  DateTime  @default(now())
-  numero_likes    Int       @default(0)
-  activo          Boolean   @default(true)
-
-  // Relaciones
-  usuario   Usuario               @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
-  imagenes  ImagenPublicacion[]
-
-  @@index([id_usuario, fecha_creacion])
-  @@map("publicaciones")
-}*/
-
-// ─────────────────────────────────────────────
-// IMÁGENES DE PUBLICACIONES
-// ─────────────────────────────────────────────
-/*model ImagenPublicacion {
-  id_imagen      Int      @id @default(autoincrement())
-  id_publicacion Int
-  url_imagen     String   @db.VarChar(255)
-  orden          Int?     @db.SmallInt // 1-9
-  fecha_subida   DateTime @default(now())
-
-  // Relaciones
-  publicacion Publicacion @relation(fields: [id_publicacion], references: [id_publicacion], onDelete: Cascade)
-
-  @@index([id_publicacion])
-  @@map("imagenes_publicacion")
-}*/
-
-// ─────────────────────────────────────────────
 // AMISTADES
 // ─────────────────────────────────────────────
 enum EstadoAmistad {

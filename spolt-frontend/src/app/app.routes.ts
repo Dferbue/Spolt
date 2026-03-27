@@ -8,9 +8,27 @@ export const routes: Routes = [
       .then(m => m.WelcomeComponent)
   },
   {
-    path: 'dashboard', // Moved Dashboard to its own route
-    loadComponent: () => import('./pages/dashboard/dashboard.component')
-      .then(m => m.DashboardComponent),
+    path: 'inicio', // Updated from dashboard
+    loadComponent: () => import('./pages/inicio/inicio')
+      .then(m => m.Inicio),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'eventos',
+    loadComponent: () => import('./pages/eventos/eventos')
+      .then(m => m.Eventos),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'amigos',
+    loadComponent: () => import('./pages/amigos/amigos')
+      .then(m => m.Amigos),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'perfil',
+    loadComponent: () => import('./pages/perfil/perfil')
+      .then(m => m.Perfil),
     canActivate: [authGuard]
   },
   {

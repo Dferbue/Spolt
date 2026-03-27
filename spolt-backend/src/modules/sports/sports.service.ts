@@ -1,26 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { CreateSportDto } from './dto/create-sport.dto';
 import { UpdateSportDto } from './dto/update-sport.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class SportsService {
+
+  constructor(private prisma:PrismaService){}
+
   create(createSportDto: CreateSportDto) {
-    return 'This action adds a new sport';
+    return this.prisma.deporte.create({ data: createSportDto });
   }
 
   findAll() {
-    return `This action returns all sports`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} sport`;
+    return this.prisma.deporte.findMany();
   }
 
   update(id: number, updateSportDto: UpdateSportDto) {
-    return `This action updates a #${id} sport`;
+    return this.prisma.deporte.update({
+      where: { id_deporte :id},
+      data: updateSportDto,
+    });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} sport`;
+    return this.prisma.deporte.delete({
+      where: { id_deporte:id },
+    });
   }
 }

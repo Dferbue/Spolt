@@ -1,15 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 
 @Controller('events')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(private readonly eventsService: EventsService) { }
 
+  //Crear eventos
+  @UseGuards(AuthGuard('jwt'))
   @Post()
-  create(@Body() createEventDto: CreateEventDto) {
-    return this.eventsService.create(createEventDto);
+  create(@Body() createEventDto: CreateEventDto, @Req() req: any) {
+    const userId = req.user.id_usuario || req.user['userId'];
+    return this.eventsService.create(createEventDto, Number(userId));
   }
 
   @Get()
@@ -17,18 +21,59 @@ export class EventsController {
     return this.eventsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.eventsService.findOne(+id);
+  //Eventos de amgos
+  @UseGuards(AuthGuard('jwt'))
+  @Get('friends')
+  findFriendsEvents(@Req() req: any) {
+    // Utilizamos el ID del usuario. (Compatibilidad con id_usuario o userId según lo tuvieras en el token)
+    const userId = req.user.id_usuario || req.user['userId'];
+    return this.eventsService.findEventsFriends(Number(userId));
   }
 
+
+  //Tus propios eventos
+  @UseGuards(AuthGuard('jwt'))
+  @Get('my-events')
+  findYoursEvents(@Req() req: any) {
+    const userId = req.user.id_usuario || req.user['userId'];
+    return this.eventsService.findYoursEvents(Number(userId));
+  }
+
+
+  //Unirse a eventos
+  @UseGuards(AuthGuard('jwt'))
+  @Post(':id/join')
+  unirseEvento(@Param('id') id: string, @Req() req: any) {
+    const userId = req.user.id_usuario || req.user['userId'];
+    return this.eventsService.unirseEvento(Number(userId), +id);
+  }
+
+
+  //Salir de eventos
+  @UseGuards(AuthGuard('jwt'))
+  @Delete(':id/leave')
+  salirEvento(@Param('id') id: string, @Req() req: any) {
+    const userId = req.user.id_usuario || req.user['userId'];
+    return this.eventsService.salirEvento(Number(userId), +id);
+  }
+
+  //Actulizar eventos
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
     return this.eventsService.update(+id, updateEventDto);
   }
 
+  //Eliminar evemto
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.eventsService.remove(+id);
+  }
+
+  //Eventos en los que tu estas dentro
+  @UseGuards(AuthGuard('jwt')) 
+  @Get("/participante")
+  async participanteEvento(@Req() req:any){
+    const userId = req.user.id_usuario || req.user['userId'];
+    return await this.eventsService.eventosParticipante(Number(userId));
   }
 }

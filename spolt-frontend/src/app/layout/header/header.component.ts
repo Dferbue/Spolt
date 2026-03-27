@@ -59,8 +59,9 @@ import { RouterModule, Router } from '@angular/router';
       left: 0;
       width: 100%;
       min-height: 90px;
-      background: var(--black);
-      border-bottom: 6px solid var(--white);
+      background: rgba(10, 10, 10, 0.95);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
       z-index: 1000;
       box-sizing: border-box;
     }
@@ -73,8 +74,8 @@ import { RouterModule, Router } from '@angular/router';
     }
 
     .logo { display: flex; align-items: center; gap: 15px; }
-    .logo-img { height: 45px; width: auto; image-rendering: pixelated; }
-    .logo .text { font-size: 20px; color: var(--pink); letter-spacing: 3px; font-weight: bold; }
+    .logo-img { height: 45px; width: auto; }
+    .logo .text { font-size: 20px; color: var(--pink); letter-spacing: 3px; font-weight: 800; }
     
     .menu-toggle {
       display: none;
@@ -130,30 +131,28 @@ import { RouterModule, Router } from '@angular/router';
     
     .retro-btn {
       position: relative;
-      background: #ff006e;
-      border: 4px solid #000;
-      padding: 8px 18px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: var(--border-radius);
+      padding: 12px 24px;
       cursor: pointer;
-      box-shadow: 3px 3px 0px #880044, 5px 5px 0px #000;
-      transition: all 0.1s;
+      transition: all 0.3s ease;
       outline: none;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
-    .retro-btn::before { content: '>'; font-size: 10px; opacity: 0; transition: opacity 0.2s; color: var(--white); }
-    .btn-text { color: var(--white); font-size: 11px; letter-spacing: 1px; font-weight: bold; }
+    .btn-text { color: var(--white); font-size: 13px; letter-spacing: 1px; font-weight: 600; transition: color 0.3s ease; }
 
-    .retro-btn:hover { background: #ff4d94; transform: translate(-1px, -1px); box-shadow: 3px 3px 0px #880044, 5px 5px 0px #000; }
-    .retro-btn:hover::before { opacity: 1; }
-    .retro-btn:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px #000; background: #880044; }
+    .retro-btn:hover { background: rgba(255,255,255,0.05); border-color: var(--pink); }
+    .retro-btn:hover .btn-text { color: var(--pink); }
+    .retro-btn:active { transform: scale(0.98); }
 
-    .register-btn { background: var(--white); border-color: #000; box-shadow: 3px 3px 0px #ccc, 5px 5px 0px #000; }
+    .register-btn { background: var(--white); border-color: var(--white); }
     .register-btn .btn-text { color: var(--black); }
-    .register-btn:hover { background: #f0f0f0; box-shadow: 4px 4px 0px #ccc, 6px 6px 0px #000; }
-    .register-btn:hover .btn-text { color: #ff006e; }
-    .register-btn::before { color: #ff006e; }
+    .register-btn:hover { background: transparent; }
+    .register-btn:hover .btn-text { color: var(--pink); }
 
     @media (max-width: 1024px) {
       .pixel-header { padding: 10px 15px; }
@@ -185,7 +184,7 @@ import { RouterModule, Router } from '@angular/router';
 
       nav.open {
         height: calc(100vh - 90px);
-        border-bottom: 6px solid var(--white);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
       }
 
       .nav-links {

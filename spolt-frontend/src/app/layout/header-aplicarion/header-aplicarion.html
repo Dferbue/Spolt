@@ -1,0 +1,13 @@
+<header class="inicio-header">
+  <div class="header-breadcrumb">
+    <span class="path">> SISTEMA / {{ pageName }}</span>
+  </div>
+  
+  <div class="header-user">
+    <span class="user-status blink">● ONLINE</span>
+    <span class="user-name">{{ (user$ | async)?.nombre_usuario || 'Cargando...' }}</span>
+    <div routerLink="/perfil" class="user-avatar">
+      <img src="logo/Logo.png" alt="User">
+    </div>
+  </div>
+</header>

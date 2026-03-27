@@ -1,0 +1,116 @@
+.sidebar-container {
+    position: relative;
+    height: 100vh;
+    width: 260px;
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 20px;
+    overflow: hidden;
+    z-index: 100;
+}
+
+.scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0),
+        rgba(255,255,255,0) 50%,
+        rgba(0,0,0,0.1) 50%,
+        rgba(0,0,0,0.1)
+    );
+    background-size: 100% 4px;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.sidebar-header {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.logo-img {
+    height: 48px;
+    width: auto;
+}
+
+.brand-name {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin: 0;
+    color: var(--white, #ffffff);
+}
+
+.sidebar-nav {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+}
+
+.retro-btn {
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+.btn-text {
+    font-size: 15px;
+    letter-spacing: 0.5px;
+}
+
+.nav-link.retro-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    justify-content: flex-start;
+    padding: 14px 20px;
+    text-decoration: none;
+    color: var(--white, #ffffff);
+    transition: all 0.2s ease;
+}
+
+.nav-link.retro-btn:hover,
+.nav-link.retro-btn.active {
+    background: var(--pink, #ff2a5f);
+    border-color: var(--pink, #ff2a5f);
+    transform: translateX(4px);
+}
+
+.sidebar-footer {
+    position: relative;
+    z-index: 2;
+    margin-top: auto;
+    padding-top: 20px;
+    padding-bottom: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logout-btn {
+    width: 100%;
+    background: transparent;
+    color: #a3a3a3;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    justify-content: center;
+    padding: 12px;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: rgba(194, 12, 12, 0.863);
+    color: var(--white, #ffffff);
+}
