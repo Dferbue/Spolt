@@ -19,9 +19,21 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get(':id')
+  @Get("perfil")
+  findPerfil(@Req() req:any) {
+    return this.usersService.findPerfil(req.user.id_usuario);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get(":id")
   findOne(@Req() req:any) {
     return this.usersService.findOne(req.user.id_usuario);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('update')
+  updatePerfil(@Req() req: any, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(req.user.id_usuario, updateUserDto);
   }
 
   @UseGuards(AuthGuard('jwt'))

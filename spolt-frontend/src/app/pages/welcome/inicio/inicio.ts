@@ -10,9 +10,9 @@ import { RouterModule } from '@angular/router';
 })
 export class Inicio {
   backgrounds = [
-    '/hero-bg/soccer.png',
-    '/hero-bg/basket.png',
-    '/hero-bg/tennis.png'
+    '/welcome/hero-bg/soccer.png',
+    '/welcome/hero-bg/basket.png',
+    '/welcome/hero-bg/tennis.png'
   ];
   currentBgIndex = 0;
   private intervalId: any;

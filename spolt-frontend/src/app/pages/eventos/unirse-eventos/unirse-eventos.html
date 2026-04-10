@@ -1,0 +1,169 @@
+<div class="page-content" style="padding-top: 0;">
+  <div class="header-actions" style="margin-bottom: 2rem; justify-content: flex-start; margin-top: -1rem; min-height: 50px;">
+    <button class="btn-filtros" (click)="abrirFiltros()">
+      <span>⚙ FILTROS</span>
+      @if (filtrosActivos() > 0) {
+        <span class="filtro-badge">{{ filtrosActivos() }}</span>
+      }
+    </button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab" [class.active]="tabActiva() === 'public'" (click)="mostrar('public')">
+      <h2>Públicos</h2>
+    </div>
+    <div class="tab" [class.active]="tabActiva() === 'amigos'" (click)="mostrar('amigos')">
+      <h2>Tus Amigos</h2>
+    </div>
+    <div class="tab" [class.active]="tabActiva() === 'unidos'" (click)="mostrar('unidos')">
+      <h2>Unidos</h2>
+    </div>
+  </div>
+
+  @switch (tabActiva()) {
+    @case ("public") {
+      <div class="status-info">
+        <div class="dot"></div>
+        <span>Eventos Públicos Disponibles</span>
+      </div>
+      @if (listaEventos(); as events) {
+        @if (events.length > 0) {
+          <app-list-events [listEvents]="events" [joinedEventsId]="joinedIds()" (output_Id_Event)="selectFuntion($event)"></app-list-events>
+        } @else {
+          <div class="no-data">
+            <p>CONEXIÓN FALLIDA: CERO EVENTOS ENCONTRADOS</p>
+          </div>
+        }
+      } @else {
+        <div class="loading-screen">
+          <p class="blink">> ESCANEANDO RED...</p>
+        </div>
+      }
+    }
+
+    @case ("amigos") {
+      <div class="status-info">
+        <div class="dot"></div>
+        <span>Eventos de Tus Amigos</span>
+      </div>
+      @if (listEventosAmigos(); as friendEvents) {
+        @if (friendEvents.length > 0) {
+          <app-list-events [listEvents]="friendEvents" [joinedEventsId]="joinedIds()" (output_Id_Event)="selectFuntion($event)"></app-list-events>
+        } @else {
+          <div class="no-data">
+            <p>CONEXIÓN FALLIDA: CERO EVENTOS ENCONTRADOS en tu red cercana</p>
+          </div>
+        }
+      } @else {
+        <div class="loading-screen">
+          <p class="blink">> ESTABLECIENDO CONEXIÓN SEGURA...</p>
+        </div>
+      }
+    }
+
+    @case ("unidos") {
+      <div class="status-info">
+        <div class="dot"></div>
+        <span>Eventos a los que te has unido</span>
+      </div>
+      @if (lisEventosEnLosQueParticipamos(); as unidosEvents) {
+        @if (unidosEvents.length > 0) {
+          <app-list-events [listEvents]="unidosEvents" [joinedEventsId]="joinedIds()" (output_Id_Event)="selectFuntion($event)"></app-list-events>
+        } @else {
+          <div class="no-data">
+            <p>AÚN NO ESTÁS UNIDO A NINGÚN EVENTO</p>
+          </div>
+        }
+      } @else {
+        <div class="loading-screen">
+          <p class="blink">> ACCEDIENDO A TUS MEMORIAS...</p>
+        </div>
+      }
+    }
+  }
+
+  @if (mensajeEnvio()) {
+    <div class="mensaje-envio">{{ mensajeEnvio() }}</div>
+  }
+
+  @if (mostrarModalSalir()) {
+    <div class="modal-overlay">
+      <div class="modal-content">
+        <h3>¿Confirmar salida?</h3>
+        <p>¿Estás seguro de que quieres salir de este evento?</p>
+        <div class="modal-actions">
+          <button class="btn-cancel" (click)="cerrarModalSalir()">Cancelar</button>
+          <button class="btn-confirm" (click)="confirmarSalirEvent()">Sí, salir</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL DE FILTROS -->
+  @if (mostrarVentanaDeFiltros()) {
+    <div class="modal-overlay" (click)="cerrarFiltros()">
+      <div class="filtros-panel" (click)="$event.stopPropagation()">
+        <div class="filtros-header">
+          <h3>⚙ Filtros</h3>
+          <button class="filtros-close" (click)="cerrarFiltros()">✕</button>
+        </div>
+
+        <div class="filtros-body">
+          <!-- Búsqueda por texto -->
+          <div class="filtro-group">
+            <label class="filtro-label">Buscar</label>
+            <input type="text" class="filtro-input" placeholder="Título, ubicación, descripción..." [value]="filtroBusqueda()" (input)="filtroBusqueda.set($any($event.target).value)">
+          </div>
+
+          <!-- Tipo de deporte -->
+          <div class="filtro-group">
+            <label class="filtro-label">Deporte</label>
+            <select class="filtro-select" [value]="filtroDeporte() || ''" (change)="filtroDeporte.set($any($event.target).value ? +$any($event.target).value : null)">
+              <option value="">Todos los deportes</option>
+              @for (d of listaDeportes(); track d.id_deporte) {
+                <option [value]="d.id_deporte">{{ d.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Tipo de evento -->
+          <div class="filtro-group">
+            <label class="filtro-label">Tipo de Evento</label>
+            <select class="filtro-select" [value]="filtroTipoEvento()" (change)="filtroTipoEvento.set($any($event.target).value)">
+              <option value="">Todos</option>
+              <option value="partido">Partido</option>
+              <option value="torneo">Torneo</option>
+            </select>
+          </div>
+
+          <!-- Plazas libres -->
+          <div class="filtro-group filtro-checkbox-group">
+            <label class="filtro-checkbox-label">
+              <input type="checkbox" [checked]="filtroPlazasLibres()" (change)="filtroPlazasLibres.set($any($event.target).checked)">
+              <span>Solo con plazas libres</span>
+            </label>
+          </div>
+
+          <!-- Fecha desde -->
+          <div class="filtro-group">
+            <label class="filtro-label">Fecha desde</label>
+            <input type="date" class="filtro-input" [value]="filtroFechaDesde()" (change)="filtroFechaDesde.set($any($event.target).value)">
+          </div>
+
+          <!-- Fecha hasta -->
+          <div class="filtro-group">
+            <label class="filtro-label">Fecha hasta</label>
+            <input type="date" class="filtro-input" [value]="filtroFechaHasta()" (change)="filtroFechaHasta.set($any($event.target).value)">
+          </div>
+        </div>
+
+        <div class="filtros-footer">
+          <button class="btn-cancel" (click)="limpiarFiltros()">Limpiar Todo</button>
+          <button class="btn-confirm" (click)="aplicarFiltros()">Aplicar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>
+

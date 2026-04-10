@@ -4,10 +4,108 @@
   <div class="main-content">
     <app-header-aplicarion pageName="AMIGOS"></app-header-aplicarion>
 
-    <main class="page-content">
-      <div class="content-wrapper">
-        <p>Aqui te saldan una lista de tus amigos , cunado clikes en un amigo tuyo te saldra una targeta con una serie de informacion y hay dentro te dejara eliminar esa amistad</p>
+    <div class="page-content">
+      <div class="header-actions">
+        <div class="title-box">
+          <h1>Amistades</h1>
+        </div>
+
+        <div>
+          <button (click)="cambioEstadoVentana()" class="addFriend">Añadir Amigo</button>
+          @if(wiewForm){
+          <div class="ventana-overlay" (click)="cambioEstadoVentana()"></div>
+          <div class="ventana-emergente">
+            <h3>Introduzca el nombre del Usuario</h3>
+            <input type="text" #userName placeholder="Nombre de usuario...">
+            <button (click)="sendFrindsShip(userName.value)">Enviar solicutud</button>
+
+            <button (click)="cambioEstadoVentana()">Cerrar</button>
+          </div>
+          }
+        </div>
       </div>
-    </main>
+
+      <div class="tabs">
+        <div class="tab" [class.active]="tabActiva() === 'amigos'" (click)="mostrar('amigos')">
+          <h2>Amigos</h2>
+        </div>
+        <div class="tab" [class.active]="tabActiva() === 'enviadas'" (click)="mostrar('enviadas')">
+          <h2>Enviadas</h2>
+        </div>
+        <div class="tab" [class.active]="tabActiva() === 'recibidas'" (click)="mostrar('recibidas')">
+          <h2>Recibidas</h2>
+        </div>
+      </div>
+
+      @switch (tabActiva()) {
+      @case ("amigos") {
+      <div class="status-info">
+        <div class="dot"></div>
+        <span>Lista de Amigos</span>
+      </div>
+      @if (listFriends(); as friends) {
+      @if (friends.length > 0) {
+      <app-list-friends [listFriends]="friends" [currentUser]="userNameActual()" [listaMostrada]="tabActiva()"
+        (amistadAction)="selctFuntion($event)"></app-list-friends>
+      } @else {
+      <div class="no-data">
+        <p>CONEXIÓN FALLIDA: CERO AMIGOS ENCONTRADOS</p>
+      </div>
+      }
+      } @else {
+      <div class="loading-screen">
+        <p class="blink">> RECUPERANDO BASE DE DATOS...</p>
+      </div>
+      }
+      }
+
+      @case ("enviadas") {
+      <div class="status-info">
+        <div class="dot"></div>
+        <span>Solicitudes De amistad enviadas</span>
+      </div>
+      @if (listSolicitudesEnviadas(); as send) {
+      @if (send.length > 0) {
+      <app-list-friends [listFriends]="send" [currentUser]="userNameActual()" [listaMostrada]="tabActiva()"
+        (amistadAction)="selctFuntion($event)"></app-list-friends>
+      } @else {
+      <div class="no-data">
+        <p>Ninguga Solicitu Encontrada</p>
+      </div>
+      }
+      } @else {
+      <div class="loading-screen">
+        <p class="blink">> RECUPERANDO BASE DE DATOS...</p>
+      </div>
+      }
+      }
+
+      @case ("recibidas") {
+      <div class="status-info">
+        <div class="dot"></div>
+        <span>Solicitudes de amistad reividas</span>
+      </div>
+      @if (listSolicitudesRecividas(); as recived) {
+      @if (recived.length > 0) {
+      <app-list-friends [listFriends]="recived" [currentUser]="userNameActual()" [listaMostrada]="tabActiva()"
+        (amistadAction)="selctFuntion($event)"></app-list-friends>
+      } @else {
+      <div class="no-data">
+        <p>CONEXIÓN FALLIDA: CERO AMIGOS ENCONTRADOS</p>
+      </div>
+      }
+      } @else {
+      <div class="loading-screen">
+        <p class="blink">> RECUPERANDO BASE DE DATOS...</p>
+      </div>
+      }
+      }
+      }
+
+      @if (mensajeEnvio()) {
+      <div class="mensaje-envio">{{ mensajeEnvio() }}</div>
+      }
+
+    </div>
   </div>
 </div>

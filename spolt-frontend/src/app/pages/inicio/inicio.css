@@ -13,6 +13,7 @@
     flex-direction: column;
     overflow-y: auto;
     position: relative;
+    background-color: #ffffff; /* Aseguramos que el fondo sea blanco y no negro */
 }
 
 /* Contenido Principal */
@@ -119,16 +120,22 @@
     pointer-events: none;
 }
 
-@media (max-width: 768px) {
-    .inicio-layout {
-        flex-direction: column;
-    }
-
+@media (max-width: 1024px) {
     .page-content {
         padding: 20px;
     }
 
     .welcome-title {
         font-size: 32px;
+    }
+
+    .content-wrapper {
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 600px) {
+    .main-content {
+        padding-bottom: 90px;
     }
 }

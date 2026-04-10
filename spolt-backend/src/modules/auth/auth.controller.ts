@@ -15,6 +15,9 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { RequestEmailChangeDto } from './dto/request-email-change.dto';
 import { UsersService } from '../users/users.service';
 
 
@@ -43,7 +46,7 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   async logout(@Req() req: any, @Res({ passthrough: true }) res: Response) {
-    await this.authService.logout(req.user['userId']);
+    await this.authService.logout(req.user.id_usuario);
     res.clearCookie('Authentication');
     res.clearCookie('Refresh');
     return { message: 'Logged out successfully' };
@@ -85,6 +88,31 @@ export class AuthController {
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
     return await this.usersService.create(createUserDto);
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return await this.authService.forgotPassword(dto.email);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return await this.authService.resetPassword(dto.token, dto.newPassword);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('request-email-change')
+  @HttpCode(HttpStatus.OK)
+  async requestEmailChange(@Req() req: any, @Body() dto: RequestEmailChangeDto) {
+    return await this.authService.requestEmailChange(req.user.id_usuario, dto.newEmail);
+  }
+
+  @Post('confirm-email-change')
+  @HttpCode(HttpStatus.OK)
+  async confirmEmailChange(@Body('token') token: string) {
+    return await this.authService.confirmEmailChange(token);
   }
 
   @UseGuards(AuthGuard('jwt'))

@@ -1,0 +1,519 @@
+.page-content {
+    flex: 1;
+    padding: 3rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    color: #000;
+}
+
+.header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+
+.title-box {
+    display: inline-block;
+    background: white;
+    border: 3px solid #000;
+    padding: 10px 40px;
+    box-shadow: 6px 6px 0px var(--pink, #ff006e);
+    position: relative;
+}
+
+.title-box h1 {
+    font-size: 2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: 2px;
+}
+
+.status-info {
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.status-info .dot {
+    width: 10px;
+    height: 10px;
+    background-color: var(--pink, #ff006e);
+}
+
+.loading-screen, .no-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem;
+    border: 3px dashed #ccc;
+    background: white;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.blink {
+    animation: blinker 1s linear infinite;
+    color: var(--pink, #ff006e);
+}
+
+@keyframes blinker {
+    50% { opacity: 0; }
+}
+
+.tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 1.5rem;
+    border: 3px solid #000;
+    background: white;
+}
+
+.tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    cursor: pointer;
+    border-right: 3px solid #000;
+    transition: all 0.2s;
+}
+
+.tab:last-child {
+    border-right: none;
+}
+
+.tab h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.tab.active {
+    background-color: var(--pink, #ff006e);
+    color: white;
+}
+
+.tab:hover:not(.active) {
+    background-color: #f0f0f0;
+}
+
+.mensaje-envio {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: #000;
+    color: white;
+    border: 3px solid var(--pink, #ff006e);
+    padding: 1rem 2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    z-index: 1001;
+    box-shadow: 6px 6px 0px var(--pink, #ff006e);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 600px) {
+    .page-content {
+        padding: 1.5rem;
+    }
+
+    .header-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .title-box {
+        align-self: flex-start;
+        padding: 8px 20px;
+    }
+
+    .title-box h1 {
+        font-size: 1.5rem;
+    }
+
+    .tab {
+        padding: 8px 6px;
+    }
+
+    .tab h2 {
+        font-size: 0.8rem;
+    }
+
+    .status-info {
+        font-size: 0.8rem;
+    }
+}
+
+/* Modal styles para la confirmación de salida */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-content {
+    background: white;
+    border: 3px solid #111;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    box-shadow: 10px 10px 0px var(--pink, #ff006e);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-content h3 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #111;
+}
+
+.modal-content p {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: #444;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.btn-cancel, .btn-confirm {
+    padding: 12px 24px;
+    font-weight: 900;
+    text-transform: uppercase;
+    border: 3px solid #111;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-cancel {
+    background: white;
+    color: #111;
+}
+
+.btn-cancel:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0px #111;
+}
+
+.btn-confirm {
+    background: #111;
+    color: white;
+}
+
+.btn-confirm:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0px var(--pink, #ff006e);
+}
+
+/* ── BOTÓN DE FILTROS ── */
+.btn-filtros {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: #111;
+    color: white;
+    border: 3px solid #111;
+    border-radius: 8px;
+    font-weight: 900;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 4px 4px 0px var(--pink, #ff006e);
+    position: relative;
+}
+
+.btn-filtros:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--pink, #ff006e);
+}
+
+.filtro-badge {
+    background: var(--pink, #ff006e);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 900;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+}
+
+/* ── PANEL DE FILTROS (MÁXIMO ESTILO) ── */
+.filtros-panel {
+    background: #ffffff;
+    border: 3px solid #111;
+    border-radius: 12px;
+    box-shadow: 10px 10px 0px var(--pink, #ff006e);
+    width: 90%;
+    max-width: 480px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.filtros-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 3px solid #111;
+    background: #111;
+    color: white;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.filtros-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: white;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+}
+
+.filtros-close {
+    background: transparent;
+    border: 2px solid white;
+    border-radius: 6px;
+    color: white;
+    font-size: 1.2rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 900;
+    transition: all 0.2s;
+}
+
+.filtros-close:hover {
+    background: var(--pink, #ff006e);
+    border-color: var(--pink, #ff006e);
+}
+
+.filtros-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.filtro-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filtro-label {
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: #111;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.filtro-input,
+.filtro-select {
+    padding: 10px 14px;
+    border: 3px solid #111;
+    border-radius: 8px;
+    background: white;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #111;
+    outline: none;
+    transition: all 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.filtro-input:focus,
+.filtro-select:focus {
+    border-color: var(--pink, #ff006e);
+}
+
+.filtro-input::placeholder {
+    color: #888;
+    font-weight: 600;
+}
+
+.filtro-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23111' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+}
+
+/* Checkbox Minimalista con Borde Duro */
+.filtro-checkbox-group {
+    flex-direction: row;
+    margin-top: 4px;
+}
+
+.filtro-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: #111;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 10px 0;
+}
+
+.filtro-checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--pink, #ff006e);
+    cursor: pointer;
+    border: 3px solid #111;
+}
+
+.filtros-footer {
+    display: flex;
+    gap: 1rem;
+    padding: 1.2rem 1.5rem;
+    border-top: 3px solid #111;
+    background: white;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.filtros-footer .btn-cancel,
+.filtros-footer .btn-confirm {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+    border-radius: 8px;
+    padding: 12px 0;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    border: 3px solid #111;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.filtros-footer .btn-cancel {
+    background: white;
+    color: #111;
+}
+
+.filtros-footer .btn-cancel:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 4px 4px 0px #111;
+}
+
+.filtros-footer .btn-confirm {
+    background: var(--pink, #ff006e);
+    color: white;
+}
+
+.filtros-footer .btn-confirm:hover {
+    background: #e60063;
+    transform: translate(-3px, -3px);
+    box-shadow: 4px 4px 0px #111;
+}
+
+@media (max-width: 600px) {
+    .btn-filtros {
+        padding: 8px 16px;
+        font-size: 0.75rem;
+    }
+
+    .filtros-panel {
+        width: 100%;
+        height: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+        border: none;
+    }
+    
+    .filtros-header, 
+    .filtros-footer {
+        border-radius: 0;
+    }
+}

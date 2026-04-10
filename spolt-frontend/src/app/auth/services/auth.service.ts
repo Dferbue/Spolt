@@ -77,4 +77,22 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!this.getAccessToken();
   }
+
+  // --- Recuperación y cambio de cuenta ---
+
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, { token, newPassword });
+  }
+
+  requestEmailChange(newEmail: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/request-email-change`, { newEmail });
+  }
+
+  confirmEmailChange(token: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/confirm-email-change`, { token });
+  }
 }

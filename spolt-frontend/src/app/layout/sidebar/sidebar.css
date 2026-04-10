@@ -1,3 +1,4 @@
+
 .sidebar-container {
     position: relative;
     height: 100vh;
@@ -9,8 +10,9 @@
     flex-direction: column;
     padding: 24px 20px;
     overflow: hidden;
-    z-index: 100;
+    z-index: 1000;
 }
+
 
 .scanlines {
     position: absolute;
@@ -114,3 +116,255 @@
     background: rgba(194, 12, 12, 0.863);
     color: var(--white, #ffffff);
 }
+
+/* LOGOUT MODAL STYLES */
+.logout-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85); /* Un poco más oscuro para mejor contraste */
+    backdrop-filter: blur(8px); /* Aumentado el desenfoque */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.logout-modal-card {
+    background: white;
+    border: 4px solid black;
+    box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+    position: relative;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    color: black;
+    animation: scaleIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* PINK CORNERS */
+.card-corner {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border: 3px solid var(--pink, #ff2a5f);
+    z-index: 5;
+}
+
+.card-corner-tl {
+    top: -4px;
+    left: -4px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.card-corner-br {
+    bottom: -4px;
+    right: -4px;
+    border-left: none;
+    border-top: none;
+}
+
+.modal-header {
+    margin-bottom: 1.5rem;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 900;
+    margin: 0;
+    letter-spacing: -1px;
+}
+
+.modal-text {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: #444;
+    line-height: 1.4;
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.action-btn {
+    padding: 0.8rem;
+    border: 3px solid black;
+    font-size: 0.9rem;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+    text-transform: uppercase;
+}
+
+.action-btn.confirm {
+    background: var(--pink, #ff2a5f);
+    color: white;
+}
+
+.action-btn.cancel {
+    background: white;
+    color: black;
+}
+
+.action-btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+}
+
+.action-btn.cancel:hover {
+    background: #f0f0f0;
+}
+
+.action-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+}
+
+/* Estilos de iconos */
+.nav-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.nav-link:hover .nav-icon {
+    transform: scale(1.1);
+}
+
+.nav-link {
+    gap: 12px;
+}
+
+/* =========================================
+   RESPONSIVE: TABLET (600px - 850px)
+   ========================================= */
+@media (min-width: 601px) and (max-width: 850px) {
+    .sidebar-container {
+        width: 85px;
+        padding: 24px 10px;
+        align-items: center;
+    }
+
+    .brand-name, 
+    .btn-text,
+    .logout-btn .btn-text {
+        display: none;
+    }
+
+    .sidebar-header {
+        justify-content: center;
+        margin-bottom: 30px;
+    }
+
+    .logo-img {
+        height: 35px;
+    }
+
+    .nav-link.retro-btn {
+        justify-content: center;
+        padding: 14px 0;
+        width: 100%;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .nav-link.retro-btn:hover,
+    .nav-link.retro-btn.active {
+        background: var(--pink, #ff2a5f);
+        color: white;
+        transform: scale(1.05); /* Un pequeño pop visual */
+        border-color: var(--pink, #ff2a5f);
+    }
+
+    .sidebar-nav {
+        align-items: center;
+        width: 100%;
+        gap: 20px; /* Más espacio entre iconos en tablet */
+    }
+
+    .logout-btn {
+        padding: 12px 0;
+        display: flex;
+        justify-content: center;
+    }
+}
+
+/* =========================================
+   RESPONSIVE: BOTTOM NAVIGATION (MOBILE)
+   ========================================= */
+@media (max-width: 600px) {
+    .sidebar-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        width: 100%;
+        height: 65px;
+        flex-direction: row;
+        padding: 0;
+        border-right: none;
+        border-top: 2px solid rgba(255, 255, 255, 0.1);
+        background: rgba(10, 10, 10, 0.98);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sidebar-header, 
+    .sidebar-footer,
+    .scanlines,
+    .btn-text {
+        display: none !important;
+    }
+
+    .sidebar-nav {
+        flex-direction: row;
+        width: 100%;
+        height: 100%;
+        gap: 0;
+        margin: 0;
+        justify-content: space-around;
+        align-items: stretch;
+    }
+
+    .nav-link.retro-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        height: 100%;
+        transition: background 0.2s;
+    }
+
+    .nav-link.retro-btn:hover,
+    .nav-link.retro-btn.active {
+        transform: none;
+        background: rgba(255, 42, 95, 0.15);
+        border-top: 3px solid var(--pink, #ff2a5f);
+        color: var(--pink, #ff2a5f);
+    }
+}
+

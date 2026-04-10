@@ -1,0 +1,346 @@
+@import 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+
+.page-content {
+    flex: 1;
+    padding: 3rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    color: #000;
+}
+
+.header-actions {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+
+.title-box {
+    display: inline-block;
+    background: white;
+    border: 3px solid #000;
+    padding: 10px 40px;
+    box-shadow: 6px 6px 0px var(--pink, #ff006e);
+}
+
+.title-box h1 {
+    font-size: 2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: 2px;
+}
+
+/* Pantalla principal - Layout Original */
+.main-options {
+    display: flex;
+    gap: 3rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 4rem;
+}
+
+.btn-option {
+    background: white;
+    border: 3px solid #111;
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    width: 100%;
+    max-width: 350px;
+    cursor: pointer;
+    box-shadow: 10px 10px 0px var(--pink, #ff006e);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.btn-option:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 14px 14px 0px var(--pink, #ff006e);
+}
+
+.btn-option .icon-wrapper {
+    width: 220px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 50%;
+    margin-bottom: 2.5rem;
+    transition: all 0.3s ease;
+    border: 3px dashed rgba(0, 0, 0, 0.1);
+}
+
+.btn-option:hover .icon-wrapper {
+    background: rgba(255, 0, 110, 0.05);
+    border-color: var(--pink, #ff006e);
+    transform: scale(1.08);
+}
+
+.option-icon {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    filter: drop-shadow(6px 6px 0px rgba(0,0,0,0.1));
+}
+
+.btn-option h2 {
+    font-size: 1.8rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #111;
+    margin: 0 0 1rem 0;
+}
+
+.btn-option p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #555;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ------------------------------------- */
+/* Modal Minimalista (Formulario + Img) */
+/* ------------------------------------- */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.form-modal-container {
+    background: #ffffff;
+    border: 3px solid #111;
+    border-radius: 12px;
+    box-shadow: 10px 10px 0px var(--pink, #ff006e);
+    width: 90%;
+    max-width: 900px;
+    height: auto;
+    max-height: 85vh;
+    display: flex;
+    overflow: hidden;
+    animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.form-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    min-width: 350px;
+    max-width: 50%;
+}
+
+.image-side {
+    flex: 1;
+    background: #f4f4f4;
+    display: flex;
+}
+
+.modal-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.filtros-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background: white;
+}
+
+.filtros-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #111;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.filtros-close {
+    background: transparent;
+    border: none;
+    color: #111;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 900;
+    transition: all 0.2s;
+}
+
+.filtros-close:hover {
+    color: var(--pink, #ff006e);
+}
+
+.filtros-body {
+    padding: 0 2rem 1.5rem 2rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.filtro-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.row-group {
+    flex-direction: row;
+    gap: 1.5rem;
+}
+
+.row-group .sub-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.filtro-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #111;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Estilo Inputs Minimalistas */
+.filtro-input.min,
+.filtro-select.min {
+    padding: 8px 0;
+    border: none;
+    border-bottom: 2px solid #ddd;
+    border-radius: 0;
+    background: transparent;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111;
+    outline: none;
+    width: 100%;
+    transition: border-bottom-color 0.2s;
+}
+
+.filtro-input.min:focus,
+.filtro-select.min:focus {
+    border-bottom-color: var(--pink, #ff006e);
+}
+
+.filtro-input.min::placeholder {
+    color: #bbb;
+    font-weight: 500;
+}
+
+textarea.textarea.min {
+    resize: none;
+    min-height: 50px;
+    font-family: inherit;
+}
+
+.filtros-footer {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    background: white;
+    margin-top: auto;
+}
+
+.filtros-footer .btn-cancel,
+.filtros-footer .btn-confirm {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+    border-radius: 6px;
+    padding: 12px 0;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    border: 3px solid #111;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.filtros-footer .btn-cancel {
+    background: white;
+    color: #111;
+    border: 2px solid #ccc;
+}
+.filtros-footer .btn-cancel:hover {
+    border-color: #111;
+}
+
+.filtros-footer .btn-confirm {
+    background: var(--pink, #ff006e);
+    color: white;
+    border: 3px solid #111;
+}
+
+.filtros-footer .btn-confirm:hover {
+    background: #e60063;
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0px #111;
+}
+
+.mensaje-envio {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: #000;
+    color: white;
+    border: 3px solid var(--pink, #ff006e);
+    padding: 1rem 2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    z-index: 3000;
+    box-shadow: 6px 6px 0px var(--pink, #ff006e);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+    .form-modal-container {
+        flex-direction: column;
+        max-height: 95vh;
+        width: 95%;
+    }
+    
+    .form-side {
+        max-width: 100%;
+        min-width: auto;
+    }
+    
+    .image-side {
+        display: none; /* Hide image on mobile for better usability */
+    }
+}

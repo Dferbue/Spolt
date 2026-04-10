@@ -1,0 +1,448 @@
+.friend-card {
+    background: #ffffff;
+    border: 2px solid #111;
+    border-radius: 12px;
+    box-shadow: 5px 5px 0px var(--pink, #ff006e);
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    min-height: 90px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Efecto de brillo de fondo sutil al hacer hover */
+.friend-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, rgba(255,0,110,0.05) 0%, rgba(255,255,255,0) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.friend-card:hover {
+    transform: translateY(-5px) translateX(-2px);
+    box-shadow: 8px 8px 0px #111;
+    border-color: var(--pink, #ff006e);
+}
+
+.friend-card:hover::after {
+    opacity: 1;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    flex: 1;
+    z-index: 1;
+}
+
+.avatar-frame {
+    width: 65px;
+    height: 65px;
+    border: 3px solid #111;
+    background: #fff;
+    padding: 3px;
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+}
+
+.friend-card:hover .avatar-frame {
+    border-color: var(--pink, #ff006e);
+    padding: 2px;
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #111 0%, #333 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 2px 2px 0px var(--pink, #ff006e);
+}
+
+.header-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.username {
+    font-size: 1.3rem;
+    font-weight: 900;
+    margin: 0 0 6px 0;
+    color: #111;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    transition: color 0.3s;
+}
+
+.friend-card:hover .username {
+    color: var(--pink, #ff006e);
+}
+
+.level-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #555;
+    letter-spacing: 0.5px;
+    align-self: flex-start;
+}
+
+.card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 0;
+    z-index: 1;
+}
+
+.btn-stats, .btn-delete {
+    background: #111;
+    color: white;
+    border: 2px solid #111;
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    letter-spacing: 0.5px;
+}
+
+.btn-stats:hover {
+    background: var(--pink, #ff006e);
+    border-color: var(--pink, #ff006e);
+    box-shadow: 0 4px 15px rgba(255, 0, 110, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-delete {
+    background: white;
+    color: #111;
+}
+
+.btn-delete:hover {
+    background: #fff;
+    border-color: #ef4444; 
+    color: #ef4444;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+    transform: translateY(-2px);
+}
+
+.btn-stats:active, .btn-delete:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+/* =========================================
+   MODAL DE CONFIRMACIÓN (VENTANA EMERGENTE)
+========================================= */
+.ventana-emergente {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    border: 3px solid #111;
+    border-radius: 12px;
+    /* Un sombreado gigante detrás para oscurecer el fondo, y la sombra plana offset rosa de la tarjeta principal */
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7), 8px 8px 0px var(--pink, #ff006e);
+    padding: 2.5rem 2rem;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 90%;
+    max-width: 400px;
+    animation: modalIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-align: center;
+}
+
+@keyframes modalIn {
+    from { opacity: 0; transform: translate(-50%, -40%) scale(0.95); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.ventana-emergente h3, .ventana-emergente h4 {
+    margin: 0;
+    text-transform: uppercase;
+    font-weight: 900;
+    font-size: 1.15rem;
+    color: #111;
+    line-height: 1.4;
+    letter-spacing: -0.5px;
+}
+
+.ventana-emergente button {
+    padding: 12px 20px;
+    font-family: inherit;
+    font-weight: 900;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    border: 2px solid #111;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    width: 100%;
+}
+
+/* Botón Confirmar (Rojo Destructivo) */
+.ventana-emergente button:nth-of-type(1) {
+    background-color: #ef4444;
+    color: white;
+    border-color: #111;
+    box-shadow: 4px 4px 0px #111;
+}
+
+.ventana-emergente button:nth-of-type(1):hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px #111;
+    background-color: #dc2626;
+}
+
+.ventana-emergente button:nth-of-type(1):active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px #111;
+}
+
+/* Botón Cancelar */
+.ventana-emergente button:nth-of-type(2) {
+    background-color: white;
+    color: #111;
+}
+
+.ventana-emergente button:nth-of-type(2):hover {
+    background-color: #f5f5f5;
+    border-color: #666;
+}
+
+/* =========================================
+   TARJETA DE AMISTAD (ESTILO CARTA ROGUELIKE/COLLECCIONABLE)
+========================================= */
+.targetaAmistad-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7); 
+    z-index: 1500;
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.targetaAmistad {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff; /* Blanco */
+    border: 4px solid #111; /* Borde negro gordo de la app */
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 280px;
+    box-shadow: 12px 12px 0px var(--pink, #ff006e); /* Sombra pink del tema */
+    animation: cardFlip 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes cardFlip {
+    from { opacity: 0; transform: translate(-50%, -50%) perspective(800px) rotateY(90deg); }
+    to { opacity: 1; transform: translate(-50%, -50%) perspective(800px) rotateY(0deg); }
+}
+
+/* Círculo gigante para el avatar basado en el dibujo */
+.targeta-avatar {
+    width: 160px;
+    height: 160px;
+    border: 4px solid #111; /* Negro en lugar de rojo */
+    border-radius: 50%;
+    background: #f0f0f0;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.targeta-avatar:hover {
+    border-color: var(--pink, #ff006e);
+}
+
+.targeta-avatar .avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #222, #000);
+    color: #fff;
+    font-size: 5.5rem;
+    font-weight: 900;
+    text-shadow: 4px 4px 0px var(--pink, #ff006e);
+}
+
+.targeta-avatar .avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Nombre  */
+.targeta-name {
+    color: #111; /* Textos de la app generalemnte en negro intenso */
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 900;
+    text-shadow: none;
+    letter-spacing: -1px;
+    text-align: center;
+}
+
+/* Fecha debajo del nombre */
+.targeta-date {
+    color: #555;
+    font-size: 0.85rem;
+    font-weight: 900;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+/* Botón cerrar para la tarjeta */
+.targetaAmistad .btn-close {
+    background: #111;
+    color: #fff;
+    border: 3px solid #111;
+    padding: 10px 20px;
+    font-weight: 900;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    text-transform: uppercase;
+    width: 100%;
+    letter-spacing: 2px;
+}
+
+.targetaAmistad .btn-close:hover {
+    background: var(--pink, #ff006e);
+    color: #fff;
+    border-color: var(--pink, #ff006e);
+    box-shadow: 4px 4px 0px #111;
+    transform: translateY(-2px);
+}
+
+/* =========================================
+   RESPONSIVE: TARJETAS EN MÓVIL
+   ========================================= */
+@media (max-width: 600px) {
+    .friend-card {
+        padding: 0.8rem 1rem;
+        gap: 1rem;
+        min-height: 70px;
+    }
+
+    .avatar-frame {
+        width: 45px;
+        height: 45px;
+        padding: 2px;
+        border-width: 2px;
+    }
+
+    .avatar-placeholder {
+        font-size: 1.2rem;
+    }
+
+    .username {
+        font-size: 1rem;
+        margin-bottom: 2px;
+    }
+
+    .level-tag {
+        padding: 2px 6px;
+        font-size: 0.55rem;
+    }
+
+    .card-actions {
+        gap: 6px;
+    }
+
+    .btn-stats, .btn-delete {
+        padding: 6px 12px;
+        font-size: 0.65rem;
+        border-width: 1px;
+    }
+
+    .ventana-emergente {
+        padding: 1.5rem 1rem;
+    }
+}
+
+/* =========================================
+   RESPONSIVE: MÓVILES EXTRA PEQUEÑOS (<= 375px)
+   ========================================= */
+@media (max-width: 375px) {
+    .friend-card {
+        padding: 0.6rem 0.8rem;
+        gap: 0.8rem;
+    }
+
+    .avatar-frame {
+        width: 35px;
+        height: 35px;
+    }
+
+    .username {
+        font-size: 0.9rem;
+    }
+
+    .card-actions {
+        gap: 4px;
+    }
+
+    .btn-stats, .btn-delete {
+        padding: 4px 8px;
+        font-size: 0.6rem;
+        letter-spacing: 0;
+    }
+}

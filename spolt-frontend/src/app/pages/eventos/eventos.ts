@@ -1,15 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Sidebar } from '../../layout/sidebar/sidebar';
 import { HeaderAplicarion } from '../../layout/header-aplicarion/header-aplicarion';
+import { UnirseEventos } from './unirse-eventos/unirse-eventos';
+import { CreateEventForm } from './create-event/create-event';
 
 @Component({
   selector: 'app-eventos',
   standalone: true,
-  imports: [CommonModule, Sidebar, HeaderAplicarion],
+  imports: [CommonModule, Sidebar, HeaderAplicarion, UnirseEventos, CreateEventForm],
   templateUrl: './eventos.html',
   styleUrl: './eventos.css',
 })
 export class Eventos {
-  userName = "Usuario";
+  // Controla qué pantalla principal estamos viendo en la sección Eventos
+  vistaActiva = signal<'inicio' | 'unirse' | 'crear' | 'mis-eventos'>('inicio');
+
+  cambiarVista(nuevaVista: 'inicio' | 'unirse' | 'crear' | 'mis-eventos') {
+    this.vistaActiva.set(nuevaVista);
+  }
 }

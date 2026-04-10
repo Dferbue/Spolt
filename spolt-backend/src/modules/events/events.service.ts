@@ -2,18 +2,22 @@ import { Injectable, ConflictException, NotFoundException, BadRequestException }
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { throwStatement } from '@babel/types';
 
 @Injectable()
 export class EventsService {
   constructor(private prisma:PrismaService){}
 
 
-  //Funcion que crea el evento
   create(createEventDto: CreateEventDto, id_creador: number) {
+    const { fecha_evento, hora_inicio, hora_fin, ...rest } = createEventDto;
+
     return this.prisma.eventoDeportivo.create({
       data: {
-        ...createEventDto,
+        ...rest,
+        // Convertir a Date objects para satisfacer a Prisma
+        fecha_evento: new Date(fecha_evento),
+        hora_inicio: new Date(`1970-01-01T${hora_inicio}`),
+        hora_fin: hora_fin ? new Date(`1970-01-01T${hora_fin}`) : null,
         id_creador,
       },
     });
@@ -22,7 +26,18 @@ export class EventsService {
 
   //Nos trameos todos los eventos deportivos que existen , depues lo borraremos esto solo es para el desarrollo
   findAll() {
-    return this.prisma.eventoDeportivo.findMany();
+    return this.prisma.eventoDeportivo.findMany({
+      include: {
+        creador: { select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true } },
+        deporte: true,
+        participantes: {
+          include: {
+            usuario: { select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true } }
+          }
+        }
+      },
+      orderBy: { fecha_evento: 'asc' }
+    });
   }
 
 
@@ -31,6 +46,15 @@ export class EventsService {
     return this.prisma.eventoDeportivo.findMany({
       where:{
         id_creador:idUser
+      },
+      include: {
+        creador: { select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true } },
+        deporte: true,
+        participantes: {
+          include: {
+            usuario: { select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true } }
+          }
+        }
       }
     });
   }
@@ -68,7 +92,12 @@ export class EventsService {
         creador: {
           select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true }
         },
-        deporte: true
+        deporte: true,
+        participantes: {
+          include: {
+            usuario: { select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true } }
+          }
+        }
       },
       orderBy: {
         fecha_evento: 'asc' 
@@ -77,13 +106,20 @@ export class EventsService {
   }
 
 
-  //Metodo que actualiza los datos del evemto por si el usuario quiere hacer algun cambio 
   update(id: number, updateEventDto: UpdateEventDto) {
+    const { fecha_evento, hora_inicio, hora_fin, ...rest } = updateEventDto;
+
+    const dataToUpdate: any = { ...rest };
+
+    if (fecha_evento) dataToUpdate.fecha_evento = new Date(fecha_evento);
+    if (hora_inicio) dataToUpdate.hora_inicio = new Date(`1970-01-01T${hora_inicio}`);
+    if (hora_fin) dataToUpdate.hora_fin = new Date(`1970-01-01T${hora_fin}`);
+
     return this.prisma.eventoDeportivo.update({
-      where:{
-        id_evento:id
+      where: {
+        id_evento: id
       },
-      data:updateEventDto
+      data: dataToUpdate
     });
   }
 
@@ -230,6 +266,18 @@ export class EventsService {
             id_usuario: id_usuario
           }
         }
+      },
+      include: {
+        creador: { select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true } },
+        deporte: true,
+        participantes: {
+          include: {
+            usuario: { select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true } }
+          }
+        }
+      },
+      orderBy: {
+        fecha_evento: 'asc'
       }
     });
   }

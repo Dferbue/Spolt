@@ -5,9 +5,182 @@
     <app-header-aplicarion pageName="PERFIL"></app-header-aplicarion>
 
     <main class="page-content">
-      <div class="content-wrapper">
-        <p>Aqui lo que ira es tu perfil con la informacion de las cosas , como puede ser tu historial , podras cambiar datos de tu cuenta etc ..</p>
-      </div>
+      @if (dtoUser) {
+        <div class="content-wrapper">
+
+          <!-- TITULO SECCIÓN -->
+          <div class="section-title-box">
+            <span class="section-title">PERFIL</span>
+          </div>
+
+          <!-- NOTIFICACIONES DE ACCIÓN -->
+          @if (passwordEmailSent || emailChangeRequested) {
+            <div class="action-notifications">
+              @if (passwordEmailSent) {
+                <div class="pixel-banner success">
+                  ✅ ¡Enlace enviado! Revisa tu correo para cambiar la contraseña.
+                </div>
+              }
+              @if (emailChangeRequested) {
+                <div class="pixel-banner success">
+                  📧 ¡Confirmación enviada! Revisa tu nuevo correo para terminar.
+                </div>
+              }
+            </div>
+          }
+
+          <!-- TARJETA ÚNICA DE PERFIL (FLUIDA) -->
+          <div class="card profile-card-unified">
+            <div class="card-corner card-corner-tl"></div>
+            <div class="card-corner card-corner-br"></div>
+
+            <div class="card-body">
+              <!-- SECCIÓN IZQUIERDA: AVATAR -->
+              <div class="profile-side-avatar">
+                <div class="avatar-container">
+                  <div class="avatar-circle-frame">
+                    @if (dtoUser.imagen_perfil) {
+                      <img
+                        [src]="dtoUser.imagen_perfil"
+                        alt="Avatar"
+                        class="avatar-img"
+                      />
+                    } @else {
+                      <div class="avatar-placeholder">
+                        <span>{{ dtoUser.nombre_usuario?.charAt(0)?.toUpperCase() }}</span>
+                      </div>
+                    }
+                  </div>
+                  <div class="user-status-badge" [class.active]="dtoUser.activo">
+                    <span class="status-dot"></span>
+                    {{ dtoUser.activo ? 'ONLINE' : 'OFFLINE' }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECCIÓN DERECHA: TODA LA INFO -->
+              <div class="profile-main-info">
+                
+                <!-- Cabecera con Nombre -->
+                <div class="info-header">
+                  <div class="name-block">
+                    <h1 class="user-handle">{{ dtoUser.nombre_usuario }}</h1>
+                    <p class="real-name">{{ dtoUser.nombre_completo || 'Nombre no especificado' }}</p>
+                  </div>
+                </div>
+
+                <!-- Bloques de Datos -->
+                <div class="data-segments">
+                  
+                  <div class="segment">
+                    <div class="segment-label">CONTACTO</div>
+                    <div class="segment-content">
+                      <div class="data-item">
+                        <span class="data-label">EMAIL:</span>
+                        <span class="data-value">{{ dtoUser.email }}</span>
+                      </div>
+                      <div class="data-item">
+                        <span class="data-label">NACIMIENTO:</span>
+                        <span class="data-value">{{ dtoUser.fecha_nacimiento | date:'dd / MM / yyyy' }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="segment">
+                    <div class="segment-label">BIOGRAFÍA</div>
+                    <div class="segment-content">
+                      @if (dtoUser.biografia) {
+                        <p class="bio-paragraph">{{ dtoUser.biografia }}</p>
+                      } @else {
+                        <p class="bio-paragraph empty-bio">
+                          Este jugador prefiere mantener el misterio. Aún no hay biografía disponible.
+                        </p>
+                      }
+                    </div>
+                </div>
+                <!-- Cierre de data-segments -->
+              </div>
+
+              <!-- BOTONES DE ACCIÓN (DENTRO DE LA TARJETA) -->
+              <div class="segment-label actions-title">EDITAR PERFIL</div>
+              <div class="actions-row">
+                <button 
+                  class="action-btn" 
+                  [class.active]="activeForm === 'email'"
+                  (click)="solicitudDeCambio('email')">
+                  ✉ EMAIL
+                </button>
+                <button 
+                  class="action-btn" 
+                  [class.active]="activeForm === 'password'"
+                  (click)="solicitudDeCambio('password')">
+                  🔒 CONTRASEÑA
+                </button>
+                <button 
+                  class="action-btn" 
+                  [class.active]="activeForm === 'datos'"
+                  (click)="solicitudDeCambio('datos')">
+                  📝 DATOS
+                </button>
+              </div>
+            </div> <!-- Cierre profile-main-info -->
+          </div> <!-- Cierre card-body -->
+        </div> <!-- Cierre card profile-card-unified -->
+
+        <!-- TARJETAS DE EDICIÓN COMO MODALES -->
+        @if (activeForm === 'email') {
+          <app-edit-email 
+            [emailActual]="dtoUser.email"
+            (solicitarCambio)="onEmailUpdateRequested($event)"
+            (cerrar)="onCerrarForm()">
+          </app-edit-email>
+        }
+
+        @if (activeForm === 'datos') {
+          <app-edit-data 
+            [dtoUser]="dtoUser"
+            (datosActualizados)="onDatosActualizados()"
+            (cerrar)="onCerrarForm()">
+          </app-edit-data>
+        }
+
+        <!-- BOTÓN CERRAR SESIÓN (SOLO MÓVIL) -->
+        <div class="mobile-logout-container">
+          <button class="mobile-logout-btn" (click)="toggleLogoutConfirm()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            CERRAR SESIÓN
+          </button>
+        </div>
+
+      </div> <!-- Cierre content-wrapper -->
+
+      <!-- MODAL DE CONFIRMACIÓN DE CIERRE DE SESIÓN (MÓVIL) -->
+      @if (showLogoutConfirm) {
+        <div class="logout-modal-backdrop" (click)="toggleLogoutConfirm()">
+          <div class="logout-modal-card" (click)="$event.stopPropagation()">
+            <div class="card-corner card-corner-tl"></div>
+            <div class="card-corner card-corner-br"></div>
+
+            <div class="modal-header">
+              <h3 class="modal-title">¿CERRAR SESIÓN?</h3>
+            </div>
+            
+            <p class="modal-text">¿ESTÁS SEGURO DE QUE QUIERES ABANDONAR LA PARTIDA?</p>
+
+            <div class="modal-actions">
+              <button class="action-btn confirm" (click)="confirmLogout()">SÍ, SALIR</button>
+              <button class="action-btn cancel" (click)="toggleLogoutConfirm()">CANCELAR</button>
+            </div>
+          </div>
+        </div>
+      }
+      } @else {
+        <!-- Loading State -->
+        <div class="loading-container">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">SINCRONIZANDO PERFIL...</p>
+        </div>
+      }
     </main>
   </div>
 </div>

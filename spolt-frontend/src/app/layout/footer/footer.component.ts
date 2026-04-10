@@ -5,19 +5,8 @@ import { CommonModule } from '@angular/common';
   selector: 'app-footer',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <footer>
-      <div class="pixel-frame">
-        <p>2026 Spolt. MADE WITH <span class="pink">LOVE</span> IN SPAIN</p>
-        <div class="konami-text">UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A</div>
-      </div>
-    </footer>
-  `,
-  styles: [`
-    footer { padding: 40px; text-align: center; font-size: 10px; }
-    .pink { color: var(--pink); }
-    .konami-text { margin-top: 20px; color: #444; }
-  `]
+  templateUrl: './footer.component.html',
+  styleUrl: './footer.component.css'
 })
 export class FooterComponent {
   private sequence: string[] = [];

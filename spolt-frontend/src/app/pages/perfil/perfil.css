@@ -2,7 +2,7 @@
     display: flex;
     height: 100vh;
     width: 100vw;
-    background-color: #050505;
+    background-color: var(--black, #0a0a0a);
     color: var(--white, #ffffff);
     overflow: hidden;
 }
@@ -12,23 +12,599 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    position: relative;
+    background-color: var(--bg-light, #f5f5f5);
+}
+
+.mobile-logout-container {
+    display: none;
 }
 
 .page-content {
     flex: 1;
-    padding: 40px;
+    padding: 3rem;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    background-color: #ffffff;
 }
 
 .content-wrapper {
     width: 100%;
-    max-width: 1000px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* SECTION TITLE */
+.section-title-box {
+    display: inline-block;
+    border: 3px solid black;
+    box-shadow: 4px 4px 0px 0px var(--pink);
+    padding: 0.7rem 2.5rem;
+    background: white;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    color: black;
+    font-weight: 900;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+}
+
+/* NOTIFICACIONES */
+.action-notifications {
+    margin-bottom: 20px;
+}
+
+.pixel-banner {
+    padding: 1rem 2rem;
+    border: 3px solid black;
+    font-weight: 900;
+    font-size: 0.95rem;
+    text-align: center;
+    box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+    animation: slideDown 0.3s ease-out;
+}
+
+.pixel-banner.success {
+    background: #10b981;
+    color: white;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* UNIFIED PROFILE CARD */
+.profile-card-unified {
     background: #ffffff;
-    padding: 60px;
+    /* Fondo con patrón de puntos estilo Cyber */
+    background-image: radial-gradient(#e0e0e0 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+    border: 3px solid #111;
+    border-radius: 16px;
+    box-shadow: 8px 8px 0px 0px var(--pink, #ff006e);
     position: relative;
-    color: #1a1a1a;
+    padding: 2rem;
+    color: #111;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.profile-card-unified:hover {
+    transform: translateY(-5px) translateX(-5px);
+    box-shadow: 13px 13px 0px 0px #111;
+    border-color: var(--pink, #ff006e);
+}
+
+.card-body {
+    display: flex;
+    gap: 3rem; /* Reducimos el alto general apretando el margen entre columnas */
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.85); /* Legibilidad sobre los puntos */
+    backdrop-filter: blur(4px);
+    border-radius: 12px;
+    padding: 0.5rem; /* Menos relleno interno para ahorrar altura */
+}
+
+/* PINK CORNERS (Modernizados) */
+.card-corner {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border: 4px solid var(--pink, #ff006e);
+    z-index: 5;
+    transition: all 0.3s;
+    border-radius: 4px;
+}
+
+.profile-card-unified:hover .card-corner {
+    border-color: #111;
+}
+
+.card-corner-tl {
+    top: -5px;
+    left: -5px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.card-corner-br {
+    bottom: -5px;
+    right: -5px;
+    border-left: none;
+    border-top: none;
+}
+
+/* LEFT SIDE: CIRCULAR AVATAR */
+.profile-side-avatar {
+    flex-shrink: 0;
+    align-self: center;
+}
+
+.avatar-container {
+    position: relative;
+}
+
+.avatar-circle-frame {
+    width: 200px;
+    height: 200px;
+    border: 4px solid #111;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0px 0px 20px rgba(0,0,0,0.05), 0px 0px 0px 8px rgba(255, 0, 110, 0.08);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.profile-card-unified:hover .avatar-circle-frame {
+    transform: scale(1.03);
+    box-shadow: inset 0px 0px 20px rgba(0,0,0,0.05), 0px 0px 0px 12px rgba(255, 0, 110, 0.2);
+    border-color: var(--pink, #ff006e);
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    font-size: 5rem;
+    font-weight: 900;
+    color: #fff;
+    background: linear-gradient(135deg, #333, #111);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 3px 3px 0px var(--pink, #ff006e);
+}
+
+.user-status-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: white;
+    border: 3px solid black;
+    padding: 0.35rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 20px;
+}
+
+.user-status-badge.active {
+    color: var(--green);
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    background: #ccc;
+    border-radius: 50%;
+}
+
+.active .status-dot {
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+}
+
+/* RIGHT SIDE: INFO */
+.profile-main-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 1rem; /* Ahorrar altura */
+}
+
+.user-handle {
+    font-size: 3.2rem;
+    font-weight: 900;
+    margin: 0;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    text-shadow: 3px 3px 0px rgba(0,0,0,0.08);
+    transition: color 0.3s;
+}
+
+.profile-card-unified:hover .user-handle {
+    color: var(--pink, #ff006e);
+}
+
+.real-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #555;
+    margin: 10px 0 0;
+    letter-spacing: 0.5px;
+}
+
+.account-type {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.75rem;
+    font-weight: 900;
+    border: 2px solid #111;
+    background: #f0f0f0;
+    letter-spacing: 1.5px;
+    border-radius: 8px;
+}
+
+.account-type.verified {
+    background: #fff0f5;
+    color: var(--pink);
+    border-color: var(--pink);
+}
+
+/* SEGMENTS */
+.data-segments {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+}
+
+.segment-content {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem; /* Menor separación para que quepan holgadamente en la misma fila */
+    flex-wrap: wrap; /* Añadimos wrap para que no se salga nunca por la derecha */
+}
+
+.segment-label {
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: #111;
+    letter-spacing: 2px;
+    margin-bottom: 1.2rem;
+    border-left: 4px solid var(--pink);
+    padding-left: 12px;
+    background: linear-gradient(90deg, rgba(255,0,110,0.08) 0%, transparent 100%);
+    display: inline-block;
+    padding-right: 20px;
+    border-radius: 0 8px 8px 0;
+}
+
+.data-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0;
+    background: #fff;
+    padding: 8px 12px; /* Más chicas para que no ocupen tanta altura ni anchura */
+    border: 2px solid #eee;
+    border-radius: 8px;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+}
+
+.data-item:hover {
+    transform: translateY(-2px);
+    border-color: #ddd;
+}
+
+.data-label {
+    font-size: 0.75rem; /* Un pelin más pequeña */
+    font-weight: 800;
+    color: #666;
+    min-width: unset; /* Quitado el min-width que forzaba a que sean muy anchas */
+}
+
+.data-value {
+    font-size: 1rem; /* Texto a 1rem para ahorrar espacio */
+    font-weight: 900;
+    color: #111;
+}
+
+.bio-paragraph {
+    line-height: 1.8;
+    font-size: 1.1rem;
+    color: #333;
+    margin: 0;
+    max-width: 650px;
+    font-weight: 500;
+}
+
+.empty-bio {
+    font-style: italic;
+    color: #888;
+}
+
+/* ACTION BUTTONS ROW */
+.actions-title {
+    margin-top: 2rem;
+    margin-bottom: 0;
+}
+
+.actions-row {
+    display: flex;
+    gap: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 0;
+    flex-wrap: wrap; /* Permitimos saltar de línea si la pantalla se comprime mucho */
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.action-btn {
+    flex: 1; /* Esto hace que los botones ocupen el 100% del ancho disponible en la fila */
+    min-width: 150px; /* Evitamos que se vuelvan minúsculos antes de saltar */
+    padding: 0.9rem 1.8rem;
+    border: 2px solid #111;
+    border-radius: 8px;
+    background: white;
+    color: #111;
+    font-size: 0.85rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 4px 4px 0px 0px #111;
+}
+
+.action-btn:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 7px 7px 0px 0px var(--pink, #ff006e);
+    border-color: var(--pink, #ff006e);
+    color: var(--pink, #ff006e);
+}
+
+.action-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px 0px #111;
+}
+
+.action-btn.active {
+    background: #111;
+    color: white;
+    border-color: #111;
+    box-shadow: 4px 4px 0px 0px var(--pink, #ff006e);
+    transform: translate(-1px, -1px);
+}
+
+/* LOADING */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100px;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #eee;
+    border-top: 4px solid var(--pink);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* RESPONSIVE TABLET (851px a 1100px) */
+@media (max-width: 1100px) and (min-width: 851px) {
+    .card-body {
+        gap: 1.5rem; 
+        padding: 0.5rem;
+    }
+
+    .profile-card-unified {
+        padding: 1.5rem;
+    }
+
+    .avatar-circle-frame {
+        width: 160px;
+        height: 160px;
+    }
+
+    .actions-row {
+        flex-direction: row; /* En tablet (incluyendo 1024) siguen en fila */
+        width: 100%;
+        gap: 0.8rem;
+    }
+
+    .action-btn {
+        flex: 1;
+        width: auto;
+        padding: 0.8rem 1.2rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* RESPONSIVE MÓVIL (PANTALLAS PEQUEÑAS: max 850px) */
+@media (max-width: 850px) {
+    .card-body {
+        flex-direction: column;
+        gap: 2rem;
+        align-items: flex-start; /* Alineamos a la izquierda, no centrado */
+    }
+
+    .profile-card-unified {
+        padding: 2rem; /* Compacta en móvil */
+    }
+
+    .avatar-circle-frame {
+        width: 140px;
+        height: 140px;
+    }
+
+    .segment-content {
+        flex-direction: row; /* En tablet aguantamos en fila si cabe */
+        gap: 1.5rem;
+    }
+
+    .data-segments {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        align-items: flex-start;
+    }
+
+    .info-header {
+        flex-direction: column;
+        align-items: flex-start; /* Mantener la izquierda */
+        gap: 1rem;
+    }
+
+    .actions-row {
+        flex-direction: column;
+        width: 100%;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .action-btn {
+        width: 100%;
+    }
+
+    .main-content {
+        padding-bottom: 0px; 
+    }
+}
+
+@media (max-width: 600px) {
+    .main-content {
+        padding-bottom: 90px;
+    }
+    
+    .mobile-logout-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 2.5rem;
+        margin-bottom: 2rem;
+        width: 100%;
+        padding: 0 1.5rem;
+        box-sizing: border-box;
+    }
+
+    .mobile-logout-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 1.2rem;
+        background: #000;
+        color: white;
+        border: 3px solid #ff4242; /* Rojo para el logout */
+        border-radius: 8px;
+        font-weight: 800;
+        font-size: 1rem;
+        letter-spacing: 1px;
+        box-shadow: 6px 6px 0px 0px #ff4242; /* Sombra roja */
+        cursor: pointer;
+        transition: all 0.2s;
+        text-transform: uppercase;
+    }
+
+    .mobile-logout-btn:active {
+        transform: translate(2px, 2px);
+        box-shadow: 2px 2px 0px 0px #ff4242;
+    }
+
+    .mobile-logout-btn svg {
+        color: #ff4242;
+    }
+
+    /* ESTILOS DEL MODAL DE LOGOUT EN PERFIL */
+    .logout-modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(5px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999999;
+    }
+
+    .logout-modal-card {
+        background: white;
+        border: 4px solid black;
+        box-shadow: 8px 8px 0px 0px var(--pink, #ff2a5f);
+        position: relative;
+        padding: 2.5rem;
+        width: 90%;
+        max-width: 380px;
+        text-align: center;
+        color: black;
+    }
+
+    .modal-title {
+        font-size: 1.4rem;
+        font-weight: 900;
+        margin-bottom: 1rem;
+    }
+
+    .modal-text {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 1rem 0 2rem;
+        color: #444;
+    }
+
+    .modal-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-content {
+        padding: 1.5rem;
+    }
+    
+    .profile-card-unified {
+        padding: 1.5rem;
+    }
+    
+    .user-handle {
+        font-size: 2.2rem;
+    }
 }

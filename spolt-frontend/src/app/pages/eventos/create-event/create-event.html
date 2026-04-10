@@ -1,0 +1,98 @@
+<div class="page-content" style="padding-top: 0;">
+
+  <div class="main-options">
+    <button class="btn-option btn-partido" (click)="abrirFormulario(TipoEvento.partido)">
+      <div class="icon-wrapper">
+        <img src="eventos/iconos/Partidos.png" alt="Partido" class="option-icon">
+      </div>
+      <h2>Crear Partido</h2>
+      <p>Organiza un partido amistoso o competitivo con otras personas</p>
+    </button>
+
+    <button class="btn-option btn-torneo" (click)="abrirFormulario(TipoEvento.torneo)">
+      <div class="icon-wrapper">
+        <img src="eventos/iconos/Torneo.png" alt="Torneo" class="option-icon">
+      </div>
+      <h2>Crear Torneo</h2>
+      <p>Crea un torneo organizado con múltiples participantes</p>
+    </button>
+  </div>
+
+  @if (mensajeEnvio()) {
+    <div class="mensaje-envio">{{ mensajeEnvio() }}</div>
+  }
+
+  <!-- Modal Minimalista con Imagen -->
+  @if (mostrarFormulario()) {
+    <div class="modal-overlay" (click)="cerrarFormulario()">
+      <div class="form-modal-container" (click)="$event.stopPropagation()">
+        
+        <!-- Formulario (Izquierda) -->
+        <div class="form-side">
+          <div class="filtros-header">
+            <h3>
+              @if(tipoSeleccionado() === TipoEvento.partido){ ⚙ Nuevo Partido } 
+              @else { 🏆 Nuevo Torneo }
+            </h3>
+            <button class="filtros-close" (click)="cerrarFormulario()">✕</button>
+          </div>
+
+          <div class="filtros-body">
+            <div class="filtro-group">
+              <label class="filtro-label">Título</label>
+              <input type="text" class="filtro-input min" [(ngModel)]="titulo" placeholder="Ej: Pachanga de Viernes">
+            </div>
+
+            <div class="filtro-group">
+              <label class="filtro-label">Deporte</label>
+              <select class="filtro-select min" [(ngModel)]="id_deporte">
+                <option [ngValue]="null" disabled selected>Selecciona...</option>
+                @for (d of listaDeportes(); track d.id_deporte) {
+                  <option [ngValue]="d.id_deporte">{{ d.nombre }}</option>
+                }
+              </select>
+            </div>
+            
+            <div class="filtro-group row-group">
+              <div class="sub-group">
+                <label class="filtro-label">Participantes</label>
+                <input type="number" class="filtro-input min" [(ngModel)]="numero_max_participantes" placeholder="Ej: 10" min="2">
+              </div>
+            </div>
+
+            <div class="filtro-group row-group">
+              <div class="sub-group">
+                <label class="filtro-label">Fecha</label>
+                <input type="date" class="filtro-input min" [(ngModel)]="fecha_evento">
+              </div>
+              <div class="sub-group">
+                <label class="filtro-label">Hora</label>
+                <input type="time" class="filtro-input min" [(ngModel)]="hora_inicio">
+              </div>
+            </div>
+
+            <div class="filtro-group">
+              <label class="filtro-label">Descripción</label>
+              <textarea class="filtro-input textarea min" [(ngModel)]="descripcion" placeholder="Detalles extra..."></textarea>
+            </div>
+          </div>
+
+          <div class="filtros-footer">
+            <button class="btn-cancel" (click)="cerrarFormulario()">Cancelar</button>
+            <button class="btn-confirm" (click)="submitFormulario()">Crear</button>
+          </div>
+        </div>
+
+        <!-- Imagen (Derecha) -->
+        <div class="image-side">
+          @if(tipoSeleccionado() === TipoEvento.partido){
+            <img src="eventos/img/partidoImg.jpg" alt="Partido" class="modal-img">
+          } @else {
+            <img src="eventos/img/TorneoImg.jpg" alt="Torneo" class="modal-img">
+          }
+        </div>
+
+      </div>
+    </div>
+  }
+</div>

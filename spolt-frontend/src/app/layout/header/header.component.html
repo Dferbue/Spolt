@@ -1,0 +1,40 @@
+<header class="pixel-header">
+  <div class="logo-container">
+    <div class="logo" (click)="scrollToSection('inicio')" style="cursor: pointer;">
+      <img src="logo/Logo.png" alt="Spolt Logo" class="logo-img">
+      <span class="text">SPOLT</span>
+    </div>
+    
+    <button class="menu-toggle" (click)="toggleMenu()" [class.open]="isMenuOpen">
+      <div class="hamburger"></div>
+    </button>
+  </div>
+
+  <nav [class.open]="isMenuOpen">
+    <div class="nav-links">
+      <a (click)="closeMenuAndScroll('inicio')">INICIO</a>
+      <a (click)="closeMenuAndScroll('habilidades')">HABILIDADES</a>
+      <a (click)="closeMenuAndScroll('funcionamiento')">FUNCIONAMIENTO</a>
+      <a (click)="closeMenuAndScroll('deportes')">DEPORTES</a>
+      <a (click)="closeMenuAndScroll('conocenos')">CONOCENOS</a>
+    </div>
+    
+    <div class="header-actions mobile-actions">
+      <button class="retro-btn" routerLink="/login" (click)="isMenuOpen = false">
+        <span class="btn-text">INICIO SESIÓN</span>
+      </button>
+      <button class="retro-btn register-btn" routerLink="/register" (click)="isMenuOpen = false">
+        <span class="btn-text">REGISTRO</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="header-actions desktop-actions">
+    <button class="retro-btn" routerLink="/login">
+      <span class="btn-text">INICIO SESIÓN</span>
+    </button>
+    <button class="retro-btn register-btn" routerLink="/register">
+      <span class="btn-text">REGISTRO</span>
+    </button>
+  </div>
+</header>

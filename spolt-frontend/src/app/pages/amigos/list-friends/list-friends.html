@@ -1,0 +1,5 @@
+<div class="container">
+    @for (amistad of listFriends(); track amistad.id_amistad) {
+        <app-card [amigo]="amistad" [currentUser]="currentUser()" [listamostrada]="listaMostrada()" (amistadAction)="sendFatherAmistadAction($event)"></app-card>
+    }
+</div>

@@ -10,6 +10,8 @@ import { ConversationsModule } from './modules/conversations/conversations.modul
 import { EventsModule } from './modules/events/events.module';
 import { SportsModule } from './modules/sports/sports.module';
 import { FrindshipsModule } from './modules/frindships/frindships.module';
+import { EmailModule } from './modules/email/email.module';
+
 
 @Module({
   imports: [
@@ -22,6 +24,7 @@ import { FrindshipsModule } from './modules/frindships/frindships.module';
     EventsModule,
     ConversationsModule,
     MessagesModule,
+    EmailModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -27,6 +27,9 @@ model Usuario {
   activo          Boolean   @default(true)
   role            String    @default("user")
   refresh_token_hash String? @db.VarChar(255)
+  reset_token         String? @db.VarChar(255)
+  reset_token_expires DateTime?
+  new_email           String? @db.VarChar(100)
 
   // Relaciones
   //publicaciones           Publicacion[]

@@ -42,5 +42,15 @@ export const routes: Routes = [
       .then(m => m.RegisterPage)
   },
   // Catch all route redirects to welcome
+  {
+    path: 'reset-password',
+    loadComponent: () => import('./auth/pages/reset-password-page/reset-password-page')
+      .then(m => m.ResetPasswordPage)
+  },
+  {
+    path: 'confirm-email',
+    loadComponent: () => import('./auth/pages/confirm-email-page/confirm-email-page')
+      .then(m => m.ConfirmEmailPage)
+  },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];

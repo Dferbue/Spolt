@@ -6,7 +6,81 @@
 
     <main class="page-content">
       <div class="content-wrapper">
-        <p>Aqui van 2 opciones unirse o crear , en crear van otras 2 opciones la ed crear un partido o un torneo , con sus respectivos formularios personalizados</p>
+        <div class="header-actions" [class.is-active]="vistaActiva() !== 'inicio'">
+          <div class="title-box">
+            <h1>
+              @switch (vistaActiva()) {
+                @case ('inicio') { EVENTOS DEPORTIVOS }
+                @case ('unirse') { UNIRSE A EVENTOS }
+                @case ('crear') { CREAR EVENTO }
+                @case ('mis-eventos') { MIS EVENTOS }
+              }
+            </h1>
+          </div>
+          @if (vistaActiva() !== 'inicio') {
+            <button class="btn-volver" (click)="cambiarVista('inicio')">VOLVER AL MENÚ &gt;</button>
+          }
+        </div>
+
+        @switch (vistaActiva()) {
+          @case ('inicio') {
+            <div class="menu-principal-grid">
+              <!-- Botón Unirse -->
+              <button class="btn-menu" (click)="cambiarVista('unirse')">
+                <div class="btn-image-container">
+                  <div class="btn-icon">
+                    <img src="eventos/iconos/Unirse.png" alt="Unirse">
+                  </div>
+                </div>
+                <div class="btn-texts">
+                  <h2>UNIRSE A EVENTOS</h2>
+                  <p>Encuentra partidos y torneos</p>
+                </div>
+              </button>
+
+              <!-- Botón Crear -->
+              <button class="btn-menu" (click)="cambiarVista('crear')">
+                <div class="btn-image-container">
+                  <div class="btn-icon">
+                    <img src="eventos/iconos/Crear.png" alt="Crear">
+                  </div>
+                </div>
+                <div class="btn-texts">
+                  <h2>CREAR EVENTO</h2>
+                  <p>Organiza tu propio encuentro</p>
+                </div>
+              </button>
+
+              <!-- Botón Mis Eventos -->
+              <button class="btn-menu" (click)="cambiarVista('mis-eventos')">
+                <div class="btn-image-container">
+                  <div class="btn-icon">
+                    <img src="eventos/iconos/MisEventos.png" alt="Mis Eventos">
+                  </div>
+                </div>
+                <div class="btn-texts">
+                  <h2>MIS EVENTOS</h2>
+                  <p>Gestiona lo que has organizado</p>
+                </div>
+              </button>
+            </div>
+          }
+
+           @case ('unirse') {
+            <app-unirse-eventos></app-unirse-eventos>
+          }
+
+          @case ('crear') {
+            <app-create-event></app-create-event>
+          }
+
+          @case ('mis-eventos') {
+            <div class="status-info">
+              <div class="dot"></div>
+              <span>Historial de tus eventos creados</span>
+            </div>
+          }
+        }
       </div>
     </main>
   </div>

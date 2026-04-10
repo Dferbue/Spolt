@@ -1,0 +1,165 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background-color: #000000;
+  font-family: 'Inter', sans-serif;
+}
+
+.page-header {
+  margin-bottom: 3.5rem;
+  text-align: center;
+}
+
+.glitch {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: -2px;
+  text-transform: uppercase;
+  text-shadow: 4px 4px 0px var(--pink, #e91e63);
+}
+
+.component-wrapper {
+  width: 100%;
+  max-width: 550px;
+}
+
+.status-card {
+  background: white;
+  border: 4px solid black;
+  box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+  position: relative;
+  padding: 3rem;
+  text-align: center;
+  color: black;
+}
+
+/* PINK CORNERS */
+.card-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 3px solid var(--pink, #e91e63);
+  z-index: 5;
+}
+
+.card-corner-tl {
+  top: -4px;
+  left: -4px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.card-corner-br {
+  bottom: -4px;
+  right: -4px;
+  border-left: none;
+  border-top: none;
+}
+
+.status-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center; /* Centramos para que los hijos con width definido se alineen */
+}
+
+/* PIXEL BANNERS */
+.pixel-banner {
+  width: 100%; /* Ocupa todo el espacio disponible del padding del padre */
+  padding: 1.2rem 1.5rem;
+  border: 3px solid black;
+  font-weight: 900;
+  font-size: 1rem;
+  text-align: center;
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  text-transform: uppercase;
+  box-sizing: border-box;
+}
+
+.pixel-banner.success {
+  background: #10b981;
+  color: white;
+}
+
+.pixel-banner.error {
+  background: #ef4444;
+  color: white;
+}
+
+/* LOADING STATE */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.loading-text {
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--gray, #666);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #eee;
+  border-top: 4px solid var(--pink, #e91e63);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ACTION BUTTONS */
+.actions {
+  width: 100%; /* Aseguramos que el contenedor de la acción ocupe lo mismo que el banner */
+}
+
+.pixel-btn {
+  display: block;
+  width: 100%;
+  padding: 0.9rem;
+  border: 3px solid black;
+  background: white;
+  color: black;
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  text-transform: uppercase;
+  box-sizing: border-box;
+}
+
+.pixel-btn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+  background: #fce4ec;
+  color: var(--pink, #e91e63);
+}
+
+.pixel-btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+@media (max-width: 600px) {
+  .status-card {
+    padding: 2.5rem 1.5rem;
+  }
+  
+  .glitch {
+    font-size: 2rem;
+  }
+}

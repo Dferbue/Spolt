@@ -1,0 +1,37 @@
+<div class="page-container">
+    <div class="page-header">
+        <h1 class="glitch">CONFIRMACIÓN DE CUENTA</h1>
+    </div>
+
+    <div class="component-wrapper">
+        <div class="status-card">
+            <div class="card-corner card-corner-tl"></div>
+            <div class="card-corner card-corner-br"></div>
+
+            @if (loading()) {
+                <div class="loading-state">
+                    <p class="loading-text">SINCRONIZANDO CUENTA...</p>
+                    <div class="loading-spinner"></div>
+                </div>
+            } @else {
+                <div class="status-content">
+                    @if (successMessage()) {
+                        <div class="pixel-banner success">
+                            ✅ {{ successMessage() }}
+                        </div>
+                    }
+
+                    @if (errorMessage()) {
+                        <div class="pixel-banner error">
+                            ❌ {{ errorMessage() }}
+                        </div>
+                    }
+
+                    <div class="actions">
+                        <a routerLink="/inicio" class="pixel-btn">VOLVER AL INICIO</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

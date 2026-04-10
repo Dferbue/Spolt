@@ -9,12 +9,17 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
+import { EmailModule } from '../email/email.module';
+import { PrismaModule } from '../../prisma/prisma.module';
+
 
 @Module({
   imports: [
     ConfigModule,
     UsersModule,
     PassportModule,
+    EmailModule,
+    PrismaModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

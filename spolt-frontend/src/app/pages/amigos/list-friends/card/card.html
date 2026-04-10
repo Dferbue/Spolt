@@ -1,0 +1,74 @@
+<div class="friend-card">
+    <div class="card-header">
+        <div class="avatar-frame">
+            @if (amigoAMostrar().imagen_perfil) {
+            <img [src]="amigoAMostrar().imagen_perfil" alt="Avatar" class="avatar-img">
+            } @else {
+            <div class="avatar-placeholder">
+                <span>{{ amigoAMostrar().nombre_usuario.charAt(0).toUpperCase() }}</span>
+            </div>
+            }
+        </div>
+
+        <div class="header-text">
+            <h3 class="username">{{ amigoAMostrar().nombre_usuario }}</h3>
+            <span class="level-tag">AMIGOS DESDE: {{ amigo().fecha_respuesta | date:'dd/MM/yyyy' }}</span>
+        </div>
+    </div>
+
+    @switch (listamostrada()) {
+    @case ("amigos") {
+    <div class="card-actions">
+        <button class="btn-stats" (click)="changeStatusTargetaAmistad()">Ver amistad</button>
+        <button class="btn-delete" (click)="changeStatusWIindow()">ELIMINAR</button>
+    </div>
+    }
+    @case ("enviadas") {
+    <div class="card-actions">
+        <button class="btn-delete" (click)="changeStatusWIindow()">ELIMINAR</button>
+    </div>
+    }
+    @case ("recibidas") {
+    <div class="card-actions">
+        <button class="btn-stats"
+            (click)="sendFatherAmistadAction({ amistad: amigo(), action: 'aceptar' })">Aceptar</button>
+        <button class="btn-delete" (click)="changeStatusWIindow()">Rechazar</button>
+    </div>
+    }
+    }
+</div>
+
+
+@if(targetaAmistad){
+<div class="targetaAmistad-overlay" (click)="changeStatusTargetaAmistad()"></div>
+<div class="targetaAmistad">
+    <div class="targeta-avatar">
+        @if (amigoAMostrar().imagen_perfil) {
+        <img [src]="amigoAMostrar().imagen_perfil" alt="Avatar" class="avatar-img">
+        } @else {
+        <div class="avatar-placeholder">
+            <span>{{ amigoAMostrar().nombre_usuario.charAt(0).toUpperCase() }}</span>
+        </div>
+        }
+    </div>
+    <h3 class="targeta-name">{{ amigoAMostrar().nombre_usuario }}</h3>
+    <p class="targeta-date">Amistad forjada desde: {{ amigo().fecha_respuesta | date:'dd/MM/yyyy' }}</p>
+    <button class="btn-close" (click)="changeStatusTargetaAmistad()">CERRAR</button>
+</div>
+}
+
+@if(viewWindow){
+<div class="ventana-emergente">
+    @if(listamostrada() === 'amigos') {
+        <h3>¿Estas seguro que quieres eliminar esta amistad?</h3>
+    }
+    @if(listamostrada() === 'enviadas') {
+        <h4>¿Estas seguro que quieres eliminar esta solicitud de amistad?</h4>
+    }
+    @if(listamostrada() === 'recibidas') {
+        <h4>¿Estas seguro que quieres rechazar esta solicitud de amistad?</h4>
+    }
+    <button (click)="sendFatherAmistadAction({ amistad: amigo(), action: 'eliminar' })">Confirmar</button>
+    <button (click)="changeStatusWIindow()">Cancelar</button>
+</div>
+} 

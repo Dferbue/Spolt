@@ -21,4 +21,8 @@ export class CreateUserDto {
   @IsOptional()
   @IsDateString()
   fecha_nacimiento?: string;
+
+  @IsOptional()
+  @IsString()
+  biografia?: string;
 }

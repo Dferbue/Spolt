@@ -6,28 +6,43 @@ export class FrindshipsService {
   constructor(private prisma: PrismaService) { }
 
   // Funcion para crear la amistad entre 2 usuarios
-  async create(payload: { id_solicitante: number; id_receptor: number }) {
-    // No permitir añadirse a sí mismo
-    if (payload.id_solicitante === payload.id_receptor) {
-      throw new Error('No puedes enviarte una solicitud a ti mismo');
+  async create(payload: { id_solicitante: number; username: string }) {
+    // Buscar al usuario receptor por su nombre de usuario
+    const receptor = await this.prisma.usuario.findUnique({
+      where: {
+        nombre_usuario: payload.username,
+      },
+    });
+
+    if (!receptor) {
+      throw new NotFoundException('El usuario no existe');
     }
+
+    const id_receptor = receptor.id_usuario;
+
+    // No permitir añadirse a sí mismo
+    if (payload.id_solicitante === id_receptor) {
+      throw new BadRequestException('No puedes enviarte una solicitud a ti mismo');
+    }
+    
     // Comprobar si ya existe una relación previa
     const existingFriendship = await this.prisma.amistad.findFirst({
       where: {
         OR: [
-          { id_usuario_solicitante: payload.id_solicitante, id_usuario_receptor: payload.id_receptor },
-          { id_usuario_solicitante: payload.id_receptor, id_usuario_receptor: payload.id_solicitante },
+          { id_usuario_solicitante: payload.id_solicitante, id_usuario_receptor: id_receptor },
+          { id_usuario_solicitante: id_receptor, id_usuario_receptor: payload.id_solicitante },
         ],
       },
     });
     if (existingFriendship) {
-      throw new Error('Ya existe una solicitud o amistad entre estos usuarios');
+      throw new BadRequestException('Ya existe una solicitud o amistad entre estos usuarios');
     }
+    
     // Crear si todo está OK
     return await this.prisma.amistad.create({
       data: {
         id_usuario_solicitante: payload.id_solicitante,
-        id_usuario_receptor: payload.id_receptor,
+        id_usuario_receptor: id_receptor,
         estado: 'pendiente',
       },
     });
@@ -83,7 +98,10 @@ export class FrindshipsService {
         estado: 'pendiente',
       },
       include: {
-        solicitante: { // Incluimos quién nos la envía para ver su nombre/foto
+        solicitante: {
+          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true }
+        },
+        receptor: {
           select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true }
         }
       }
@@ -98,7 +116,10 @@ export class FrindshipsService {
         estado: 'pendiente',
       },
       include: {
-        receptor: { // Incluimos a quién se la enviamos
+        solicitante: {
+          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true }
+        },
+        receptor: {
           select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true }
         }
       }

@@ -8,11 +8,11 @@ export class FrindshipsController {
   constructor(private readonly frindshipsService: FrindshipsService) { }
 
   //Creamos la amistad
-  @Post(':id')
-  create(@Req() req: any, @Param('id') id_receptor: string) {
+  @Post(':username')
+  create(@Req() req: any, @Param('username') username: string) {
     return this.frindshipsService.create({
       id_solicitante: req.user.id_usuario,
-      id_receptor: Number(id_receptor),
+      username: username,
     });
   }
 
