@@ -5,8 +5,6 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
-import { MessagesModule } from './modules/messages/messages.module';
-import { ConversationsModule } from './modules/conversations/conversations.module';
 import { EventsModule } from './modules/events/events.module';
 import { SportsModule } from './modules/sports/sports.module';
 import { FrindshipsModule } from './modules/frindships/frindships.module';
@@ -22,8 +20,6 @@ import { EmailModule } from './modules/email/email.module';
     FrindshipsModule,
     SportsModule,
     EventsModule,
-    ConversationsModule,
-    MessagesModule,
     EmailModule
   ],
   controllers: [AppController],

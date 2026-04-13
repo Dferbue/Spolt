@@ -4,11 +4,12 @@ import { Sidebar } from '../../layout/sidebar/sidebar';
 import { HeaderAplicarion } from '../../layout/header-aplicarion/header-aplicarion';
 import { UnirseEventos } from './unirse-eventos/unirse-eventos';
 import { CreateEventForm } from './create-event/create-event';
+import { MyEvents } from './my-events/my-events';
 
 @Component({
   selector: 'app-eventos',
   standalone: true,
-  imports: [CommonModule, Sidebar, HeaderAplicarion, UnirseEventos, CreateEventForm],
+  imports: [CommonModule, Sidebar, HeaderAplicarion, UnirseEventos, CreateEventForm, MyEvents],
   templateUrl: './eventos.html',
   styleUrl: './eventos.css',
 })

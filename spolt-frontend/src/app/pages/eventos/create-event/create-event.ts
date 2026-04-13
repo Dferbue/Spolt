@@ -1,6 +1,6 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, EventEmitter, inject, Input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CreateEvent, TipoEvento } from '../models/createEvent';
+import { CreateEvent, EventInterface, TipoEvento } from '../models/createEvent';
 import { EventosService } from '../service/eventos.service';
 import { HttpClient } from '@angular/common/http';
 
@@ -11,6 +11,7 @@ import { HttpClient } from '@angular/common/http';
   styleUrl: './create-event.css',
 })
 export class CreateEventForm {
+  onComplete = output<void>();
   private readonly eventosService = inject(EventosService);
   public TipoEvento = TipoEvento;
 
@@ -60,6 +61,12 @@ export class CreateEventForm {
       return;
     }
 
+    if (this.numero_max_participantes! > 50) {
+      this.mensajeEnvio.set('⚠️ El número máximo de participantes es 50');
+      setTimeout(() => this.mensajeEnvio.set(''), 3000);
+      return;
+    }
+
     const fechaHoraEvento = new Date(`${this.fecha_evento}T${this.hora_inicio}`);
     const ahora = new Date();
 
@@ -68,7 +75,14 @@ export class CreateEventForm {
       setTimeout(() => this.mensajeEnvio.set(''), 3000);
       return;
     }
+    const unAnioFuturo = new Date();
+    unAnioFuturo.setFullYear(unAnioFuturo.getFullYear() + 1);
 
+    if (fechaHoraEvento > unAnioFuturo) {
+      this.mensajeEnvio.set('⚠️ El evento no puede programarse a más de un año vista');
+      setTimeout(() => this.mensajeEnvio.set(''), 3000);
+      return;
+    }
     const data: CreateEvent = {
       titulo: this.titulo,
       descripcion: this.descripcion || undefined,
@@ -87,8 +101,11 @@ export class CreateEventForm {
     this.eventosService.createEvent(data).subscribe({
       next: () => {
         this.mensajeEnvio.set('✅ Se ha creado correctamente el evento');
-        this.cerrarFormulario();
-        setTimeout(() => this.mensajeEnvio.set(''), 3000);
+        this.onComplete.emit();
+        setTimeout(() => {
+          this.mensajeEnvio.set('');
+          this.cerrarFormulario();
+        }, 2000);
       },
       error: () => {
         this.mensajeEnvio.set('❌ Error al crear el evento');

@@ -30,6 +30,7 @@ export class Perfil {
   passwordEmailSent = false;
   emailChangeRequested = false;
   showLogoutConfirm = false; // Estado para el modal de logout móvil
+  showPasswordConfirm = false; // Estado para el modal de confirmación de password
 
   ngOnInit() {
     this.loadUserData();
@@ -44,11 +45,22 @@ export class Perfil {
 
   solicitudDeCambio(formName: string) {
     if (formName === 'password') {
-      this.solicitarCambioPassword();
+      this.showPasswordConfirm = true;
+      this.cdr.detectChanges();
       return;
     }
     // Para email, seguimos necesitando que introduzca el nuevo email
     this.activeForm = this.activeForm === formName ? null : formName;
+  }
+
+  cancelPasswordConfirm() {
+    this.showPasswordConfirm = false;
+    this.cdr.detectChanges();
+  }
+
+  confirmPasswordChange() {
+    this.showPasswordConfirm = false;
+    this.solicitarCambioPassword();
   }
 
   solicitarCambioPassword() {

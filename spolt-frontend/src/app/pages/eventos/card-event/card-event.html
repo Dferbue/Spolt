@@ -14,7 +14,16 @@
 
         <div class="header-text">
             <h3 class="event-title">{{ evento()?.titulo }}</h3>
-            <span class="deporte-tag">{{ (evento()?.deporte?.nombre || evento()?.nombre_deporte) | uppercase }}</span>
+            <div class="tags-row">
+                <span class="deporte-tag">{{ (evento()?.deporte?.nombre || evento()?.nombre_deporte) | uppercase }}</span>
+                <span class="tipo-tag" [ngClass]="evento()?.tipo_evento === 'partido' ? 'tag-partido' : 'tag-torneo'">
+                    @if (evento()?.tipo_evento === 'partido') {
+                        ⚔️ PARTIDO
+                    } @else {
+                        🏆 TORNEO
+                    }
+                </span>
+            </div>
         </div>
     </div>
 
@@ -71,10 +80,15 @@
     </div>
 
     <div class="card-actions">
-        @if (isJoined()) {
-            <button class="btn-join btn-leave" style="background-color: var(--color-danger, #ff3366); border: 2px solid var(--color-danger, #ff3366);" (click)="sendIDevent({ evento: evento()!, action: 'leave' })">SALIR</button>
+        @if (isOwner()) {
+            <button class="btn-join btn-edit" (click)="sendIDevent({ evento: evento()!, action: 'edit' })">EDITAR</button>
+            <button class="btn-join btn-leave" style="background-color: var(--color-danger, #ff3366); border: 2px solid var(--color-danger, #ff3366);" (click)="sendIDevent({ evento: evento()!, action: 'delete' })">ELIMINAR</button>
         } @else {
-            <button class="btn-join" (click)="sendIDevent({ evento: evento()!, action: 'join' })">UNIRSE</button>
+            @if (isJoined()) {
+                <button class="btn-join btn-leave" style="background-color: var(--color-danger, #ff3366); border: 2px solid var(--color-danger, #ff3366);" (click)="sendIDevent({ evento: evento()!, action: 'leave' })">SALIR</button>
+            } @else {
+                <button class="btn-join" (click)="sendIDevent({ evento: evento()!, action: 'join' })">UNIRSE</button>
+            }
         }
         <button class="btn-details" (click)="sendIDevent({ evento: evento()!, action: 'details' })">DETALLES</button>
     </div>

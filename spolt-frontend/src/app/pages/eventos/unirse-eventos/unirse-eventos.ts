@@ -1,25 +1,33 @@
-// Force TS rebuild
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewEncapsulation, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ListEvents } from '../list-events/list-events';
-import { signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EventosService } from '../service/eventos.service';
 import { EventInterface, eventAction } from '../models/createEvent';
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-unirse-eventos',
-  imports: [ListEvents, FormsModule],
+  standalone: true,
+  imports: [CommonModule, ListEvents, FormsModule],
   templateUrl: './unirse-eventos.html',
   styleUrl: './unirse-eventos.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class UnirseEventos {
   private readonly eventService = inject(EventosService)
 
   tabActiva = signal("public");
-  mensajeEnvio=signal('');
+  mensajeEnvio = signal('');
+
+  private map: L.Map | undefined;
+  private resizeObserver: ResizeObserver | undefined;
 
   public mostrarModalSalir = signal<boolean>(false);
   public eventoIdParaSalir = signal<number | null>(null);
+
+  public mostrarModalDetalles = signal<boolean>(false);
+  public eventSelected = signal<EventInterface | null>(null);
 
   // ── FILTROS ──
   public mostrarVentanaDeFiltros = signal<boolean>(false);
@@ -66,9 +74,7 @@ export class UnirseEventos {
     this.filtroFechaHasta.set('');
   }
 
-  aplicarFiltros() {
-    this.cerrarFiltros();
-  }
+
 
   // Función genérica que aplica los filtros a cualquier lista de eventos
   private aplicarFiltrosALista(eventos: EventInterface[]): EventInterface[] {
@@ -204,7 +210,83 @@ export class UnirseEventos {
     }else if(data.action=== "leave"){
       this.eventoIdParaSalir.set(ide);
       this.mostrarModalSalir.set(true);
+    }else if (data.action === "details") {
+      this.eventSelected.set(data.evento);
+      this.mostrarModalDetalles.set(true);
+      setTimeout(() => this.initMap(), 50);
     }
+  }
+
+  // Lógica Detalles
+  cerrarModalDetalles() {
+    this.mostrarModalDetalles.set(false);
+    this.eventSelected.set(null);
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = undefined;
+    }
+    if (this.map) {
+      this.map.remove();
+      this.map = undefined;
+    }
+  }
+
+  initMap() {
+    const event = this.eventSelected();
+    if (!event) return;
+
+    if (this.map) {
+      this.map.remove();
+    }
+
+    const mapContainer = document.getElementById('map-details');
+    if (!mapContainer) return;
+
+    const lat = event.latitud || 40.4168; 
+    const lng = event.longitud || -3.7038;
+
+    this.map = L.map('map-details').setView([lat, lng], 17);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors'
+    }).addTo(this.map);
+
+    const redIcon = new L.Icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    });
+
+    L.marker([lat, lng], { icon: redIcon }).addTo(this.map)
+      .bindPopup(`<b>${event.titulo}</b><br>${event.ubicacion || 'Ubicación por defecto'}`)
+      .openPopup();
+    
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+    this.resizeObserver = new ResizeObserver(() => {
+      this.map?.invalidateSize();
+    });
+    this.resizeObserver.observe(mapContainer);
+
+    setTimeout(() => {
+      this.map?.invalidateSize();
+    }, 100);
+  }
+
+  // Helper para formatear la hora en la vista de detalles
+  formatTime(time: string | null | undefined): string {
+    if (!time) return '--:--';
+    if (time.includes('T')) {
+      const date = new Date(time);
+      const pad = (n: number) => n < 10 ? '0' + n : n;
+      return `${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}`;
+    }
+    return time.substring(0, 5);
   }
 
   confirmarSalirEvent() {

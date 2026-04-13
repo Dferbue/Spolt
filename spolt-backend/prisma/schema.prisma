@@ -37,8 +37,6 @@ model Usuario {
   amistades_recibidas     Amistad[]              @relation("Receptor")
   eventos_creados         EventoDeportivo[]
   participaciones_evento  ParticipanteEvento[]
-  participaciones_chat    ParticipanteConversacion[]
-  mensajes_enviados       Mensaje[]
 
   @@index([nombre_usuario])
   @@index([email])
@@ -161,78 +159,4 @@ model ParticipanteEvento {
   @@index([id_evento])
   @@index([id_usuario])
   @@map("participantes_evento")
-}
-
-// ─────────────────────────────────────────────
-// CONVERSACIONES
-// ─────────────────────────────────────────────
-enum TipoConversacion {
-  individual
-  grupo
-}
-
-model Conversacion {
-  id_conversacion  Int               @id @default(autoincrement())
-  tipo             TipoConversacion  @default(individual)
-  nombre_grupo     String?           @db.VarChar(100)
-  fecha_creacion   DateTime          @default(now())
-  ultima_actividad DateTime          @default(now()) @updatedAt
-
-  // Relaciones
-  participantes ParticipanteConversacion[]
-  mensajes      Mensaje[]
-
-  @@index([ultima_actividad])
-  @@map("conversaciones")
-}
-
-// ─────────────────────────────────────────────
-// PARTICIPANTES EN CONVERSACIONES
-// ─────────────────────────────────────────────
-model ParticipanteConversacion {
-  id_participante       Int      @id @default(autoincrement())
-  id_conversacion       Int
-  id_usuario            Int
-  fecha_union           DateTime @default(now())
-  ultimo_mensaje_leido  Int?
-  notificaciones_activas Boolean @default(true)
-
-  // Relaciones
-  conversacion Conversacion @relation(fields: [id_conversacion], references: [id_conversacion], onDelete: Cascade)
-  usuario      Usuario      @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
-
-  @@unique([id_conversacion, id_usuario])
-  @@index([id_conversacion])
-  @@index([id_usuario])
-  @@map("participantes_conversacion")
-}
-
-// ─────────────────────────────────────────────
-// MENSAJES
-// ─────────────────────────────────────────────
-enum TipoMensaje {
-  texto
-  imagen
-  archivo
-  ubicacion
-}
-
-model Mensaje {
-  id_mensaje        Int         @id @default(autoincrement())
-  id_conversacion   Int
-  id_usuario_emisor Int
-  contenido         String      @db.Text
-  tipo_mensaje      TipoMensaje @default(texto)
-  url_archivo       String?     @db.VarChar(255)
-  fecha_envio       DateTime    @default(now())
-  editado           Boolean     @default(false)
-  fecha_edicion     DateTime?
-
-  // Relaciones
-  conversacion Conversacion @relation(fields: [id_conversacion], references: [id_conversacion], onDelete: Cascade)
-  emisor       Usuario      @relation(fields: [id_usuario_emisor], references: [id_usuario], onDelete: Cascade)
-
-  @@index([id_conversacion, fecha_envio])
-  @@index([id_usuario_emisor])
-  @@map("mensajes")
 }

@@ -11,6 +11,7 @@ export class CardEvent {
     //Imputs
     public evento=input<EventInterface>();
     public isJoined=input<boolean>(false);
+    public isOwner=input<boolean>(false);
 
     //Output
     protected out_Id_Event=output<eventAction>();

@@ -8,6 +8,7 @@ import {
   IsNumber,
   MaxLength,
   Min,
+  Max,
 } from 'class-validator';
 
 enum TipoEvento {
@@ -61,5 +62,6 @@ export class CreateEventDto {
   @IsNotEmpty()
   @IsInt()
   @Min(2)
+  @Max(50)
   numero_max_participantes: number;
 }

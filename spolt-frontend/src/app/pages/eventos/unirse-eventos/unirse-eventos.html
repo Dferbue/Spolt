@@ -159,11 +159,83 @@
 
         <div class="filtros-footer">
           <button class="btn-cancel" (click)="limpiarFiltros()">Limpiar Todo</button>
-          <button class="btn-confirm" (click)="aplicarFiltros()">Aplicar</button>
+          <button class="btn-confirm" (click)="cerrarFiltros()">Aplicar</button>
         </div>
       </div>
     </div>
   }
 
+  <!-- MODAL DE DETALLES (Minimalista con Mapa) -->
+  @if (mostrarModalDetalles() && eventSelected(); as event) {
+    <div class="modal-overlay" (click)="cerrarModalDetalles()">
+      <div class="minimalist-modal-container details-view" (click)="$event.stopPropagation()">
+        
+        <!-- Información (Izquierda) -->
+        <div class="form-side">
+          <div class="header-row-1">
+            <div class="sport-icon-name">
+              @if (event.deporte?.imagen_icono) {
+                <img [src]="event.deporte!.imagen_icono" alt="Deporte" class="sport-icon-min">
+              } @else {
+                <div class="sport-icon-min sport-question">?</div>
+              }
+              <span class="sport-name">{{ (event.deporte?.nombre || event.nombre_deporte) }}</span>
+            </div>
+            <div class="header-stats">
+              <div class="stat-item"><i class="icon-date">📅</i> {{ event.fecha_evento | date:'dd/MM/yyyy' }}</div>
+              <div class="stat-item"><i class="icon-time">⏰</i> {{ formatTime(event.hora_inicio) }}</div>
+              <div class="stat-item"><i class="icon-users">👥</i> {{ event.numero_participantes_actuales || event.participantes_actuales || 0 }}/{{ event.numero_max_participantes }}</div>
+            </div>
+          </div>
+          
+          <div class="creator-row">
+            @if (event.creador?.imagen_perfil) {
+              <img [src]="event.creador!.imagen_perfil" alt="Creador" class="creator-avatar">
+            } @else {
+              <div class="creator-avatar avatar-initial">{{ (event.creador?.nombre_usuario || event.nombre_creador || '?').charAt(0) | uppercase }}</div>
+            }
+            <span class="creator-name">{{ event.creador?.nombre_usuario || event.nombre_creador }}</span>
+          </div>
+
+          <div class="details-body-scroll">
+            <div class="description-block">
+              {{ event.descripcion || 'Sin descripción disponible.' }}
+            </div>
+
+            <div class="participants-section">
+              <h4>Participantes</h4>
+              <ul class="participants-list">
+                @for (p of event.participantes; track p?.usuario?.id_usuario) {
+                  @if (p?.usuario) {
+                    <li class="participant-item">
+                      @if (p.usuario.imagen_perfil) {
+                        <img [src]="p.usuario.imagen_perfil" alt="Avatar" class="participant-avatar">
+                      } @else {
+                        <div class="participant-avatar avatar-initial">{{ p.usuario.nombre_usuario.charAt(0) | uppercase }}</div>
+                      }
+                      <span class="participant-name">{{ p.usuario.nombre_usuario }}</span>
+                    </li>
+                  }
+                }
+                @if (!event.participantes || event.participantes.length === 0) {
+                  <li class="no-participants">Aún no hay participantes unidos.</li>
+                }
+              </ul>
+            </div>
+          </div>
+
+          <div class="filtros-footer details-footer">
+            <button class="btn-cancel-edit close-full" (click)="cerrarModalDetalles()">CERRAR</button>
+          </div>
+        </div>
+
+        <!-- Mapa (Derecha) -->
+        <div class="image-side map-wrapper">
+          <div id="map-details" class="map-container"></div>
+        </div>
+
+      </div>
+    </div>
+  }
 </div>
 

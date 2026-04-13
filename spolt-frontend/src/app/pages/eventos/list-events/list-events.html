@@ -1,5 +1,5 @@
 <div class="container">
     @for (event of listEvents(); track event.id_evento || event.id) {
-        <app-card-event [evento]="event" [isJoined]="joinedEventsId().includes(event.id_evento || event.id || 0)" (out_Id_Event)="sendIdEvent($event)"></app-card-event>
+        <app-card-event [evento]="event" [isJoined]="joinedEventsId().includes(event.id_evento || event.id || 0)" [isOwner]="isOwner()" (out_Id_Event)="sendIdEvent($event)"></app-card-event>
     }
 </div>

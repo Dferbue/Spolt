@@ -58,12 +58,14 @@ export class EventsController {
   }
 
   //Actulizar eventos
+  @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
     return this.eventsService.update(+id, updateEventDto);
   }
 
   //Eliminar evemto
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.eventsService.remove(+id);

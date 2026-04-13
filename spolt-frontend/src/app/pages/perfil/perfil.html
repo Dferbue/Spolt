@@ -154,24 +154,21 @@
 
       </div> <!-- Cierre content-wrapper -->
 
-      <!-- MODAL DE CONFIRMACIÓN DE CIERRE DE SESIÓN (MÓVIL) -->
+      <!-- MODAL DE CONFIRMACIÓN DE CIERRE DE SESIÓN -->
       @if (showLogoutConfirm) {
-        <div class="logout-modal-backdrop" (click)="toggleLogoutConfirm()">
-          <div class="logout-modal-card" (click)="$event.stopPropagation()">
-            <div class="card-corner card-corner-tl"></div>
-            <div class="card-corner card-corner-br"></div>
+        <div class="ventana-emergente">
+          <h3>¿ESTÁS SEGURO QUE QUIERES CERRAR SESIÓN?</h3>
+          <button (click)="confirmLogout()">Confirmar</button>
+          <button (click)="toggleLogoutConfirm()">Cancelar</button>
+        </div>
+      }
 
-            <div class="modal-header">
-              <h3 class="modal-title">¿CERRAR SESIÓN?</h3>
-            </div>
-            
-            <p class="modal-text">¿ESTÁS SEGURO DE QUE QUIERES ABANDONAR LA PARTIDA?</p>
-
-            <div class="modal-actions">
-              <button class="action-btn confirm" (click)="confirmLogout()">SÍ, SALIR</button>
-              <button class="action-btn cancel" (click)="toggleLogoutConfirm()">CANCELAR</button>
-            </div>
-          </div>
+      <!-- MODAL DE CONFIRMACIÓN DE CAMBIO DE CONTRASEÑA -->
+      @if (showPasswordConfirm) {
+        <div class="ventana-emergente">
+          <h3>¿ESTÁS SEGURO QUE QUIERES CAMBIAR LA CONTRASEÑA?</h3>
+          <button (click)="confirmPasswordChange()">Confirmar</button>
+          <button (click)="cancelPasswordConfirm()">Cancelar</button>
         </div>
       }
       } @else {

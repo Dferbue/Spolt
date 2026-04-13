@@ -72,3 +72,263 @@ body {
 
 .green { background-color: var(--green); }
 .pink { background-color: var(--pink); }
+
+/* ── GLOBAL DETAILS MODAL STYLES (Minimalist) ── */
+.minimalist-modal-container {
+  background: #ffffff;
+  border: 2px solid #000;
+  box-shadow: 8px 8px 0px var(--pink, #ff006e);
+  width: 95%;
+  max-width: 950px;
+  max-height: 90vh;
+  display: flex;
+  overflow: hidden;
+  animation: modalIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.form-side {
+  flex: 1.2;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  min-width: 350px;
+}
+
+.image-side {
+  flex: 1;
+  background: #f4f4f4;
+  display: flex;
+}
+
+.details-view {
+  max-width: 900px;
+}
+
+.details-view .form-side {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 2px solid #eee;
+}
+
+.header-row-1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 2rem 0.5rem;
+  background: white;
+}
+
+.sport-icon-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sport-icon-min {
+  width: 45px;
+  height: 45px;
+  border: 1px solid #111;
+  border-radius: 8px;
+  padding: 4px;
+  object-fit: contain;
+}
+
+.sport-question {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--pink, #ff006e);
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 900;
+  padding: 0;
+}
+
+.sport-name {
+  font-size: 1.4rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  color: #111;
+  letter-spacing: -0.5px;
+}
+
+.header-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+.stat-item {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stat-item i {
+  font-style: normal;
+}
+
+.creator-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 2rem 1.5rem;
+  border-bottom: 2px solid #eee;
+}
+
+.creator-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #111;
+  object-fit: cover;
+}
+
+.creator-name {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #000;
+}
+
+.details-body-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.description-block {
+  padding: 1rem;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #333;
+  font-weight: 600;
+}
+
+.participants-section h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #111;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 4px;
+  display: inline-block;
+}
+
+.participants-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.participant-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.participant-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  object-fit: cover;
+}
+
+.avatar-initial {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #111;
+  color: white;
+  font-weight: 900;
+  font-size: 1rem;
+}
+
+.participant-item .avatar-initial {
+  font-size: 0.8rem;
+}
+
+.participant-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #222;
+}
+
+.no-participants {
+  font-size: 0.85rem;
+  color: #888;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.details-footer {
+  padding: 1.5rem 2rem;
+  border-top: none;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-cancel-edit.close-full {
+  width: 100%;
+  text-align: center;
+  justify-content: center;
+  padding: 12px 0;
+  font-weight: 950;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  border-radius: 6px;
+  background: white;
+  color: #000;
+  border: 2px solid #ccc;
+}
+
+.btn-cancel-edit.close-full:hover {
+  background: #f0f0f0;
+  border-color: #bbb;
+}
+
+.map-wrapper {
+  padding: 0;
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  background: #e0e0e0;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 600px) {
+  .minimalist-modal-container { flex-direction: column; height: auto; max-height: 95vh; }
+  .image-side { display: none; }
+  .form-side { min-width: 100%; }
+}

@@ -11,6 +11,14 @@ export class EventsService {
   create(createEventDto: CreateEventDto, id_creador: number) {
     const { fecha_evento, hora_inicio, hora_fin, ...rest } = createEventDto;
 
+    const fecha = new Date(fecha_evento);
+    const unAnioFuturo = new Date();
+    unAnioFuturo.setFullYear(unAnioFuturo.getFullYear() + 1);
+
+    if (fecha > unAnioFuturo) {
+      throw new BadRequestException('El evento no puede programarse a más de un año vista');
+    }
+
     return this.prisma.eventoDeportivo.create({
       data: {
         ...rest,
@@ -108,6 +116,16 @@ export class EventsService {
 
   update(id: number, updateEventDto: UpdateEventDto) {
     const { fecha_evento, hora_inicio, hora_fin, ...rest } = updateEventDto;
+
+    if (fecha_evento) {
+      const fecha = new Date(fecha_evento);
+      const unAnioFuturo = new Date();
+      unAnioFuturo.setFullYear(unAnioFuturo.getFullYear() + 1);
+
+      if (fecha > unAnioFuturo) {
+        throw new BadRequestException('El evento no puede programarse a más de un año vista');
+      }
+    }
 
     const dataToUpdate: any = { ...rest };
 

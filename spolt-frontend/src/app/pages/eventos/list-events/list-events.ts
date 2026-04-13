@@ -1,3 +1,4 @@
+// Force refresh to resolve property binding issues
 import { Component, input, output } from '@angular/core';
 import { EventInterface ,eventAction} from '../models/createEvent';
 import { CardEvent } from '../card-event/card-event';
@@ -13,6 +14,7 @@ export class ListEvents {
   //Inputs 
   public listEvents= input<EventInterface[]>();
   public joinedEventsId = input<number[]>([]);
+  public isOwner = input<boolean>(false);
 
   //Ootputs
   protected output_Id_Event= output<eventAction>();

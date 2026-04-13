@@ -1,0 +1,463 @@
+
+.my-events-container {
+  padding-top: 0;
+}
+
+/* ── TABS (Neo-Brutalist) ── */
+.tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 2rem;
+  border: 3px solid #000;
+  background: white;
+  box-shadow: 5px 5px 0px #000;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  cursor: pointer;
+  border-right: 3px solid #000;
+  transition: all 0.2s;
+  background: white;
+  color: #000;
+}
+
+.tab:last-child {
+  border-right: none;
+}
+
+.tab h2 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tab.active {
+  background-color: var(--pink, #ff006e);
+  color: white;
+}
+
+.tab:hover:not(.active) {
+  background-color: #f8f8f8;
+  transform: translateY(-2px);
+}
+
+/* ── STATUS INFO ── */
+.status-info {
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #444;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+
+.status-info .dot {
+  width: 12px;
+  height: 12px;
+  background-color: var(--pink, #ff006e);
+  border: 2px solid #000;
+}
+
+/* ── STATES (Loading / No Data) ── */
+.loading-screen, .no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem;
+  border: 4px dashed #000;
+  background: white;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-align: center;
+  border-radius: 16px;
+  box-shadow: 8px 8px 0px rgba(0,0,0,0.1);
+}
+
+.no-data-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  color: #000;
+}
+
+.no-data p {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.no-data .subtitle {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.8rem;
+  font-weight: 700;
+}
+
+.blink {
+  animation: blinker 1s steps(2, start) infinite;
+  color: var(--pink, #ff006e);
+}
+
+@keyframes blinker {
+  to { visibility: hidden; }
+}
+
+/* ── MODALS BASE ── */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  backdrop-filter: blur(4px);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.modal-content {
+  background: white;
+  border: 4px solid #000;
+  box-shadow: 12px 12px 0px var(--pink, #ff006e);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  animation: modalIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+@keyframes modalIn {
+  from { transform: scale(0.9) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #000;
+  color: white;
+  border: 2px solid #000;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  z-index: 10;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: var(--pink, #ff006e);
+  transform: rotate(90deg);
+}
+
+/* ── DETAILS MODAL ── */
+.details-header {
+  padding: 2.5rem 2rem 1.5rem;
+  border-bottom: 4px solid #000;
+  background: #f8f8f8;
+}
+
+.details-header h2 {
+  margin: 0.5rem 0 0;
+  font-size: 2rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+}
+
+.deporte-tag {
+  display: inline-block;
+  background: #000;
+  color: white;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.details-grid {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-label {
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.detail-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.modal-actions-details {
+  padding: 1.5rem 2rem 2.5rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-edit, .btn-close-details {
+  flex: 1;
+  padding: 15px;
+  font-weight: 950;
+  text-transform: uppercase;
+  border: 4px solid #000;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-edit {
+  background: #000;
+  color: white;
+}
+
+.btn-edit:hover {
+  background: var(--pink, #ff006e);
+  transform: translate(-4px, -4px);
+  box-shadow: 4px 4px 0px #000;
+}
+
+.btn-close-details {
+  background: white;
+  color: #000;
+}
+
+.btn-close-details:hover {
+  background: #eee;
+  transform: translate(-4px, -4px);
+  box-shadow: 4px 4px 0px #000;
+}
+
+/* ── EDIT MODAL ── */
+.edit-modal-content {
+  max-width: 800px;
+}
+
+.edit-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 4px solid #000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #000;
+  color: white;
+}
+
+.edit-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.edit-header .close-btn {
+  position: static;
+  background: white;
+  color: #000;
+}
+
+.edit-body {
+  padding: 1rem;
+  background: #f0f0f0;
+}
+
+/* ── EDIT FORM MODAL (Minimalista & Directo) ── */
+.modal-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.filtros-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 2.5rem;
+  background: white;
+}
+
+.filtros-header h3 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 950;
+  color: #111;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+}
+
+.filtros-close {
+  background: transparent;
+  border: none;
+  color: #111;
+  font-size: 1.5rem;
+  cursor: pointer;
+  font-weight: 900;
+  transition: all 0.2s;
+}
+
+.filtros-close:hover {
+  color: var(--pink, #ff006e);
+  transform: rotate(90deg);
+}
+
+.filtros-body {
+  padding: 0 2.5rem 1rem 2.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+}
+
+.filtro-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.sub-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filtro-label {
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Inputs Minimalistas (solo borde inferior) */
+.filtro-input.min,
+.filtro-select.min {
+  padding: 10px 0;
+  border: none;
+  border-bottom: 3px solid #eee;
+  background: transparent;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #111;
+  outline: none;
+  width: 100%;
+  transition: border-bottom-color 0.3s;
+}
+
+.filtro-input.min:focus,
+.filtro-select.min:focus {
+  border-bottom-color: var(--pink, #ff006e);
+}
+
+.filtro-input.textarea.min {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.filtros-footer {
+  padding: 2rem 2.5rem;
+  display: flex;
+  gap: 1.5rem;
+  background: white;
+  margin-top: auto;
+}
+
+.btn-cancel-edit, 
+.btn-confirm-edit {
+  flex: 1;
+  text-align: center;
+  justify-content: center;
+  padding: 12px 0;
+  font-weight: 950;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  border-radius: 6px;
+}
+
+.btn-cancel-edit {
+  background: white;
+  color: #000;
+  border: 2px solid #ccc; /* Lighter thinner border for cancel */
+}
+
+.btn-cancel-edit:hover {
+  background: #f0f0f0;
+  border-color: #bbb;
+}
+
+.btn-confirm-edit {
+  background: var(--pink, #ff006e);
+  color: white;
+  border: 3px solid #000; /* Distinct thick border for confirm */
+}
+
+.btn-confirm-edit:hover {
+  background: #e60063;
+  transform: translate(-3px, -3px);
+  box-shadow: 6px 6px 0px #000;
+}
+
+/* ── MENSAJE ENVIO ── */
+.mensaje-envio {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: #000;
+  color: white;
+  border: 4px solid var(--pink, #ff006e);
+  padding: 1.2rem 2rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+  z-index: 4001;
+  box-shadow: 8px 8px 0px var(--pink, #ff006e);
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+}
