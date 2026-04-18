@@ -39,8 +39,8 @@
         <div class="info-item">
             <span class="label">ORGANIZADO POR:</span>
             <div class="value" style="display: flex; align-items: center; gap: 8px;">
-                @if (evento()?.creador?.imagen_perfil) {
-                    <img [src]="'http://localhost:3000/uploads/profiles/' + evento()?.creador?.imagen_perfil" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-primary);" alt="Avatar de creador">
+                @if (evento()?.creador?.imagen_perfil; as img) {
+                    <img [src]="apiUrl + '/storage/' + (img.split('/').pop())" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-primary);" alt="Avatar de creador">
                 } @else {
                     <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--color-primary); color: var(--bg-card); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">
                         {{ (evento()?.creador?.nombre_usuario || evento()?.nombre_creador || '?').charAt(0).toUpperCase() }}
@@ -57,8 +57,8 @@
                 <div class="avatar-group">
                     @if (evento()?.participantes && evento()?.participantes!.length > 0) {
                         @for (p of evento()?.participantes!.slice(0, 5); track p.usuario.id_usuario) {
-                            @if (p.usuario.imagen_perfil) {
-                                <img [src]="'http://localhost:3000/uploads/profiles/' + p.usuario.imagen_perfil" class="avatar-item" [alt]="p.usuario.nombre_usuario" [title]="p.usuario.nombre_usuario">
+                            @if (p.usuario.imagen_perfil; as img) {
+                                <img [src]="apiUrl + '/storage/' + (img.split('/').pop())" class="avatar-item" [alt]="p.usuario.nombre_usuario" [title]="p.usuario.nombre_usuario">
                             } @else {
                                 <div class="avatar-item avatar-placeholder" [title]="p.usuario.nombre_usuario">
                                     {{ p.usuario.nombre_usuario.charAt(0).toUpperCase() }}
@@ -81,15 +81,25 @@
 
     <div class="card-actions">
         @if (isOwner()) {
+            @if (evento()?.estado === 'abierto' || evento()?.estado === 'cerrado') {
+                @if ((evento()?.numero_participantes_actuales || evento()?.participantes_actuales || 0) >= (evento()?.numero_max_participantes || 1) && eventoYaComenzo) {
+                    <button class="btn-join btn-finalizar" style="background-color: #FFE800; border: 2px solid #111; color: #111; font-weight: 900;" (click)="sendIDevent({ evento: evento()!, action: 'finalizar' })">FINALIZAR</button>
+                } @else if (!eventoYaComenzo) {
+                    <button class="btn-join btn-finalizar btn-disabled" title="El evento aún no ha comenzado" disabled style="background-color: #555; border: 2px solid #333; color: #999; font-weight: 900; cursor: not-allowed; opacity: 0.6;">⏳ FINALIZAR</button>
+                } @else {
+                    <button class="btn-join btn-finalizar btn-disabled" title="El evento debe estar lleno para finalizarlo" disabled style="background-color: #555; border: 2px solid #333; color: #999; font-weight: 900; cursor: not-allowed; opacity: 0.6;">🔒 FINALIZAR</button>
+                }
+            }
             <button class="btn-join btn-edit" (click)="sendIDevent({ evento: evento()!, action: 'edit' })">EDITAR</button>
             <button class="btn-join btn-leave" style="background-color: var(--color-danger, #ff3366); border: 2px solid var(--color-danger, #ff3366);" (click)="sendIDevent({ evento: evento()!, action: 'delete' })">ELIMINAR</button>
-        } @else {
-            @if (isJoined()) {
-                <button class="btn-join btn-leave" style="background-color: var(--color-danger, #ff3366); border: 2px solid var(--color-danger, #ff3366);" (click)="sendIDevent({ evento: evento()!, action: 'leave' })">SALIR</button>
-            } @else {
-                <button class="btn-join" (click)="sendIDevent({ evento: evento()!, action: 'join' })">UNIRSE</button>
-            }
         }
+        
+        @if (isJoined()) {
+            <button class="btn-join btn-leave" style="background-color: var(--color-danger, #ff3366); border: 2px solid var(--color-danger, #ff3366);" (click)="sendIDevent({ evento: evento()!, action: 'leave' })">SALIR</button>
+        } @else {
+            <button class="btn-join" (click)="sendIDevent({ evento: evento()!, action: 'join' })">UNIRSE</button>
+        }
+        
         <button class="btn-details" (click)="sendIDevent({ evento: evento()!, action: 'details' })">DETALLES</button>
     </div>
 </div>

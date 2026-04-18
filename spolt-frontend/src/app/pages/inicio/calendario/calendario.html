@@ -1,0 +1,98 @@
+<div class="page">
+  <!-- Calendario -->
+  <div class="calendar-card">
+    <div class="cal-header">
+      <div class="month-title-box">
+        <span class="cal-month">{{ monthLabel() }}</span>
+      </div>
+    </div>
+
+    <div class="weekdays">
+      @for (wd of weekdays; track $index) {
+        <div class="weekday" [class.weekend]="$index === 5 || $index === 6">{{ wd }}</div>
+      }
+    </div>
+
+    <div class="days-grid">
+      @for (day of calendarDays(); track $index) {
+        @if (day === null) {
+          <div class="day-cell empty" [class.weekend]="$index % 7 === 5 || $index % 7 === 6"></div>
+        } @else {
+          <div class="day-cell" 
+               [ngClass]="{
+                 'today': isToday(day),
+                 'has-events': getEventsForDay(day).length > 0,
+                 'selected': selectedDate() === dateKey(day),
+                 'weekend': $index % 7 === 5 || $index % 7 === 6
+               }"
+               (click)="selectDay(day)">
+            <div class="day-num">{{ day }}</div>
+            <div class="event-indicators">
+              @for (ev of getEventsForDay(day).slice(0, 2); track ev.id) {
+                <div class="ev-chip" [ngClass]="ev.color">{{ ev.name }}</div>
+              }
+              @if (getEventsForDay(day).length > 2) {
+                <div class="more-tag">+{{ getEventsForDay(day).length - 2 }} MÁS</div>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- Columna lateral -->
+  <div class="side-col">
+    <!-- Panel del día seleccionado -->
+    <div class="panel-card">
+      @if (selectedDate()) {
+        <div class="panel-head">
+          <span class="panel-date">{{ formatDateLabel(selectedDate()!) }}</span>
+          <span class="panel-count-badge">{{ selectedDateEvents().length }}</span>
+        </div>
+        
+        <div class="events-scroll">
+          @if (selectedDateEvents().length === 0) {
+            <div class="empty-state">No hay eventos para este día</div>
+          } @else {
+            @for (ev of selectedDateEvents(); track ev.id) {
+              <div class="event-item">
+                <div class="event-color-bar" [ngClass]="ev.color"></div>
+                <div class="event-content">
+                  <div class="event-name">{{ ev.name }}</div>
+                  <div class="event-time">{{ ev.time }}</div>
+                </div>
+                <div class="joined-indicator" title="Unido">★</div>
+              </div>
+            }
+          }
+        </div>
+      } @else {
+        <div class="empty-selection">
+          <div class="selection-icon">
+             <img src="eventos/iconos/Crear.png" alt="Crear">
+          </div>
+          <p>Selecciona un día para ver tus eventos</p>
+        </div>
+      }
+    </div>
+
+    <!-- Próximos eventos -->
+    @if (upcomingEvents().length > 0) {
+      <div class="upcoming-card">
+        <div class="card-title">PRÓXIMOS EVENTOS</div>
+        <div class="upcoming-list">
+          @for (ev of upcomingEvents(); track ev.id) {
+            <div class="upcoming-item">
+              <div class="mini-dot" [ngClass]="ev.color"></div>
+              <div class="upcoming-details">
+                <div class="upcoming-name">{{ ev.name }}</div>
+                <div class="upcoming-meta">{{ formatDateLabel(ev.date) }} · {{ ev.time }}</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

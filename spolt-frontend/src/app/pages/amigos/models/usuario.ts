@@ -4,4 +4,6 @@ export interface usuario {
     imagen_perfil:string
 
     nombre_usuario:string
+
+    ultimo_acceso?:string
 }

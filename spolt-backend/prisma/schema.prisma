@@ -37,6 +37,7 @@ model Usuario {
   amistades_recibidas     Amistad[]              @relation("Receptor")
   eventos_creados         EventoDeportivo[]
   participaciones_evento  ParticipanteEvento[]
+  niveles_deportivos      NivelDeportivo[]
 
   @@index([nombre_usuario])
   @@index([email])
@@ -83,9 +84,29 @@ model Deporte {
 
   // Relaciones
   eventos EventoDeportivo[]
+  niveles_deportivos NivelDeportivo[]
 
   @@index([nombre])
   @@map("deportes")
+}
+
+model NivelDeportivo {
+  id_nivel_deportivo  Int      @id @default(autoincrement())
+  id_usuario          Int
+  id_deporte          Int
+  nivel               Int      @default(1)
+  experiencia_actual  Int      @default(0)   // XP dentro del nivel actual
+  experiencia_total   Int      @default(0)   // XP histórica acumulada
+  partidos_jugados    Int      @default(0)   // Eventos finalizados
+  fecha_actualizacion DateTime @updatedAt
+
+  usuario  Usuario @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+  deporte  Deporte @relation(fields: [id_deporte], references: [id_deporte], onDelete: Cascade)
+
+  @@unique([id_usuario, id_deporte])
+  @@index([id_usuario])
+  @@index([id_deporte])
+  @@map("niveles_deportivos")
 }
 
 // ─────────────────────────────────────────────
@@ -94,6 +115,7 @@ model Deporte {
 enum TipoEvento {
   partido
   torneo
+  playday
 }
 
 enum EstadoEvento {

@@ -53,9 +53,50 @@
     padding: 3px;
     position: relative;
     border-radius: 50%;
-    overflow: hidden;
+    overflow: visible;
     transition: all 0.3s ease;
     box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+}
+
+.avatar-frame .avatar-img,
+.avatar-frame .avatar-placeholder {
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+/* ── Indicador Online/Offline ── */
+.online-dot {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    z-index: 2;
+    transition: background-color 0.3s;
+}
+
+.online-dot.online {
+    background-color: #22c55e;
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+}
+
+.online-dot.offline {
+    background-color: #888;
+}
+
+.online-status {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 800;
+    color: #888;
+    margin-top: 3px;
+    letter-spacing: 0.3px;
+}
+
+.online-status.online-text {
+    color: #22c55e;
 }
 
 .friend-card:hover .avatar-frame {
@@ -387,6 +428,13 @@
         height: 45px;
         padding: 2px;
         border-width: 2px;
+    }
+
+    .online-dot {
+        width: 10px;
+        height: 10px;
+        bottom: 1px;
+        right: 1px;
     }
 
     .avatar-placeholder {

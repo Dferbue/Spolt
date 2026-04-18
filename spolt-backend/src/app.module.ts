@@ -9,18 +9,26 @@ import { EventsModule } from './modules/events/events.module';
 import { SportsModule } from './modules/sports/sports.module';
 import { FrindshipsModule } from './modules/frindships/frindships.module';
 import { EmailModule } from './modules/email/email.module';
+import { WeatherModule } from './modules/weather/weather.module';
+import { StorageModule } from './modules/storage/storage.module';
+import { SportLevelModule } from './modules/sport-level/sport-level.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    ScheduleModule.forRoot(),
     PrismaModule,
     AuthModule,
     UsersModule,
     FrindshipsModule,
     SportsModule,
     EventsModule,
-    EmailModule
+    EmailModule,
+    WeatherModule,
+    StorageModule,
+    SportLevelModule
   ],
   controllers: [AppController],
   providers: [AppService],

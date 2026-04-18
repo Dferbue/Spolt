@@ -1,11 +1,15 @@
-import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SportLevelService } from '../sport-level/sport-level.service';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class EventsService {
-  constructor(private prisma:PrismaService){}
+  private readonly logger = new Logger(EventsService.name);
+
+  constructor(private prisma: PrismaService, private sportLevel: SportLevelService) { }
 
 
   create(createEventDto: CreateEventDto, id_creador: number) {
@@ -52,8 +56,8 @@ export class EventsService {
   //Creamos una funcion que nos traiga los eventos que ha creado ese usuario
   findYoursEvents(idUser: number) {
     return this.prisma.eventoDeportivo.findMany({
-      where:{
-        id_creador:idUser
+      where: {
+        id_creador: idUser
       },
       include: {
         creador: { select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true } },
@@ -83,18 +87,18 @@ export class EventsService {
     });
 
     // Extraer los IDs de los amigos 
-    const amigosIds = amistades.map(a => 
+    const amigosIds = amistades.map(a =>
       a.id_usuario_solicitante === id_usuario ? a.id_usuario_receptor : a.id_usuario_solicitante
     );
 
     //Si no tiene amigos devolvemos un array vacio
-    if (amigosIds.length === 0) return []; 
+    if (amigosIds.length === 0) return [];
 
     // Buscar eventos creados por esos amigos
     return await this.prisma.eventoDeportivo.findMany({
       where: {
         id_creador: { in: amigosIds },
-        estado: 'abierto', 
+        estado: 'abierto',
       },
       include: {
         creador: {
@@ -108,7 +112,7 @@ export class EventsService {
         }
       },
       orderBy: {
-        fecha_evento: 'asc' 
+        fecha_evento: 'asc'
       }
     });
   }
@@ -144,8 +148,8 @@ export class EventsService {
   //Funcion que elimina el evento
   remove(idEvento: number) {
     return this.prisma.eventoDeportivo.delete({
-      where:{
-        id_evento:idEvento
+      where: {
+        id_evento: idEvento
       }
     });
   }
@@ -224,19 +228,19 @@ export class EventsService {
   }
 
   //Creamos la funcion para abandonar el evento
-  async salirEvento(id_usuario:number,id_evento:number){
+  async salirEvento(id_usuario: number, id_evento: number) {
     //Encontramos el evento
-    const evento= await this.prisma.eventoDeportivo.findUnique({
-      where:{
-        id_evento:id_evento
+    const evento = await this.prisma.eventoDeportivo.findUnique({
+      where: {
+        id_evento: id_evento
       }
     });
 
     //Hacemos las comporbaciones
-    if(!evento){
+    if (!evento) {
       throw new NotFoundException("Este evento no existe");
     }
-    if(evento.estado==="cerrado"){
+    if (evento.estado === "cerrado") {
       throw new BadRequestException("Este evento ya ha terminado");
     }
     return await this.prisma.$transaction(async (tx) => {
@@ -276,7 +280,7 @@ export class EventsService {
   }
 
   //Nos traemos los eventos en los que estas dentro
-  async eventosParticipante(id_usuario:number){
+  async eventosParticipante(id_usuario: number) {
     return await this.prisma.eventoDeportivo.findMany({
       where: {
         participantes: {
@@ -298,5 +302,87 @@ export class EventsService {
         fecha_evento: 'asc'
       }
     });
+  }
+
+
+  //Funcion que ceirra el evento y ya reparte la experiencia 
+  private async finalizarEventoInterno(evento: any) {
+    // 1. Cambiar estado a 'finalizado'
+    await this.prisma.eventoDeportivo.update({
+      where: { id_evento: evento.id_evento },
+      data: { estado: 'finalizado' }
+    });
+
+    // 2. Solo repartir XP si el evento estaba lleno
+    const estaLleno = evento.numero_participantes_actuales >= evento.numero_max_participantes;
+
+    if (!estaLleno) {
+      this.logger.log(`Evento ${evento.id_evento} finalizado SIN XP (no estaba lleno: ${evento.numero_participantes_actuales}/${evento.numero_max_participantes})`);
+      return;
+    }
+
+    // 3. Obtener participantes confirmados
+    const participantes = await this.prisma.participanteEvento.findMany({
+      where: { id_evento: evento.id_evento, estado: 'confirmado' }
+    });
+
+    // 4. Dar XP a cada participante
+    for (const p of participantes) {
+      await this.sportLevel.darExeperiencia(p.id_usuario, evento.id_deporte, evento.tipo_evento);
+    }
+
+    // 5. Dar XP al creador también (si no está ya como participante)
+    const creadorEsParticipante = participantes.some(p => p.id_usuario === evento.id_creador);
+    if (!creadorEsParticipante) {
+      await this.sportLevel.darExeperiencia(evento.id_creador, evento.id_deporte, evento.tipo_evento);
+    }
+  }
+
+  //Evento para que el credor pueda cerrar el evento un vez empezado cuando el quiera
+  async finalizarEvento(id_evento: number, id_creador: number) {
+    const evento = await this.prisma.eventoDeportivo.findUnique({
+      where: { id_evento }
+    });
+
+    if (!evento) throw new NotFoundException('El evento no existe');
+    if (evento.id_creador !== id_creador) throw new BadRequestException('Solo el creador puede finalizar el evento');
+    if (evento.estado === 'finalizado') throw new BadRequestException('El evento ya fue finalizado');
+    if (evento.estado === 'cancelado') throw new BadRequestException('No se puede finalizar un evento cancelado');
+    if (evento.numero_participantes_actuales < evento.numero_max_participantes) {
+      throw new BadRequestException('El evento debe estar lleno para poder finalizarlo');
+    }
+
+    // Comprobar que la fecha y hora del evento ya han pasado
+    const fechaEvento = new Date(evento.fecha_evento);
+    const horaInicio = new Date(evento.hora_inicio);
+    fechaEvento.setUTCHours(horaInicio.getUTCHours(), horaInicio.getUTCMinutes(), 0, 0);
+
+    if (new Date() < fechaEvento) {
+      throw new BadRequestException('No se puede finalizar el evento antes de su fecha y hora de inicio');
+    }
+
+    await this.finalizarEventoInterno(evento);
+    return { message: 'Evento finalizado y XP repartida correctamente' };
+  }
+
+  //Funcion que finaliza los eventos del dia
+  @Cron('59 23 * * *')
+  async finalizarEventosDelDia() {
+    const hoy = new Date();
+    hoy.setHours(23, 59, 59, 999);
+
+    const eventosPendientes = await this.prisma.eventoDeportivo.findMany({
+      where: {
+        fecha_evento: { lte: hoy },
+        estado: { in: ['abierto', 'cerrado'] }
+      },
+      include: { participantes: true }
+    });
+
+    for (const evento of eventosPendientes) {
+      await this.finalizarEventoInterno(evento);
+    }
+
+    this.logger.log(`CRON: Finalizados ${eventosPendientes.length} eventos del día.`);
   }
 }

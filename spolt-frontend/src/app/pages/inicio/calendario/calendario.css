@@ -1,0 +1,351 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.page {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 30px;
+}
+
+/* ---- CALENDARIO PRINCIPAL ---- */
+.calendar-card {
+  background: #ffffff;
+  border: 3px solid #000000;
+  box-shadow: 8px 8px 0px #ff006e;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  border-bottom: 3px solid #000000;
+  background: #ffffff;
+}
+
+.month-title-box {
+  background: #ff006e;
+  padding: 20px 40px;
+  border-right: 3px solid #000000;
+}
+
+.cal-month {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: -1.5px;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: #000000;
+  border-bottom: 3px solid #000000;
+}
+
+.weekday {
+  text-align: center;
+  padding: 15px 0;
+  font-size: 13px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-right: 3px solid #000000;
+  color: #ffffff; /* Letras blancas */
+}
+
+.weekday.weekend {
+  background: #333333; /* Un gris muy oscuro para el fin de semana sobre fondo negro */
+}
+
+.weekday:last-child {
+  border-right: none;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0;
+  border-bottom: 3px solid #000000;
+  background: #ffffff;
+}
+
+.day-cell {
+  background: #ffffff;
+  height: 120px;
+  padding: 10px;
+  border-right: 3px solid #000000;
+  border-bottom: 3px solid #000000;
+  cursor: pointer;
+  transition: background 0.1s;
+  overflow: hidden;
+}
+
+/* Remove border correctly on the last cell of each row */
+.day-cell:nth-child(7n) {
+  border-right: none;
+}
+
+.day-cell:hover {
+  background: #fff8fa;
+}
+
+.day-cell.empty {
+  background: #fafafa;
+  cursor: default;
+}
+
+.day-cell.weekend {
+  background: #eeeeee;
+}
+
+.day-cell.empty.weekend {
+  background: #dddddd;
+}
+
+.day-cell.selected {
+  background: #fff0f5;
+  box-shadow: inset 0 0 0 4px #ff006e;
+}
+
+.day-cell.today {
+  position: relative;
+}
+
+.day-cell.today .day-num {
+  background: #ff006e;
+  color: #ffffff;
+  display: inline-block;
+  padding: 2px 8px;
+  border: 2px solid #000000;
+  border-radius: 4px; /* Slight rounding for the 'today' marker */
+}
+
+.day-num {
+  font-size: 20px;
+  font-weight: 950;
+  margin-bottom: 12px;
+  color: #000000;
+}
+
+.event-indicators {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ev-chip {
+  font-size: 9px;
+  font-weight: 950;
+  padding: 2px 6px;
+  border: 1.5px solid #000000;
+  text-transform: uppercase;
+  box-shadow: 1.5px 1.5px 0px #000000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 4px;
+  color: #000000;
+}
+
+.ev-chip.green   { background: #22c55e; }
+.ev-chip.blue    { background: #a5ccf3; }
+.ev-chip.orange  { background: #ff6600; }
+.ev-chip.purple  { background: #cca5f3; }
+.ev-chip.lime    { background: #9efd38; }
+.ev-chip.pink    { background: #f3a5cc; }
+
+.more-tag {
+  font-size: 10px;
+  font-weight: 950;
+  color: #666666;
+  margin-top: 5px;
+}
+
+/* ---- PANEL LATERAL ---- */
+.side-col {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.panel-card, .upcoming-card {
+  background: #ffffff;
+  border: 3px solid #000000;
+  box-shadow: 8px 8px 0px #ff006e;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-head {
+  padding: 20px 24px;
+  background: #000000;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-date {
+  font-size: 18px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.panel-count-badge {
+  background: #ff006e;
+  padding: 4px 12px;
+  border: 2px solid #ffffff;
+  font-size: 14px;
+  color: #ffffff;
+  border-radius: 6px;
+}
+
+.events-scroll {
+  max-height: 400px;
+  overflow-y: auto;
+  background: #ffffff;
+}
+
+.event-item {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 3px solid #000000;
+  gap: 15px;
+}
+
+.event-item:last-child {
+  border-bottom: none;
+}
+
+.event-color-bar {
+  width: 12px;
+  height: 44px;
+  border: 2px solid #000000;
+  box-shadow: 3px 3px 0px #000000;
+  border-radius: 4px;
+}
+
+.event-color-bar.green  { background: #22c55e; }
+.event-color-bar.blue   { background: #5d87ff; }
+.event-color-bar.orange { background: #ff6600; }
+.event-color-bar.purple { background: #b300ff; }
+.event-color-bar.lime   { background: #ccff00; }
+.event-color-bar.pink   { background: #ff006e; }
+
+.event-content {
+  flex: 1;
+}
+
+.event-name {
+  font-size: 16px;
+  font-weight: 950;
+  text-transform: uppercase;
+  color: #000000;
+}
+
+.event-time {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: #666666;
+  margin-top: 4px;
+}
+
+.joined-indicator {
+  font-size: 20px;
+  color: #ff006e;
+  border: 2px solid #000000;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+.empty-state, .empty-selection {
+  padding: 60px 30px;
+  text-align: center;
+  color: #666666;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.selection-icon {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.selection-icon img {
+  width: 70px;
+  height: auto;
+  opacity: 0.8;
+}
+
+.upcoming-card .card-title {
+  padding: 15px 24px;
+  background: #f5f5f5;
+  border-bottom: 3px solid #000000;
+  font-weight: 950;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: #000000;
+}
+
+.upcoming-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 24px;
+  border-bottom: 3px solid #000000;
+  gap: 12px;
+}
+
+.upcoming-item:last-child {
+  border-bottom: none;
+}
+
+.mini-dot {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #000000;
+  border-radius: 50%;
+}
+
+.mini-dot.green  { background: #22c55e; }
+.mini-dot.blue   { background: #5d87ff; }
+.mini-dot.orange { background: #ff6600; }
+.mini-dot.purple { background: #b300ff; }
+.mini-dot.lime   { background: #ccff00; }
+.mini-dot.pink   { background: #ff006e; }
+
+.upcoming-name {
+  font-size: 14px;
+  font-weight: 950;
+  text-transform: uppercase;
+  color: #000000;
+}
+
+.upcoming-meta {
+  font-size: 11px;
+  color: #666666;
+  margin-top: 2px;
+}
+
+/* RESPONSIVO */
+@media (max-width: 1150px) {
+  .page { grid-template-columns: 1fr; }
+  .side-col { order: 2; }
+}

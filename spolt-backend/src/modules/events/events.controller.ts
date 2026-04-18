@@ -78,4 +78,13 @@ export class EventsController {
     const userId = req.user.id_usuario || req.user['userId'];
     return await this.eventsService.eventosParticipante(Number(userId));
   }
+
+  //Finalizar un evento manualmente
+  @UseGuards(AuthGuard('jwt'))
+  @Patch(':id/finalizar')
+  finalizarEvento(@Param('id') id: string, @Req() req: any) {
+    const userId = req.user.id_usuario || req.user['userId'];
+    return this.eventsService.finalizarEvento(+id, Number(userId));
+  }
 }
+

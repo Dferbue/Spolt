@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, shareReplay } from 'rxjs';
+import { Observable, BehaviorSubject, tap, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface LoginDto {
@@ -29,25 +29,39 @@ export class AuthService {
   }
 
   logout(): Observable<{ message: string }> {
-    this.profile$ = null;
+    this.profileSubject.next(null);
     this.clearTokens();
     return this.http.post<{ message: string }>(`${this.apiUrl}/logout`, {});
   }
 
-  private profile$: Observable<any> | null = null;
+  private profileSubject = new BehaviorSubject<any>(null);
+  public profile$ = this.profileSubject.asObservable();
+  private loadingProfile = false;
 
   getProfile(): Observable<any> {
-    if (!this.profile$) {
-      this.profile$ = this.http.get(`${this.apiUrl}/profile`).pipe(
-        shareReplay(1)
-      );
+    if (!this.profileSubject.value && !this.loadingProfile) {
+      this.refreshProfile();
     }
     return this.profile$;
   }
 
-  // Método para forzar la recarga (útil después de editar el perfil)
   refreshProfile(): void {
-    this.profile$ = null;
+    if (this.loadingProfile) return;
+    this.loadingProfile = true;
+
+    this.http.get(`${this.apiUrl}/profile`).subscribe({
+      next: (user) => {
+        this.profileSubject.next(user);
+        this.loadingProfile = false;
+      },
+      error: () => {
+        this.loadingProfile = false;
+      }
+    });
+  }
+
+  updateProfileState(userData: any): void {
+    this.profileSubject.next(userData);
   }
 
   refreshTokens(): Observable<{ accessToken: string, refreshToken: string }> {
@@ -56,9 +70,12 @@ export class AuthService {
   }
 
   // Token Management
+  private readonly INACTIVITY_LIMIT_MS = 14 * 24 * 60 * 60 * 1000; // 14 días
+
   setTokens(accessToken: string, refreshToken: string): void {
     localStorage.setItem('access_token', accessToken);
     localStorage.setItem('refresh_token', refreshToken);
+    this.updateLastActivity();
   }
 
   getAccessToken(): string | null {
@@ -72,10 +89,32 @@ export class AuthService {
   clearTokens(): void {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('last_activity');
+  }
+
+  // Actualiza el timestamp de última actividad
+  updateLastActivity(): void {
+    localStorage.setItem('last_activity', Date.now().toString());
+  }
+
+  // Comprueba si han pasado más de 14 días sin actividad
+  isSessionExpired(): boolean {
+    const lastActivity = localStorage.getItem('last_activity');
+    if (!lastActivity) return false; // Primera vez, no expira
+    return (Date.now() - parseInt(lastActivity, 10)) > this.INACTIVITY_LIMIT_MS;
   }
 
   isLoggedIn(): boolean {
-    return !!this.getAccessToken();
+    if (!this.getAccessToken()) return false;
+
+    // Si han pasado >14 días de inactividad, cerramos sesión automáticamente
+    if (this.isSessionExpired()) {
+      this.profileSubject.next(null);
+      this.clearTokens();
+      return false;
+    }
+
+    return true;
   }
 
   // --- Recuperación y cambio de cuenta ---

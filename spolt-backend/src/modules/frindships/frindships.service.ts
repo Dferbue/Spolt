@@ -61,10 +61,10 @@ export class FrindshipsService {
       include: {
         // Es muy útil incluir los datos del usuario para no recibir solo IDs
         solicitante: {
-          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true }
+          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true, ultimo_acceso: true }
         },
         receptor: {
-          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true }
+          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true, ultimo_acceso: true }
         },
       },
     });

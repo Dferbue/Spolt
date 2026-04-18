@@ -1,0 +1,166 @@
+.sport-levels-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  color: #000;
+  margin: 0;
+  border-bottom: 4px solid #000;
+  padding-bottom: 0.5rem;
+}
+
+.empty-state, .loading-state {
+  background: #f4f4f4;
+  border: 3px solid #000;
+  box-shadow: 4px 4px 0px #000;
+  padding: 2rem;
+  text-align: center;
+  font-weight: 600;
+  border-radius: 8px;
+  color: #000;
+}
+
+.sport-levels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2.5rem;
+}
+
+.sport-level-card {
+  background: #ffffff;
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0px var(--pink, #ff006e);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  align-items: center;
+}
+
+.sport-level-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0px #000;
+}
+
+.sport-image-container {
+  width: 180px;
+  height: 180px;
+  border: 3px solid #000;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fce8cd;
+  box-shadow: 4px 4px 0px #000;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.sport-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sport-icon-fallback {
+  font-size: 7rem;
+}
+
+.sport-info-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.sport-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid #000;
+  padding-bottom: 0.5rem;
+  gap: 0.5rem;
+}
+
+.sport-title-row h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #000;
+  letter-spacing: -0.02em;
+  word-break: break-word;
+  line-height: 1.1;
+}
+
+.level-indicator {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #000;
+  background: #FFE800;
+  padding: 0.2rem 0.6rem;
+  border: 2px solid #000;
+  border-radius: 6px;
+}
+
+.xp-container {
+  width: 100%;
+}
+
+.xp-bar-wrapper {
+  width: 100%;
+  height: 24px;
+  background: #fff;
+  border: 3px solid #000;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 2px 2px 0px #000;
+}
+
+.xp-progress-bar {
+  height: 100%;
+  background: #4ade80;
+  border-right: 3px solid #000;
+  transition: width 0.5s ease;
+}
+
+.stats-footer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.matches-played-badge {
+  background: #000;
+  color: #fff;
+  border: 2px solid #000;
+  box-shadow: 4px 4px 0px var(--pink, #ff006e);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform 0.2s;
+}
+
+.matches-played-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 0px var(--pink, #ff006e);
+}
+
+.fire-icon {
+  font-size: 1.2rem;
+}

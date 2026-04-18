@@ -1,0 +1,83 @@
+<div class="weather-card">
+  <div class="weather-header">
+    <span class="weather-title">PREVISIÓN 7 DÍAS</span>
+    <span class="weather-location">📍 {{ locationName() }}</span>
+  </div>
+
+  @if (loading()) {
+    <div class="weather-loading">
+      <span>Cargando clima...</span>
+    </div>
+  } @else if (error()) {
+    <div class="weather-error">
+      <span>{{ error() }}</span>
+    </div>
+  } @else {
+    <div class="forecast-table-container">
+      <div class="forecast-matrix">
+        
+        <!-- ROW: DÍAS -->
+        <div class="matrix-row row-header">
+          <div class="cell-label label-empty"></div>
+          @for (day of forecast(); track day.date) {
+             <div class="cell-data cell-head" [class.today-col]="isToday(day.date)">
+               <strong>{{ day.dayName }}</strong>
+               <small>{{ day.dayNum }}</small>
+             </div>
+          }
+        </div>
+
+        <!-- ROW: CLIMA -->
+        <div class="matrix-row row-clima">
+          <div class="cell-label">Clima</div>
+          @for (day of forecast(); track day.date) {
+             <div class="cell-data cell-icon-box" [class.today-col]="isToday(day.date)">
+               <span class="icon">{{ day.icon }}</span>
+             </div>
+          }
+        </div>
+
+        <!-- ROW: MÁXIMA -->
+        <div class="matrix-row">
+          <div class="cell-label">Máx</div>
+          @for (day of forecast(); track day.date) {
+             <div class="cell-data temp-max" [class.today-col]="isToday(day.date)">
+              {{ day.tempMax }}°
+             </div>
+          }
+        </div>
+
+        <!-- ROW: MÍNIMA -->
+        <div class="matrix-row">
+          <div class="cell-label">Mín</div>
+          @for (day of forecast(); track day.date) {
+             <div class="cell-data temp-min" [class.today-col]="isToday(day.date)">
+              {{ day.tempMin }}°
+             </div>
+          }
+        </div>
+
+        <!-- ROW: LLUVIA -->
+        <div class="matrix-row">
+          <div class="cell-label">Lluvia</div>
+          @for (day of forecast(); track day.date) {
+             <div class="cell-data cell-rain" [class.rain-high]="day.precipitation > 50" [class.today-col]="isToday(day.date)">
+              {{ day.precipitation }}%
+             </div>
+          }
+        </div>
+
+        <!-- ROW: VIENTO -->
+        <div class="matrix-row">
+          <div class="cell-label">Viento</div>
+          @for (day of forecast(); track day.date) {
+             <div class="cell-data wind-label" [class.today-col]="isToday(day.date)">
+              {{ day.windSpeed }} <small>km/h</small>
+             </div>
+          }
+        </div>
+
+      </div>
+    </div>
+  }
+</div>

@@ -16,6 +16,15 @@
       <h2>Crear Torneo</h2>
       <p>Crea un torneo organizado con múltiples participantes</p>
     </button>
+
+    <button class="btn-option btn-playday" (click)="abrirFormulario(TipoEvento.playday)">
+      <div class="icon-wrapper">
+        <!-- Reusamos el icono de partido temporalmente -->
+        <img src="eventos/iconos/Partidos.png" alt="Playday" class="option-icon">
+      </div>
+      <h2>Crear Playday</h2>
+      <p>Organiza un día de juegos casuales y variados</p>
+    </button>
   </div>
 
   @if (mensajeEnvio()) {
@@ -32,7 +41,8 @@
           <div class="filtros-header">
             <h3>
               @if(tipoSeleccionado() === TipoEvento.partido){ ⚙ Nuevo Partido } 
-              @else { 🏆 Nuevo Torneo }
+              @else if(tipoSeleccionado() === TipoEvento.torneo) { 🏆 Nuevo Torneo }
+              @else { 🎉 Nuevo Playday }
             </h3>
             <button class="filtros-close" (click)="cerrarFormulario()">✕</button>
           </div>
@@ -87,11 +97,27 @@
         <div class="image-side">
           @if(tipoSeleccionado() === TipoEvento.partido){
             <img src="eventos/img/partidoImg.jpg" alt="Partido" class="modal-img">
-          } @else {
+          } @else if(tipoSeleccionado() === TipoEvento.torneo) {
             <img src="eventos/img/TorneoImg.jpg" alt="Torneo" class="modal-img">
+          } @else {
+            <img src="eventos/img/partidoImg.jpg" alt="Playday" class="modal-img">
           }
         </div>
 
+      </div>
+    </div>
+  }
+
+  <!-- MODAL DE CONFIRMACIÓN DE UNIÓN -->
+  @if (mostrarModalUnirse()) {
+    <div class="modal-overlay" (click)="cancelarUnirse()">
+      <div class="modal-content confirmation-modal" (click)="$event.stopPropagation()">
+        <h3>¿Quieres unirte a tu propio evento?</h3>
+        <p>¡No te quedes fuera! Únete ahora para aparecer en la lista de participantes.</p>
+        <div class="modal-actions">
+          <button class="btn-cancel" (click)="cancelarUnirse()">No, gracias</button>
+          <button class="btn-confirm" (click)="confirmarUnirse()">Sí, unirme</button>
+        </div>
       </div>
     </div>
   }

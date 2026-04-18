@@ -1,4 +1,13 @@
 <div class="my-events-container">
+  <div class="header-actions-row">
+    <button class="btn-filtros" (click)="abrirFiltros()">
+      <span>⚙ FILTROS</span>
+      @if (filtrosActivos() > 0) {
+        <span class="filtro-badge">{{ filtrosActivos() }}</span>
+      }
+    </button>
+  </div>
+
   <div class="tabs">
     <div class="tab" [class.active]="tabActiva() === 'creados'" (click)="cambiarTab('creados')">
       <h2>Creados</h2>
@@ -209,12 +218,90 @@
   <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN -->
   @if (mostrarModalEliminar()) {
     <div class="modal-overlay" (click)="cerrarModalEliminar()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <h3>¿Eliminar evento?</h3>
-        <p>Esta acción es permanente. Se notificará a todos los participantes que el evento ha sido cancelado.</p>
-        <div class="modal-actions">
-          <button class="btn-cancel" (click)="cerrarModalEliminar()">Cancelar</button>
-          <button class="btn-confirm" (click)="confirmarEliminar()">Sí, eliminar</button>
+      <div class="brutal-modal-confirm" (click)="$event.stopPropagation()">
+        <h3>¿ESTÁS SEGURO QUE QUIERES ELIMINAR<br>ESTE EVENTO?</h3>
+        <div class="modal-actions-vertical">
+          <button class="btn-brutal-confirm" (click)="confirmarEliminar()">CONFIRMAR</button>
+          <button class="btn-brutal-cancel" (click)="cerrarModalEliminar()">CANCELAR</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL DE CONFIRMACIÓN DE FINALIZAR -->
+  @if (mostrarModalFinalizar()) {
+    <div class="modal-overlay" (click)="cerrarModalFinalizar()">
+      <div class="brutal-modal-confirm" (click)="$event.stopPropagation()">
+        <h3>¿ESTÁS SEGURO QUE QUIERES FINALIZAR<br>ESTE EVENTO?</h3>
+        <div class="modal-actions-vertical">
+          <button class="btn-brutal-confirm" (click)="confirmarFinalizar()">CONFIRMAR</button>
+          <button class="btn-brutal-cancel" (click)="cerrarModalFinalizar()">CANCELAR</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL DE FILTROS (Espejo de unirse-eventos) -->
+  @if (mostrarVentanaDeFiltros()) {
+    <div class="modal-overlay" (click)="cerrarFiltros()">
+      <div class="filtros-panel" (click)="$event.stopPropagation()">
+        <div class="filtros-header-panel">
+          <h3>⚙ Filtros</h3>
+          <button class="filtros-close-panel" (click)="cerrarFiltros()">✕</button>
+        </div>
+
+        <div class="filtros-body-panel">
+          <!-- Búsqueda por texto -->
+          <div class="filtro-group">
+            <label class="filtro-label">Buscar</label>
+            <input type="text" class="filtro-input-p" placeholder="Título, ubicación, descripción..." [value]="filtroBusqueda()" (input)="filtroBusqueda.set($any($event.target).value)">
+          </div>
+
+          <!-- Tipo de deporte -->
+          <div class="filtro-group">
+            <label class="filtro-label">Deporte</label>
+            <select class="filtro-select-p" [value]="filtroDeporte() || ''" (change)="filtroDeporte.set($any($event.target).value ? +$any($event.target).value : null)">
+              <option value="">Todos los deportes</option>
+              @for (d of listaDeportes(); track d.id_deporte) {
+                <option [value]="d.id_deporte">{{ d.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Tipo de evento -->
+          <div class="filtro-group">
+            <label class="filtro-label">Tipo de Evento</label>
+            <select class="filtro-select-p" [value]="filtroTipoEvento()" (change)="filtroTipoEvento.set($any($event.target).value)">
+              <option value="">Todos</option>
+              <option value="partido">Partido</option>
+              <option value="torneo">Torneo</option>
+            </select>
+          </div>
+
+          <!-- Plazas libres -->
+          <div class="filtro-group filtro-checkbox-group">
+            <label class="filtro-checkbox-label">
+              <input type="checkbox" [checked]="filtroPlazasLibres()" (change)="filtroPlazasLibres.set($any($event.target).checked)">
+              <span>Solo con plazas libres</span>
+            </label>
+          </div>
+
+          <!-- Fecha desde -->
+          <div class="filtro-group">
+            <label class="filtro-label">Fecha desde</label>
+            <input type="date" class="filtro-input-p" [value]="filtroFechaDesde()" (change)="filtroFechaDesde.set($any($event.target).value)">
+          </div>
+
+          <!-- Fecha hasta -->
+          <div class="filtro-group">
+            <label class="filtro-label">Fecha hasta</label>
+            <input type="date" class="filtro-input-p" [value]="filtroFechaHasta()" (change)="filtroFechaHasta.set($any($event.target).value)">
+          </div>
+        </div>
+
+        <div class="filtros-footer-panel">
+          <button class="btn-cancel-p" (click)="limpiarFiltros()">Limpiar Todo</button>
+          <button class="btn-confirm-p" (click)="cerrarFiltros()">Aplicar</button>
         </div>
       </div>
     </div>

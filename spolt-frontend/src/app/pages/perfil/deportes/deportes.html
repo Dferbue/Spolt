@@ -1,0 +1,54 @@
+<section class="sport-levels-section">
+  
+  @if (isLoading) {
+    <div class="loading-state">
+      <p>Cargando niveles deportivos...</p>
+    </div>
+  } @else {
+    @if (niveles.length === 0) {
+      <div class="empty-state">
+        <p>Aún no has jugado ningún deporte. ¡Únete a un evento!</p>
+      </div>
+    } @else {
+      <div class="sport-levels-grid">
+        @for (nivel of niveles; track nivel.id_nivel_deportivo) {
+          <div class="sport-level-card">
+            
+            <div class="sport-image-container">
+              @if (nivel.deporte.imagen_icono) {
+                <img [src]="nivel.deporte.imagen_icono" alt="icono deporte">
+              } @else {
+                <span class="sport-icon-fallback">❓</span>
+              }
+            </div>
+
+            <div class="sport-info-container">
+              <div class="sport-title-row">
+                <h3>{{ nivel.deporte.nombre || 'Deporte' }}</h3>
+                <span class="level-indicator">Lvl {{ nivel.nivel }}</span>
+              </div>
+
+              <div class="xp-container">
+                <div class="xp-bar-wrapper" title="{{ nivel.experiencia_actual }}/{{ nivel.xp_siguiente_nivel || '?' }} XP">
+                  <div class="xp-progress-bar" [style.width.%]="getProgreso(nivel.experiencia_actual, nivel.xp_siguiente_nivel)"></div>
+                </div>
+              </div>
+
+              <div class="stats-footer">
+                <span class="matches-played-badge">
+                  <span class="fire-icon">🔥</span> 
+                  @if (nivel.partidos_jugados === 0 || nivel.partidos_jugados === 1) {
+                    1 evento
+                  } @else {
+                    {{ nivel.partidos_jugados }} Evento
+                  }
+                </span>
+              </div>
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+  }
+</section>

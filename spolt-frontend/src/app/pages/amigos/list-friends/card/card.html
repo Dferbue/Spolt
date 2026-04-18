@@ -1,18 +1,20 @@
 <div class="friend-card">
     <div class="card-header">
         <div class="avatar-frame">
-            @if (amigoAMostrar().imagen_perfil) {
-            <img [src]="amigoAMostrar().imagen_perfil" alt="Avatar" class="avatar-img">
+            @if (amigoAMostrar().imagen_perfil; as img) {
+            <img [src]="img.startsWith('http') || img.startsWith('/') ? img : apiUrl + '/storage/' + img" alt="Avatar" class="avatar-img">
             } @else {
             <div class="avatar-placeholder">
                 <span>{{ amigoAMostrar().nombre_usuario.charAt(0).toUpperCase() }}</span>
             </div>
             }
+            <span class="online-dot" [class.online]="estaOnline()" [class.offline]="!estaOnline()"></span>
         </div>
 
         <div class="header-text">
             <h3 class="username">{{ amigoAMostrar().nombre_usuario }}</h3>
             <span class="level-tag">AMIGOS DESDE: {{ amigo().fecha_respuesta | date:'dd/MM/yyyy' }}</span>
+            <span class="online-status" [class.online-text]="estaOnline()">{{ estaOnline() ? '🟢 En línea' : '⚫ Desconectado' }}</span>
         </div>
     </div>
 
@@ -43,8 +45,8 @@
 <div class="targetaAmistad-overlay" (click)="changeStatusTargetaAmistad()"></div>
 <div class="targetaAmistad">
     <div class="targeta-avatar">
-        @if (amigoAMostrar().imagen_perfil) {
-        <img [src]="amigoAMostrar().imagen_perfil" alt="Avatar" class="avatar-img">
+        @if (amigoAMostrar().imagen_perfil; as img) {
+        <img [src]="img.startsWith('http') || img.startsWith('/') ? img : apiUrl + '/storage/' + img" alt="Avatar" class="avatar-img">
         } @else {
         <div class="avatar-placeholder">
             <span>{{ amigoAMostrar().nombre_usuario.charAt(0).toUpperCase() }}</span>

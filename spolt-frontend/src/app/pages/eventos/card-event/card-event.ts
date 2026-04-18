@@ -1,6 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EventInterface , eventAction } from '../models/createEvent';
+import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-card-event',
   imports: [CommonModule],
@@ -12,6 +13,8 @@ export class CardEvent {
     public evento=input<EventInterface>();
     public isJoined=input<boolean>(false);
     public isOwner=input<boolean>(false);
+
+    public apiUrl = environment.apiUrl;
 
     //Output
     protected out_Id_Event=output<eventAction>();
@@ -37,5 +40,24 @@ export class CardEvent {
       
       // Si recibimos formato cadena "15:30:00" o similar
       return h.substring(0, 5);
+    }
+
+    // Comprueba si la fecha+hora del evento ya ha pasado
+    get eventoYaComenzo(): boolean {
+      const ev = this.evento();
+      if (!ev) return false;
+
+      const fecha = new Date(ev.fecha_evento);
+      const hora = ev.hora_inicio;
+
+      if (hora && hora.includes('T')) {
+        const h = new Date(hora);
+        fecha.setHours(h.getUTCHours(), h.getUTCMinutes(), 0, 0);
+      } else if (hora) {
+        const [hh, mm] = hora.split(':').map(Number);
+        fecha.setHours(hh, mm, 0, 0);
+      }
+
+      return new Date() >= fecha;
     }
 }

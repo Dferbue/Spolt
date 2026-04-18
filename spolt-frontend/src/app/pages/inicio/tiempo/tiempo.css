@@ -1,0 +1,187 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.weather-card {
+  background: #ffffff;
+  border: 3px solid #000000;
+  box-shadow: 8px 8px 0px #ff006e;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.weather-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  background: #000000;
+  color: #ffffff;
+  border-bottom: 3px solid #000000;
+}
+
+.weather-title {
+  font-size: 16px;
+  font-weight: 950;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.weather-location {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.weather-loading,
+.weather-error {
+  padding: 40px;
+  text-align: center;
+  font-weight: 950;
+  text-transform: uppercase;
+  color: #666666;
+  font-size: 14px;
+}
+
+/* ---- MATRIZ ---- */
+.forecast-table-container {
+  width: 100%;
+  overflow-x: auto; /* Permite scroll ninja en móviles si no cabe */
+}
+
+.forecast-matrix {
+  display: flex;
+  flex-direction: column;
+  min-width: 600px; /* Evita que los días se espachurren en el móvil */
+}
+
+/* Fila base de la matriz: 1 columna de título, 7 columnas iguales para los días */
+.matrix-row {
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  border-bottom: 2px solid #000000;
+}
+
+.matrix-row:last-child {
+  border-bottom: none; /* La tarjeta ya tiene borde inferior */
+}
+
+/* Fila especial: La cabecera de los días de la semana */
+.row-header {
+  background: #f5f5f5;
+  border-bottom: 3px solid #000000;
+}
+
+/* La primera columna izquierda que indica qué es la fila (Clima, Max, Min...) */
+.cell-label {
+  font-weight: 950;
+  font-size: 13px;
+  color: #000000;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 5px;
+  border-right: 3px solid #000000; /* Borde vertical Neo-brutalista */
+}
+
+.label-empty {
+  border-right: 3px solid #000000;
+}
+
+/* El contenido que va debajo de los días de la semana */
+.cell-data {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 5px;
+  border-right: 2px solid #e0e0e0;
+  text-align: center;
+}
+
+.cell-data:last-child {
+  border-right: none;
+}
+
+/* Resaltado de la columna del DÍA ACTUAL */
+.today-col {
+  background: #fff0f5;
+}
+
+/* Casilla especial del día actual en la cabecera */
+.row-header .cell-head.today-col {
+  border-bottom: 4px solid #ff006e;
+}
+
+/* --- ESTILOS DE CELDAS ESPECÍFICAS --- */
+
+/* Textos de los días arrba */
+.cell-head {
+  gap: 2px;
+  padding: 10px 5px;
+}
+.cell-head strong {
+  font-size: 15px;
+  font-weight: 950;
+  color: #000000;
+}
+.cell-head small {
+  font-size: 12px;
+  color: #999999;
+  font-weight: 700;
+}
+
+/* Icono grandote */
+.cell-icon-box .icon {
+  font-size: 38px; 
+}
+
+/* Temperaturas */
+.temp-max {
+  font-size: 16px;
+  font-weight: 950;
+  color: #ff006e;
+  background: #fff0f5; /* tenue fondo rosita */
+}
+
+.temp-min {
+  font-size: 15px;
+  font-weight: 950;
+  color: #0044ff; /* azul más marcado */
+}
+
+/* Probabilidad de lluvia */
+.cell-rain {
+  font-size: 14px;
+  font-weight: 950;
+  color: #000000; /* texto negro */
+  background: #fff0f5; /* tenue fondo rosita */
+}
+.cell-rain.rain-high {
+  background: #cce0ff;
+  color: #000000; /* texto negro aunque llueva mucho */
+}
+
+/* Velocidad del viento */
+.wind-label {
+  font-size: 14px;
+  font-weight: 800;
+  color: #000000; /* texto negro */
+  gap: 2px;
+}
+.wind-label small {
+  font-size: 10px;
+  font-weight: 700;
+  color: #000000; /* letras (km/h) en negro */
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+  .cell-label {
+    font-size: 11px;
+    padding: 10px 5px;
+  }
+}

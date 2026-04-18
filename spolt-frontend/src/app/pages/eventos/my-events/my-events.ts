@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewEncapsulation, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EventosService } from '../service/eventos.service';
 import { CreateEvent, TipoEvento, EventInterface, eventAction } from '../models/createEvent';
@@ -21,9 +21,65 @@ export class MyEvents implements OnInit {
   public mensajeEnvio = signal('');
   public loading = signal<boolean>(true);
 
-  public myEvents = signal<EventInterface[]>([]);
-  public joinedEvents = signal<EventInterface[]>([]);
+  public rawMyEvents = signal<EventInterface[]>([]);
+  public rawJoinedEvents = signal<EventInterface[]>([]);
   public joinedIds = signal<number[]>([]);
+
+  // ── FILTROS (Espejo de unirse-eventos) ──
+  public mostrarVentanaDeFiltros = signal<boolean>(false);
+  public filtroDeporte = signal<number | null>(null);
+  public filtroTipoEvento = signal<string>('');
+  public filtroBusqueda = signal<string>('');
+  public filtroPlazasLibres = signal<boolean>(false);
+  public filtroFechaDesde = signal<string>('');
+  public filtroFechaHasta = signal<string>('');
+
+  public filtrosActivos = computed(() => {
+    let count = 0;
+    if (this.filtroDeporte()) count++;
+    if (this.filtroTipoEvento()) count++;
+    if (this.filtroBusqueda()) count++;
+    if (this.filtroPlazasLibres()) count++;
+    if (this.filtroFechaDesde()) count++;
+    if (this.filtroFechaHasta()) count++;
+    return count;
+  });
+
+  private aplicarFiltrosALista(eventos: EventInterface[]): EventInterface[] {
+    let resultado = eventos;
+    const busqueda = this.filtroBusqueda().toLowerCase().trim();
+    if (busqueda) {
+      resultado = resultado.filter(e =>
+        e.titulo.toLowerCase().includes(busqueda) ||
+        (e.ubicacion && e.ubicacion.toLowerCase().includes(busqueda)) ||
+        (e.descripcion && e.descripcion.toLowerCase().includes(busqueda))
+      );
+    }
+    const deporte = this.filtroDeporte();
+    if (deporte) resultado = resultado.filter(e => e.id_deporte === deporte);
+    
+    const tipo = this.filtroTipoEvento();
+    if (tipo) resultado = resultado.filter(e => e.tipo_evento === tipo);
+
+    if (this.filtroPlazasLibres()) {
+      resultado = resultado.filter(e => {
+        const actuales = e.numero_participantes_actuales || e.participantes_actuales || 0;
+        return actuales < e.numero_max_participantes;
+      });
+    }
+    if (this.filtroFechaDesde()) {
+      resultado = resultado.filter(e => new Date(e.fecha_evento) >= new Date(this.filtroFechaDesde()));
+    }
+    if (this.filtroFechaHasta()) {
+      resultado = resultado.filter(e => new Date(e.fecha_evento) <= new Date(this.filtroFechaHasta()));
+    }
+    return resultado;
+  }
+
+  // Señales filtradas para la vista
+  public myEvents = computed(() => this.aplicarFiltrosALista(this.rawMyEvents()));
+  public joinedEvents = computed(() => this.aplicarFiltrosALista(this.rawJoinedEvents()));
+
 
   private map: L.Map | undefined;
   private resizeObserver: ResizeObserver | undefined;
@@ -32,6 +88,9 @@ export class MyEvents implements OnInit {
   public mostrarModalEliminar = signal<boolean>(false);
   public eventoIdParaEliminar = signal<number | null>(null);
   
+  public mostrarModalFinalizar = signal<boolean>(false);
+  public eventoIdParaFinalizar = signal<number | null>(null);
+
   public mostrarModalDetalles = signal<boolean>(false);
   public eventSelected = signal<EventInterface | null>(null);
   
@@ -57,7 +116,7 @@ export class MyEvents implements OnInit {
     // Cargar eventos creados por mí
     this.eventService.getMyEvents().subscribe({
       next: (data) => {
-        this.myEvents.set(data || []);
+        this.rawMyEvents.set(data || []);
         this.checkLoading();
       },
       error: (err) => {
@@ -69,7 +128,7 @@ export class MyEvents implements OnInit {
     // Cargar eventos a los que me he unido
     this.eventService.geteventosEnlosQueParticipamos().subscribe({
       next: (data) => {
-        this.joinedEvents.set(data || []);
+        this.rawJoinedEvents.set(data || []);
         this.joinedIds.set(data?.map(e => Number(e.id_evento || e.id)) || []);
         this.checkLoading();
       },
@@ -78,6 +137,7 @@ export class MyEvents implements OnInit {
         this.checkLoading();
       }
     });
+
   }
 
   private checkLoading() {
@@ -103,8 +163,35 @@ export class MyEvents implements OnInit {
       setTimeout(() => this.initMap(), 50); // Pequeño retraso para que el DOM se actualice
     } else if (data.action === 'edit') {
       this.abrirEdicionDirecta(data.evento);
+    } else if (data.action === 'join') {
+      this.joinEvent(ide);
+    } else if (data.action === 'finalizar') {
+      this.eventoIdParaFinalizar.set(ide);
+      this.mostrarModalFinalizar.set(true);
     }
   }
+
+  // Lógica Filtros
+  abrirFiltros() {
+    if (this.listaDeportes().length === 0) {
+      this.eventService.getSports().subscribe(sports => this.listaDeportes.set(sports || []));
+    }
+    this.mostrarVentanaDeFiltros.set(true);
+  }
+
+  cerrarFiltros() {
+    this.mostrarVentanaDeFiltros.set(false);
+  }
+
+  limpiarFiltros() {
+    this.filtroDeporte.set(null);
+    this.filtroTipoEvento.set('');
+    this.filtroBusqueda.set('');
+    this.filtroPlazasLibres.set(false);
+    this.filtroFechaDesde.set('');
+    this.filtroFechaHasta.set('');
+  }
+
 
   // Lógica Detalles
   cerrarModalDetalles() {
@@ -250,7 +337,7 @@ export class MyEvents implements OnInit {
     this.refreshData();
   }
 
-  // Lógica Eliminación
+  // Lógica Eliminación y Finalización
   confirmarEliminar() {
     const id = this.eventoIdParaEliminar();
     if (id) {
@@ -264,6 +351,19 @@ export class MyEvents implements OnInit {
     this.eventoIdParaEliminar.set(null);
   }
 
+  confirmarFinalizar() {
+    const id = this.eventoIdParaFinalizar();
+    if (id) {
+      this.finalizarEvent(id);
+    }
+    this.cerrarModalFinalizar();
+  }
+
+  cerrarModalFinalizar() {
+    this.mostrarModalFinalizar.set(false);
+    this.eventoIdParaFinalizar.set(null);
+  }
+
   deleteEvent(id_evento: number) {
     this.eventService.delete(id_evento).subscribe({
       next: (response) => {
@@ -273,6 +373,21 @@ export class MyEvents implements OnInit {
       },
       error: (e) => {
         this.mensajeEnvio.set('❌ Error al intentar eliminar este evento');
+        setTimeout(() => this.mensajeEnvio.set(''), 3000);
+      }
+    });
+  }
+
+  finalizarEvent(id_evento: number) {
+    this.eventService.finalizarEvent(id_evento).subscribe({
+      next: (response) => {
+        this.mensajeEnvio.set('✅ Evento finalizado y XP repartida correctamente');
+        this.refreshData();
+        setTimeout(() => this.mensajeEnvio.set(''), 3000);
+      },
+      error: (e) => {
+        const msg = e?.error?.message || 'Error al intentar finalizar este evento';
+        this.mensajeEnvio.set(`❌ ${msg}`);
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       }
     });
@@ -291,6 +406,21 @@ export class MyEvents implements OnInit {
       }
     });
   }
+
+  joinEvent(id_evento: number) {
+    this.eventService.joinEvent(id_evento).subscribe({
+      next: (response) => {
+        this.mensajeEnvio.set('✅ Te has unido correctamente a este evento');
+        this.refreshData();
+        setTimeout(() => this.mensajeEnvio.set(''), 3000);
+      },
+      error: (err) => {
+        this.mensajeEnvio.set('❌ Error al intentar unirte a este evento');
+        setTimeout(() => this.mensajeEnvio.set(''), 3000);
+      }
+    });
+  }
+
 
   // Helper para formatear la hora en la vista de detalles
   formatTime(time: string | null | undefined): string {

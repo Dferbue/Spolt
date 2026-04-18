@@ -17,6 +17,8 @@ export class CreateEventForm {
 
   mensajeEnvio = signal('');
   mostrarFormulario = signal(false);
+  mostrarModalUnirse = signal(false);
+  idEventoCreado = signal<number | null>(null);
   tipoSeleccionado = signal<TipoEvento | null>(null);
   listaDeportes = signal<any[]>([]);
 
@@ -41,6 +43,8 @@ export class CreateEventForm {
 
   cerrarFormulario() {
     this.mostrarFormulario.set(false);
+    this.mostrarModalUnirse.set(false);
+    this.idEventoCreado.set(null);
     this.tipoSeleccionado.set(null);
   }
 
@@ -99,18 +103,60 @@ export class CreateEventForm {
 
   createEvent(data: CreateEvent) {
     this.eventosService.createEvent(data).subscribe({
-      next: () => {
-        this.mensajeEnvio.set('✅ Se ha creado correctamente el evento');
+      next: (event) => {
+        const id = Number(event.id_evento || event.id);
+        
+        if (id) {
+          this.idEventoCreado.set(id);
+          this.mostrarModalUnirse.set(true);
+          this.mostrarFormulario.set(false); // Cerramos el formulario de creación para que no se superpongan
+        } else {
+          // Fallback por si la respuesta no tiene el ID esperado
+          this.mensajeEnvio.set('✅ Evento creado correctamente');
+          setTimeout(() => {
+            this.mensajeEnvio.set('');
+            this.cerrarFormulario();
+          }, 2000);
+        }
+        
         this.onComplete.emit();
-        setTimeout(() => {
-          this.mensajeEnvio.set('');
-          this.cerrarFormulario();
-        }, 2000);
       },
       error: () => {
         this.mensajeEnvio.set('❌ Error al crear el evento');
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       }
     });
+  }
+
+
+  confirmarUnirse() {
+    const id = this.idEventoCreado();
+    if (id) {
+      this.joinMyEvent(id);
+    }
+    this.mostrarModalUnirse.set(false);
+  }
+
+  cancelarUnirse() {
+    this.cerrarFormulario();
+  }
+
+
+  //Creamos al funcio para despues de crear el evento que nos permita unirnos directamente a nuestro evento
+  joinMyEvent(id_evento:number){
+    this.eventosService.joinEvent(id_evento).subscribe({
+      next:(response)=>{
+        this.mensajeEnvio.set('✅ Te has unido correctamnete al evento');
+        this.onComplete.emit();
+        setTimeout(() => {
+          this.mensajeEnvio.set('');
+          this.cerrarFormulario();
+        }, 2000);
+      },
+      error:(e)=>{
+        this.mensajeEnvio.set('❌ No has podido unirte a tu evento');
+        setTimeout(() => this.mensajeEnvio.set(''), 3000);
+      }
+    })
   }
 }

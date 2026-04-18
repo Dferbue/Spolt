@@ -2,6 +2,7 @@ import { Component, computed, input, output } from '@angular/core';
 import { Amistad } from '../../models/amistad';
 import { DatePipe, CommonModule } from '@angular/common';
 import { AmistadAction } from '../../models/asmitadAction';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-card',
@@ -15,6 +16,8 @@ export class Card {
   public readonly amigo = input.required<Amistad>()
   public readonly currentUser = input.required<string>()
   public readonly listamostrada= input.required<string>()
+
+  public apiUrl = environment.apiUrl;
 
 
   //Outputs que mandaremos al padre y al abuelo para trabajar con el servicio
@@ -42,6 +45,15 @@ export class Card {
     } else {
       return solicitud.solicitante;
     }
+  });
+
+  // Comprueba si el amigo está online (activo en los últimos 5 minutos)
+  public readonly estaOnline = computed(() => {
+    const amigo = this.amigoAMostrar();
+    if (!amigo.ultimo_acceso) return false;
+    const ultimoAcceso = new Date(amigo.ultimo_acceso).getTime();
+    const ahora = Date.now();
+    return (ahora - ultimoAcceso) < 5 * 60 * 1000; // 5 minutos
   });
 
   //Funcion que nos mandara al padre la informacion cuando le demo a un boton

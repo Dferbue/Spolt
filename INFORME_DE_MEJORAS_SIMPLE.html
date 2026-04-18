@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe de Mejoras — Spolt</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.5;
+            color: #000;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+        }
+        h1, h2, h3 { 
+            color: #000; 
+            margin-top: 1em;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 1em 0; 
+        }
+        th, td { 
+            border: 1px solid #000; 
+            padding: 8px; 
+            text-align: left; 
+        }
+        th { 
+            background-color: #eee; 
+            font-weight: bold; 
+        }
+        code, pre { 
+            font-family: monospace; 
+        }
+        pre { 
+            background-color: #eee; 
+            padding: 10px; 
+            border: 1px solid #000; 
+            overflow-x: auto;
+        }
+        ul { 
+            padding-left: 20px; 
+        }
+        li { 
+            margin-bottom: 5px; 
+        }
+        .metadata {
+            margin-bottom: 2em;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Informe de Mejoras — Spolt (Segunda Entrega)</h1>
+
+    <div class="metadata">
+        <p><strong>Proyecto:</strong> Spolt — Red Social Deportiva</p>
+        <p><strong>Autor:</strong> David Fernández Bueno</p>
+        <p><strong>Fecha:</strong> Abril 2026</p>
+    </div>
+
+    <h2>1. Introducción</h2>
+    <p>Este documento recoge las mejoras implementadas en el proyecto <strong>Spolt</strong> desde la primera entrega hasta la segunda entrega. Se detallan los nuevos módulos incorporados tanto en el backend (NestJS) como en el frontend (Angular), las ampliaciones del esquema de base de datos, las mejoras de seguridad, la integración con servicios externos y las mejoras en la experiencia de usuario.</p>
+
+    <h2>2. Resumen de cambios</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Área</th>
+                <th>Primera entrega</th>
+                <th>Segunda entrega</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Módulos backend</strong></td>
+                <td>7 (auth, users, events, frindships, conversations, messages, sports)</td>
+                <td>10 (+email, weather, storage, sport-level)</td>
+            </tr>
+            <tr>
+                <td><strong>Tablas BD</strong></td>
+                <td>8 (usuarios, amistades, deportes, eventos_deportivos, participantes_evento, conversaciones, participantes_conversacion, mensajes)</td>
+                <td>9 (+niveles_deportivos)</td>
+            </tr>
+            <tr>
+                <td><strong>Endpoints Auth</strong></td>
+                <td>5</td>
+                <td>9 (+forgot-password, reset-password, request-email-change, confirm-email-change)</td>
+            </tr>
+            <tr>
+                <td><strong>Endpoints nuevos</strong></td>
+                <td>—</td>
+                <td>weather/forecast, storage/upload, storage/:objectName, sport-level/me, events/:id/finalizar</td>
+            </tr>
+            <tr>
+                <td><strong>Páginas frontend</strong></td>
+                <td>5 (Inicio, Eventos, Amigos, Perfil, Welcome)</td>
+                <td>5 + subcomponentes complejos (Deportes, Calendario, Tiempo, Unirse-Eventos, My-Events, EditData, EditEmail)</td>
+            </tr>
+            <tr>
+                <td><strong>Rutas frontend</strong></td>
+                <td>7</td>
+                <td>9 (+reset-password, confirm-email)</td>
+            </tr>
+            <tr>
+                <td><strong>Migraciones BD</strong></td>
+                <td>3</td>
+                <td>5 (+add_reset_tokens, add_new_email_field)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>3. Nuevos módulos del backend</h2>
+
+    <h3>3.1. Módulo de Email (email)</h3>
+    <p><strong>Archivos:</strong> email.module.ts, email.service.ts, templates/</p>
+    <p>Se ha implementado un servicio de correo electrónico integrado con @nestjs-modules/mailer que ofrece las siguientes funcionalidades:</p>
+    <ul>
+        <li><strong>Email de bienvenida</strong> (welcome.hbs): se envía automáticamente al registrarse un nuevo usuario.</li>
+        <li><strong>Email de restablecimiento de contraseña</strong> (password-reset.hbs): genera un enlace seguro con token criptográfico (crypto.randomBytes) para que el usuario pueda restablecer su contraseña.</li>
+        <li><strong>Email de confirmación de cambio de correo</strong> (email-change.hbs): envía un correo de verificación al nuevo email del usuario antes de realizar el cambio.</li>
+    </ul>
+
+    <h3>3.2. Módulo de Meteorología (weather)</h3>
+    <p><strong>Archivos:</strong> weather.module.ts, weather.service.ts, weather.controller.ts</p>
+    <p>Se ha integrado la <strong>API de AEMET (Agencia Estatal de Meteorología)</strong> para ofrecer previsiones meteorológicas a 7 días basadas en la ubicación del usuario:</p>
+    <ul>
+        <li><strong>Precarga de municipios</strong>: al arrancar el servidor se descarga el catálogo completo de municipios españoles desde AEMET y se almacena en memoria para búsquedas rápidas.</li>
+        <li><strong>Geolocalización por proximidad</strong>: se utiliza la fórmula de Haversine para calcular la distancia real entre las coordenadas del usuario y los municipios, devolviendo el más cercano.</li>
+        <li><strong>Transformación de datos</strong>: los datos brutos de AEMET se transforman en un formato limpio y consumible por el frontend.</li>
+        <li><strong>Traducción de iconos</strong>: los códigos oficiales de estado del cielo de AEMET se mapean a emojis representativos.</li>
+        <li><strong>Fallback robusto</strong>: si la API falla o no está configurada, se utiliza Madrid como ubicación por defecto.</li>
+    </ul>
+
+    <h3>3.3. Módulo de Almacenamiento (storage)</h3>
+    <p><strong>Archivos:</strong> storage.module.ts, storage.service.ts, storage.controller.ts</p>
+    <p>Se ha implementado un sistema completo de almacenamiento de archivos mediante MinIO (compatible con S3):</p>
+    <ul>
+        <li><strong>Subida de archivos</strong> (POST /storage/upload): endpoint protegido con JWT que permite subir imágenes con límite de 15 MB. Validación mediante ParseFilePipe.</li>
+        <li><strong>Servido de archivos</strong> (GET /storage/:objectName): endpoint público que devuelve el archivo directamente como stream.</li>
+        <li><strong>Creación automática de bucket</strong>: al iniciar el módulo se asegura la existencia del bucket configurado.</li>
+    </ul>
+
+    <h3>3.4. Módulo de Niveles Deportivos (sport-level)</h3>
+    <p><strong>Archivos:</strong> sport-level.module.ts, sport-level.service.ts, sport-level.controller.ts</p>
+    <p>Se ha creado un sistema de gamificación con niveles deportivos por deporte:</p>
+    <ul>
+        <li><strong>Sistema de experiencia (XP)</strong>: cada tipo de evento otorga diferente cantidad de XP (Partido: 50, Torneo: 150, Playday: 150).</li>
+        <li><strong>Niveles progresivos</strong>: el XP necesario para subir es dinámico (51 + nivel_actual). Máximo nivel 100.</li>
+        <li><strong>Upsert inteligente</strong>: se crea o actualiza automáticamente el registro al recibir XP.</li>
+        <li><strong>Tracking completo</strong>: nivel, XP actual, XP total y partidos jugados.</li>
+    </ul>
+
+    <h2>4. Mejoras en módulos existentes</h2>
+
+    <h3>4.1. Módulo de Autenticación (auth)</h3>
+    <ul>
+        <li><strong>Recuperación de contraseña</strong>: POST /auth/forgot-password y POST /auth/reset-password para flujo seguro con tokens temporales.</li>
+        <li><strong>Cambio de correo electrónico</strong>: POST /auth/request-email-change y POST /auth/confirm-email-change para verificar propiedad del nuevo email.</li>
+        <li><strong>Mejoras de seguridad</strong>: tracking de ultimo_acceso y validación estricta con DTOs.</li>
+    </ul>
+
+    <h3>4.2. Módulo de Eventos (events)</h3>
+    <ul>
+        <li><strong>Finalización manual</strong> (PATCH /events/:id/finalizar): el creador puede finalizar el evento y repartir XP si está lleno y la fecha ya pasó.</li>
+        <li><strong>Finalización automática</strong> (@Cron): tarea diaria a las 23:59 que procesa y finaliza eventos pasados automáticamente, repartiendo XP.</li>
+        <li><strong>Mejoras de seguridad</strong>: protección total de endpoints de modificación y eliminación con JWT.</li>
+    </ul>
+
+    <h2>5. Cambios en el esquema de base de datos</h2>
+
+    <h3>5.1. Nueva tabla niveles_deportivos</h3>
+<pre><code>model NivelDeportivo {
+  id_nivel_deportivo  Int      @id @default(autoincrement())
+  id_usuario          Int
+  id_deporte          Int
+  nivel               Int      @default(1)
+  experiencia_actual  Int      @default(0)
+  experiencia_total   Int      @default(0)
+  partidos_jugados    Int      @default(0)
+  fecha_actualizacion DateTime @updatedAt
+
+  @@unique([id_usuario, id_deporte])
+}</code></pre>
+
+    <h3>5.2. Nuevos campos en usuarios</h3>
+    <ul>
+        <li>reset_token: VARCHAR(255) temporal para restablecimientos.</li>
+        <li>reset_token_expires: DateTime.</li>
+        <li>new_email: VARCHAR(100) almacenamiento temporal del email propuesto.</li>
+    </ul>
+
+    <h2>6. Mejoras en el frontend</h2>
+    <ul>
+        <li><strong>Página de Inicio</strong>: Nuevo Widget de Meteorología por geolocalización y Calendario Deportivo interactivo.</li>
+        <li><strong>Página de Perfil</strong>: Sistema de pestañas dividiendo Perfil personal y Niveles Deportivos. Flujo visual de subida de Avatar.</li>
+        <li><strong>Página de Eventos</strong>: Dividida en "Mis Eventos" (con ordenación y finalización) y "Unirse a Eventos" (exploración de amigos).</li>
+        <li><strong>Nuevas páginas Auth</strong>: Vistas para reset de contraseña y confirmación de email.</li>
+        <li><strong>Diseño Neo-Brutalist</strong>: Perfeccionamiento del sistema de diseño visual con paletas consistentes, micro-animaciones y sombras duras.</li>
+    </ul>
+
+    <h2>7. Mejoras de arquitectura y calidad de código</h2>
+    <ul>
+        <li><strong>Programación de tareas</strong>: @nestjs/schedule para CRON jobs de finalización de eventos.</li>
+        <li><strong>Transacciones Prisma</strong>: Uso de $transaction para unirse/salir de eventos, previniendo condiciones de carrera.</li>
+        <li><strong>Validación con DTOs</strong>: Ampliación de validadores (ej: @Min, @Max) en entradas de API.</li>
+        <li><strong>Estado reactivo</strong>: Uso de BehaviorSubject en Angular para actualizar la interfaz (ej: Avatar) instantáneamente sin recargas.</li>
+    </ul>
+
+    <h2>8. Tabla resumen de endpoints API (actualizada)</h2>
+    
+    <h3>Auth</h3>
+    <table>
+        <tr><th>Ruta</th><th>Auth</th><th>Estado</th></tr>
+        <tr><td>POST /auth/register, login</td><td>No</td><td>Existente</td></tr>
+        <tr><td>POST /auth/logout, refresh, GET /profile</td><td>Sí</td><td>Existente</td></tr>
+        <tr><td>POST /auth/forgot-password, reset-password</td><td>No</td><td>Nuevo</td></tr>
+        <tr><td>POST /auth/request-email-change</td><td>Sí</td><td>Nuevo</td></tr>
+        <tr><td>POST /auth/confirm-email-change</td><td>No</td><td>Nuevo</td></tr>
+    </table>
+
+    <h3>Events</h3>
+    <table>
+        <tr><th>Ruta</th><th>Auth</th><th>Estado</th></tr>
+        <tr><td>POST /events, GET /events/friends, etc.</td><td>Sí</td><td>Existente</td></tr>
+        <tr><td>PATCH /events/:id, DELETE /events/:id</td><td>Sí</td><td>Mejorado (Seguridad)</td></tr>
+        <tr><td>PATCH /events/:id/finalizar</td><td>Sí</td><td>Nuevo</td></tr>
+    </table>
+
+    <h3>Storage & Weather & Sport Level</h3>
+    <table>
+        <tr><th>Ruta</th><th>Auth</th><th>Estado</th></tr>
+        <tr><td>POST /storage/upload</td><td>Sí</td><td>Nuevo</td></tr>
+        <tr><td>GET /storage/:objectName, GET /weather/forecast</td><td>No</td><td>Nuevo</td></tr>
+        <tr><td>GET /sport-level/me</td><td>Sí</td><td>Nuevo</td></tr>
+    </table>
+
+</body>
+</html>

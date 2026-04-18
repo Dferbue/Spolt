@@ -61,6 +61,12 @@ export class EventosService {
 
   // Funcion que que sirve para elimiar un evento
   delete(id_evento: number) {
-    return this.http.delete<any>(`${this.apiUrl}/${id_evento}`)
+    return this.http.delete<any>(`${this.apiUrl}/${id_evento}`);
+  }
+
+  // Finalizar un evento manualmente y dar XP
+  finalizarEvent(idEvento: number) {
+    return this.http.patch<any>(`${this.apiUrl}/${idEvento}/finalizar`, {});
   }
 }
+

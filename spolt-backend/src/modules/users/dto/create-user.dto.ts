@@ -25,4 +25,8 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   biografia?: string;
+
+  @IsOptional()
+  @IsString()
+  imagen_perfil?: string;
 }

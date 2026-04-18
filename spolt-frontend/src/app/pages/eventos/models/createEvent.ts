@@ -1,6 +1,7 @@
 export enum TipoEvento {
   partido = 'partido',
   torneo = 'torneo',
+  playday = 'playday',
 }
 
 export interface CreateEvent {

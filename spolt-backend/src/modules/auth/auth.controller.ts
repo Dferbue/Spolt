@@ -81,7 +81,7 @@ export class AuthController {
     res.cookie('Refresh', tokens.refreshToken, {
       httpOnly: true,
       path: '/',
-      maxAge: 7 * 24 * 3600 * 1000, // 7 days
+      maxAge: 14 * 24 * 3600 * 1000, // 14 días
     });
   }
 

@@ -37,42 +37,46 @@
 /* Pantalla principal - Layout Original */
 .main-options {
     display: flex;
-    gap: 3rem;
+    gap: 2rem;
     justify-content: center;
     flex-wrap: wrap;
     margin-top: 4rem;
 }
 
 .btn-option {
-    background: white;
-    border: 3px solid #111;
-    border-radius: 16px;
-    padding: 3rem 2rem;
-    width: 100%;
-    max-width: 350px;
+    background: #ffffff;
+    border: 3px solid #000;
+    border-radius: 20px;
+    padding: 2rem 1.5rem;
+    width: 320px;
+    height: 460px;
     cursor: pointer;
-    box-shadow: 10px 10px 0px var(--pink, #ff006e);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 10px 10px 0px #000;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    justify-content: flex-start;
+    position: relative;
+    overflow: hidden;
+    outline: none;
 }
 
 .btn-option:hover {
-    transform: translate(-4px, -4px);
-    box-shadow: 14px 14px 0px var(--pink, #ff006e);
+    transform: translate(-5px, -5px);
+    box-shadow: 15px 15px 0px var(--pink, #ff006e);
 }
 
 .btn-option .icon-wrapper {
-    width: 220px;
-    height: 220px;
+    width: 210px;
+    height: 210px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(0, 0, 0, 0.03);
     border-radius: 50%;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
     transition: all 0.3s ease;
     border: 3px dashed rgba(0, 0, 0, 0.1);
 }
@@ -80,30 +84,31 @@
 .btn-option:hover .icon-wrapper {
     background: rgba(255, 0, 110, 0.05);
     border-color: var(--pink, #ff006e);
-    transform: scale(1.08);
+    border-style: solid;
+    transform: scale(1.05) rotate(3deg);
 }
 
 .option-icon {
-    width: 160px;
-    height: 160px;
+    width: 140px;
+    height: 140px;
     object-fit: contain;
     filter: drop-shadow(6px 6px 0px rgba(0,0,0,0.1));
 }
 
 .btn-option h2 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 900;
     text-transform: uppercase;
-    color: #111;
-    margin: 0 0 1rem 0;
+    color: #000;
+    margin: 0 0 0.4rem 0;
+    letter-spacing: 0.5px;
 }
 
 .btn-option p {
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 0.95rem;
+    font-weight: 700;
     color: #555;
     margin: 0;
-    line-height: 1.5;
 }
 
 /* ------------------------------------- */
@@ -344,3 +349,80 @@ textarea.textarea.min {
         display: none; /* Hide image on mobile for better usability */
     }
 }
+
+/* ── ESTILOS MODAL CONFIRMACIÓN (UNIRSE) ── */
+.confirmation-modal {
+    background: white;
+    border: 3px solid #111;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    box-shadow: 10px 10px 0px var(--pink, #ff006e);
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.confirmation-modal h3 {
+    font-size: 1.6rem;
+    font-weight: 950;
+    text-transform: uppercase;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #111;
+    letter-spacing: -0.5px;
+}
+
+.confirmation-modal p {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: #444;
+    line-height: 1.4;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.2rem;
+}
+
+.modal-actions .btn-cancel,
+.modal-actions .btn-confirm {
+    flex: 1;
+    padding: 14px 0;
+    font-weight: 900;
+    text-transform: uppercase;
+    border: 3px solid #111;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modal-actions .btn-cancel {
+    background: white;
+    color: #111;
+}
+
+.modal-actions .btn-cancel:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 5px 5px 0px #111;
+}
+
+.modal-actions .btn-confirm {
+    background: #111;
+    color: white;
+}
+
+.modal-actions .btn-confirm:hover {
+    background: var(--pink, #ff006e);
+    transform: translate(-3px, -3px);
+    box-shadow: 5px 5px 0px #111;
+}
+

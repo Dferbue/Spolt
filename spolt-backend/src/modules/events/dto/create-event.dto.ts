@@ -14,6 +14,7 @@ import {
 enum TipoEvento {
   partido = 'partido',
   torneo = 'torneo',
+  playday = 'playday',
 }
 
 export class CreateEventDto {

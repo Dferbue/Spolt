@@ -32,6 +32,11 @@ export class AuthService {
     if (!user) throw new UnauthorizedException('Credenciales inválidas');
     const tokens = await this.getTokens(user.id_usuario, user.email, user.role);
     await this.updateRefreshToken(user.id_usuario, tokens.refreshToken);
+    // Actualizar último acceso
+    await this.prisma.usuario.update({
+      where: { id_usuario: user.id_usuario },
+      data: { ultimo_acceso: new Date() }
+    });
     return tokens;
   }
 
@@ -52,6 +57,11 @@ export class AuthService {
 
     const tokens = await this.getTokens(user.id_usuario, user.email, user.role);
     await this.updateRefreshToken(user.id_usuario, tokens.refreshToken);
+    // Actualizar último acceso en cada refresh
+    await this.prisma.usuario.update({
+      where: { id_usuario: user.id_usuario },
+      data: { ultimo_acceso: new Date() }
+    });
     return tokens;
   }
 

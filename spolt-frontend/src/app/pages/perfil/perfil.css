@@ -32,6 +32,40 @@
     margin: 0 auto;
 }
 
+/* =========================================
+   TABS DE NAVEGACIÓN
+   ========================================= */
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 2rem;
+    border-bottom: 3px solid #111;
+    padding-bottom: 0;
+}
+
+.tab {
+    padding: 10px 30px;
+    background: transparent;
+    border: 3px solid transparent;
+    border-bottom: none;
+    cursor: pointer;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: #888;
+    position: relative;
+    top: 3px;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+}
+
+.tab.active {
+    background: white;
+    border: 3px solid #111;
+    border-bottom: 3px solid white;
+    color: #111;
+    border-radius: 8px 8px 0 0;
+}
+
 /* SECTION TITLE */
 .section-title-box {
     display: inline-block;
@@ -47,6 +81,33 @@
     font-weight: 900;
     font-size: 1.2rem;
     letter-spacing: 2px;
+}
+
+/* BRAND HEADER */
+.brand-header-box {
+    display: inline-block;
+    border: 4px solid #111;
+    background: #FFE800; /* Bright yellow */
+    padding: 1rem 3rem;
+    box-shadow: 6px 6px 0px #111;
+    margin-bottom: 2rem;
+    transform: rotate(-1deg);
+    transition: all 0.2s ease;
+}
+
+.brand-header-box:hover {
+    transform: rotate(0deg) translate(-2px, -2px);
+    box-shadow: 8px 8px 0px var(--pink, #ff006e);
+}
+
+.brand-title {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    color: #111;
+    line-height: 1;
 }
 
 /* NOTIFICACIONES */
@@ -163,6 +224,38 @@
     transform: scale(1.03);
     box-shadow: inset 0px 0px 20px rgba(0,0,0,0.05), 0px 0px 0px 12px rgba(255, 0, 110, 0.2);
     border-color: var(--pink, #ff006e);
+}
+
+.avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 900;
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-align: center;
+    z-index: 10;
+}
+
+.avatar-circle-frame:hover .avatar-overlay {
+    opacity: 1;
+}
+
+.avatar-overlay svg {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 8px;
+    color: var(--pink);
 }
 
 .avatar-img {

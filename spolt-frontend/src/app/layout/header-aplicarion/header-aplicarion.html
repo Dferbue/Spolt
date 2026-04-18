@@ -7,7 +7,13 @@
     <span class="user-status blink">● ONLINE</span>
     <span class="user-name">{{ (user$ | async)?.nombre_usuario || 'Cargando...' }}</span>
     <div routerLink="/perfil" class="user-avatar">
-      <img src="logo/Logo.png" alt="User">
+      @if ((user$ | async)?.imagen_perfil) {
+        <img [src]="(user$ | async).imagen_perfil" alt="User">
+      } @else {
+        <div class="avatar-placeholder-header">
+           {{ (user$ | async)?.nombre_usuario?.charAt(0)?.toUpperCase() }}
+        </div>
+      }
     </div>
   </div>
 </header>
