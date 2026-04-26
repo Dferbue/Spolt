@@ -3,6 +3,8 @@ import { signal } from '@angular/core';
 import { CalendarEvent } from '../modules/calendar';
 import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { SportColorService } from '../../../shared/services/sport-color.service';
+
 
 @Injectable({
   providedIn: 'root',
@@ -11,19 +13,10 @@ export class InicioService {
 
   private readonly apiUrl = `${environment.apiUrl}/events`;
   private readonly http = inject(HttpClient);
+  private readonly sportColorService = inject(SportColorService);
 
   // Eventos en los que el usuario participa (este mes)
   myEvents = signal<CalendarEvent[]>([]);
-
-  // Paleta de colores para asignar según deporte (en español)
-  private readonly sportColors: Record<string, string> = {
-    'fútbol': 'green',
-    'baloncesto': 'orange',
-    'voley': 'purple',
-    'voleibol': 'purple',
-    'tenis': 'blue',
-    'pádel': 'lime',
-  };
 
   //Obtengo los eventos en los que participas del mes actual 
   fetchMyEvents(): void {
@@ -67,8 +60,7 @@ export class InicioService {
     const time = horaFin ? `${horaInicio} - ${horaFin}` : horaInicio;
 
     // Color según deporte
-    const sportName = raw.deporte?.nombre?.toLowerCase() || '';
-    const color = this.sportColors[sportName] || 'pink';
+    const color = this.sportColorService.getColor(raw.deporte);
 
     return {
       id: raw.id_evento,

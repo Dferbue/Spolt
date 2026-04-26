@@ -63,13 +63,20 @@ export class Tiempo implements OnInit {
         throw new Error('Error al conectar con tu backend para el clima');
       }
 
-      const backendData: DayForecast[] = await response.json();
+      const backendData = await response.json();
 
-      this.forecast.set(backendData);
+      if (backendData && backendData.available === false) {
+        this.error.set('Previsión meteorológica no disponible en este momento');
+        this.forecast.set([]);
+      } else {
+        // En caso de éxito, backendData.forecast contiene los datos
+        this.forecast.set(backendData.forecast || []);
+        this.error.set(null);
+      }
       this.loading.set(false);
     } catch (err) {
       console.error('Error al obtener el clima:', err);
-      this.error.set('No se pudo obtener el clima desde AEMET');
+      this.error.set('No se pudo conectar con el servidor para obtener el clima');
       this.loading.set(false);
     }
   }

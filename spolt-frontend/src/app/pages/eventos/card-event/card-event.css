@@ -17,7 +17,7 @@
 .event-card:hover {
     transform: translateY(-5px) translateX(-2px);
     box-shadow: 8px 8px 0px #111;
-    border-color: var(--pink, #ff006e);
+    border-color: var(--hover-color, #ff006e);
 }
 
 .card-header {
@@ -40,7 +40,7 @@
 }
 
 .event-card:hover .sport-frame {
-    border-color: var(--pink, #ff006e);
+    border-color: var(--hover-color, #ff006e);
     transform: rotate(-5deg);
 }
 
@@ -114,6 +114,45 @@
     background-color: #ffb3d9; /* Rosa claro neo-brutalista */
     color: #111;
     box-shadow: 2px 2px 0px #111;
+}
+
+.tag-playday {
+    background-color: #00f5d4; /* Vibrant Cyan/Green */
+    color: #111;
+    box-shadow: 2px 2px 0px #111;
+}
+
+.estado-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border: 2px solid #111;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    box-shadow: 2px 2px 0px #111;
+}
+
+.estado-abierto {
+    background: #b9fbc0;
+    color: #111;
+}
+
+.estado-cerrado {
+    background: #ffcfd2;
+    color: #111;
+}
+
+.estado-finalizado {
+    background: #e0e1dd;
+    color: #111;
+}
+
+.estado-cancelado {
+    background: #495057;
+    color: #fff;
+    box-shadow: 2px 2px 0px var(--pink, #ff006e);
 }
 
 .event-info {

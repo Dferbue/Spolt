@@ -1,47 +1,38 @@
-<div class="modal-backdrop" (click)="cerrar.emit()">
-  <div class="edit-form-card" (click)="$event.stopPropagation()">
-    <div class="card-corner card-corner-tl"></div>
-    <div class="card-corner card-corner-br"></div>
+<div class="targetaAmistad-overlay" (click)="cerrar.emit()">
+  <div class="ventana-emergente" (click)="$event.stopPropagation()" style="max-width: 500px;">
+    <h3>📝 EDITAR DATOS</h3>
 
-    <div class="form-header">
-      <h3 class="form-title">📝 EDITAR DATOS</h3>
-      <button class="close-btn" (click)="cerrar.emit()">✕</button>
-    </div>
-
-    <form [formGroup]="datosForm" (ngSubmit)="submit()">
-      <div class="form-group">
-        <label class="form-label">> NOMBRE COMPLETO_</label>
-        <input type="text" class="form-input" placeholder="TU NOMBRE COMPLETO" formControlName="nombre_completo" />
+    <form [formGroup]="datosForm" (ngSubmit)="submit()" style="width: 100%; text-align: left; display: flex; flex-direction: column; gap: 12px;">
+      <div class="form-group" style="margin-bottom: 2px;">
+        <label class="form-label" style="font-size: 0.72rem; color: #111; font-weight: 950; text-transform: uppercase; margin-bottom: 6px; display: block;">NOMBRE COMPLETO</label>
+        <input type="text" class="form-input" placeholder="TU NOMBRE COMPLETO" formControlName="nombre_completo" style="width: 100%; padding: 11px; border: 3px solid #111; border-radius: 8px; font-weight: 700; outline: none;" />
       </div>
 
-      <div class="form-group">
-        <label class="form-label">> BIOGRAFÍA_</label>
+      <div class="form-group" style="margin-bottom: 2px;">
+        <label class="form-label" style="font-size: 0.72rem; color: #111; font-weight: 950; text-transform: uppercase; margin-bottom: 6px; display: block;">BIOGRAFÍA</label>
         <textarea class="form-input form-textarea" placeholder="CUÉNTANOS SOBRE TI..." formControlName="biografia"
-          rows="4"></textarea>
+          rows="3" style="width: 100%; padding: 11px; border: 3px solid #111; border-radius: 8px; font-weight: 700; outline: none; resize: none;"></textarea>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">> FECHA DE NACIMIENTO_</label>
-        <input type="date" class="form-input" formControlName="fecha_nacimiento" />
+      <div class="form-group" style="margin-bottom: 2px;">
+        <label class="form-label" style="font-size: 0.72rem; color: #111; font-weight: 950; text-transform: uppercase; margin-bottom: 6px; display: block;">FECHA DE NACIMIENTO</label>
+        <input type="date" class="form-input" formControlName="fecha_nacimiento" style="width: 100%; padding: 11px; border: 3px solid #111; border-radius: 8px; font-weight: 700; outline: none;" />
       </div>
 
       @if (serverError) {
-      <div class="form-error server-error">* {{ serverError }}</div>
+      <div class="form-error server-error" style="color: #ef4444; font-size: 0.68rem; font-weight: 900;">* {{ serverError }}</div>
       }
 
       @if (successMsg) {
-      <div class="form-success">✓ {{ successMsg }}</div>
+      <div class="form-success" style="color: #22c55e; font-size: 0.78rem; font-weight: 900; padding: 10px; border: 2px solid #22c55e; background: #f0fdf4; border-radius: 8px;">✓ {{ successMsg }}</div>
       }
 
-      <button type="submit" class="submit-btn" [disabled]="datosForm.invalid || loading">
-        <span>
-          @if (loading) {
-          GUARDANDO...
-          } @else {
-          GUARDAR DATOS
-          }
-        </span>
-      </button>
+      <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: 8px;">
+        <button type="submit" class="btn-confirm-delete" [disabled]="datosForm.invalid || loading" style="background: #111; color: white; border: 3px solid #111; box-shadow: 4px 4px 0px var(--pink); padding: 12px;">
+          @if (loading) { GUARDANDO... } @else { GUARDAR DATOS }
+        </button>
+        <button type="button" class="btn-cancel-delete" (click)="cerrar.emit()" style="border: 3px solid #111; padding: 12px;">CANCELAR</button>
+      </div>
     </form>
   </div>
 </div>

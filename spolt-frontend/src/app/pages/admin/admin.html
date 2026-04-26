@@ -1,0 +1,17 @@
+<div class="admin-layout">
+  <!-- Barra lateral izquierda -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Area principal (derecha) -->
+  <div class="main-content">
+    <!-- Header superior externo -->
+    <app-header-aplicarion pageName="ADMIN"></app-header-aplicarion>
+
+    <!-- Contenido dinámico -->
+    <main class="page-content">
+      <div class="page-container">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,64 @@
+<div class="calendar-wrapper" [class.disabled]="disabled" [ngClass]="'theme-' + theme">
+  <!-- Input box that triggers the calendar -->
+  <div class="calendar-input" [class.pixel-input]="theme === 'dark'" (click)="toggleCalendar()">
+    <input 
+      type="text" 
+      class="real-date-input" 
+      placeholder="DD/MM/AAAA" 
+      [value]="displayValue" 
+      (input)="onInput($event)"
+      (blur)="onInputBlur()"
+      (keydown)="onInputKeydown($event)"
+      [disabled]="disabled"
+      maxlength="10"
+    />
+    <span class="calendar-icon">📅</span>
+  </div>
+
+  <!-- Popup Calendar -->
+  @if (isOpen) {
+    <div class="calendar-popup neo-brutalist" [ngClass]="['position-' + position, 'size-' + size]" (click)="$event.stopPropagation()">
+      
+      <!-- Header -->
+      <div class="calendar-header">
+        <button type="button" class="nav-btn" (click)="prevMonth($event)">◄</button>
+        <div class="month-year-selectors" (click)="$event.stopPropagation()">
+          <select class="calendar-select" [ngModel]="currentMonth.getMonth()" (ngModelChange)="onMonthChange($event)">
+            @for (month of monthNames; track $index) {
+              <option [value]="$index">{{ month }}</option>
+            }
+          </select>
+          <select class="calendar-select" [ngModel]="currentMonth.getFullYear()" (ngModelChange)="onYearChange($event)">
+            @for (year of years; track year) {
+              <option [value]="year">{{ year }}</option>
+            }
+          </select>
+        </div>
+        <button type="button" class="nav-btn" (click)="nextMonth($event)">►</button>
+      </div>
+
+      <!-- Days of Week -->
+      <div class="week-days">
+        @for (day of weekDays; track day) {
+          <div class="week-day">{{ day }}</div>
+        }
+      </div>
+
+      <!-- Days Grid -->
+      <div class="days-grid">
+        @for (day of daysInMonth; track day.fullDate.getTime()) {
+          <button 
+            type="button"
+            class="day-cell"
+            [class.other-month]="!day.isCurrentMonth"
+            [class.selected]="isSameDate(day.fullDate, selectedDate)"
+            [class.today]="isToday(day.fullDate)"
+            (click)="selectDate(day, $event)">
+            {{ day.date }}
+          </button>
+        }
+      </div>
+
+    </div>
+  }
+</div>

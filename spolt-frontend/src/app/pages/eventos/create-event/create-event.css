@@ -95,6 +95,10 @@
     filter: drop-shadow(6px 6px 0px rgba(0,0,0,0.1));
 }
 
+.btn-playday .option-icon {
+    mix-blend-mode: multiply; /* Helps blend JPG with white background into the wrapper */
+}
+
 .btn-option h2 {
     font-size: 1.6rem;
     font-weight: 900;
@@ -154,6 +158,7 @@
     background: white;
     min-width: 350px;
     max-width: 50%;
+    overflow-y: auto; /* Enable scroll here instead of the body */
 }
 
 .image-side {
@@ -204,7 +209,7 @@
 
 .filtros-body {
     padding: 0 2rem 1.5rem 2rem;
-    overflow-y: auto;
+    overflow: visible; /* Allow absolute children to overlap */
     display: flex;
     flex-direction: column;
     gap: 1.5rem;

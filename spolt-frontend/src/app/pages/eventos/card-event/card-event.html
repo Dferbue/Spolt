@@ -1,9 +1,11 @@
-<div class="event-card">
+<div class="event-card" [style.box-shadow]="sportShadow" [style.--hover-color]="sportDarkColor">
     <div class="card-header">
         <div class="sport-frame">
-            @if (evento()?.nombre_deporte) {
+            @if (evento()?.deporte?.imagen_icono) {
+                <img [src]="evento()!.deporte!.imagen_icono!.startsWith('http') || evento()!.deporte!.imagen_icono!.startsWith('/') ? evento()!.deporte!.imagen_icono : '/api/v1/storage/' + evento()!.deporte!.imagen_icono" alt="Icono Deporte" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+            } @else if (evento()?.nombre_deporte || evento()?.deporte?.nombre) {
                 <div class="sport-placeholder">
-                    <span>{{ evento()?.nombre_deporte?.charAt(0)?.toUpperCase() }}</span>
+                    <span>{{ (evento()?.nombre_deporte || evento()?.deporte?.nombre)?.charAt(0)?.toUpperCase() }}</span>
                 </div>
             } @else {
                 <div class="sport-placeholder">
@@ -15,14 +17,27 @@
         <div class="header-text">
             <h3 class="event-title">{{ evento()?.titulo }}</h3>
             <div class="tags-row">
-                <span class="deporte-tag">{{ (evento()?.deporte?.nombre || evento()?.nombre_deporte) | uppercase }}</span>
-                <span class="tipo-tag" [ngClass]="evento()?.tipo_evento === 'partido' ? 'tag-partido' : 'tag-torneo'">
-                    @if (evento()?.tipo_evento === 'partido') {
-                        ⚔️ PARTIDO
-                    } @else {
-                        🏆 TORNEO
+                <span class="deporte-tag" [style.background]="sportColor" [style.color]="'#fff'">{{ (evento()?.deporte?.nombre || evento()?.nombre_deporte) | uppercase }}</span>
+                <span class="tipo-tag" [ngClass]="{
+                    'tag-partido': evento()?.tipo_evento === 'partido',
+                    'tag-torneo': evento()?.tipo_evento === 'torneo',
+                    'tag-playday': evento()?.tipo_evento === 'playday'
+                }">
+                    @switch (evento()?.tipo_evento) {
+                        @case ('partido') {
+                            <img src="eventos/iconos/Partidos.png" alt="Partido" style="width: 14px; height: 14px; border-radius: 2px; margin-right: 2px;"> PARTIDO
+                        }
+                        @case ('torneo') {
+                            <img src="eventos/iconos/Torneo.png" alt="Torneo" style="width: 14px; height: 14px; border-radius: 2px; margin-right: 2px;"> TORNEO
+                        }
+                        @case ('playday') {
+                            <img src="eventos/iconos/playday.png" alt="Playday" style="width: 14px; height: 14px; border-radius: 2px; margin-right: 2px;"> PLAYDAY
+                        }
                     }
                 </span>
+                @if (isJoined() || isOwner()) {
+                    <span class="estado-tag" [ngClass]="'estado-' + evento()?.estado">{{ evento()?.estado | uppercase }}</span>
+                }
             </div>
         </div>
     </div>
@@ -51,7 +66,7 @@
         </div>
         <div class="participants-info">
             <div class="progress-bar">
-                <div class="progress" [style.width.%]="((evento()?.numero_participantes_actuales || evento()?.participantes_actuales || 0) / (evento()?.numero_max_participantes || 1)) * 100"></div>
+                <div class="progress" [style.background]="sportDarkColor" [style.width.%]="((evento()?.numero_participantes_actuales || evento()?.participantes_actuales || 0) / (evento()?.numero_max_participantes || 1)) * 100"></div>
             </div>
             <div class="participants-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
                 <div class="avatar-group">

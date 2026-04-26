@@ -4,7 +4,7 @@
   <div class="form-container">
     <form [formGroup]="loginForm" (ngSubmit)="login()">
       <div class="input-block">
-        <label for="email" >> EMAIL_</label>
+        <label for="email" >EMAIL</label>
         <input 
           type="email" 
           id="email"
@@ -19,7 +19,7 @@
       </div>
       
       <div class="input-block">
-        <label for="password" >> PASSWORD_</label>
+        <label for="password" >PASSWORD</label>
         <input 
           type="password" 
           id="password"
@@ -33,8 +33,12 @@
         }
       </div>
 
+      <div class="forgot-password-link">
+        <a class="forgot-password-a" (click)="openForgotModal()">¿He olvidado mi contraseña?</a>
+      </div>
+
       @if (serverError) {
-        <div class="pixel-error" style="margin-bottom: 20px; font-weight: bold;">
+        <div class="pixel-error pixel-error-container">
           * ERROR: {{ serverError }}
         </div>
       }
@@ -51,3 +55,43 @@
     </form>
   </div>
 </div>
+
+<!-- Modal Forgot Password -->
+@if (showForgotModal) {
+  <div class="ventana-overlay" (click)="closeForgotModal()">
+    <div class="ventana-emergente" (click)="$event.stopPropagation()">
+      
+      <h3 class="modal-title">Recuperar Contraseña</h3>
+      <p class="modal-subtitle">Introduce tu correo electrónico para recibir un enlace de recuperación.</p>
+      
+      <form class="modal-form" [formGroup]="forgotForm" (ngSubmit)="sendForgotPassword()">
+        <input 
+          type="email" 
+          formControlName="email" 
+          placeholder="TU CORREO ELECTRÓNICO" 
+          class="modal-input"
+        />
+        
+        @if (forgotForm.get('email')?.touched && forgotForm.get('email')?.invalid) {
+          <div class="modal-error-text">* CORREO INVÁLIDO</div>
+        }
+
+        @if (forgotError) {
+          <div class="modal-error-text">* {{ forgotError }}</div>
+        }
+        @if (forgotMsg) {
+          <div class="modal-success-box">✓ {{ forgotMsg }}</div>
+        }
+        
+        <div class="modal-actions">
+          <button type="submit" class="modal-btn-submit" [disabled]="forgotForm.invalid || isSubmittingForgot">
+            {{ isSubmittingForgot ? 'ENVIANDO...' : 'ENVIAR ENLACE' }}
+          </button>
+          <button type="button" class="modal-btn-cancel" (click)="closeForgotModal()">
+            CANCELAR
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

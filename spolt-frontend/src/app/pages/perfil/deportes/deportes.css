@@ -36,7 +36,7 @@
 .sport-level-card {
   background: #ffffff;
   border: 3px solid #000;
-  box-shadow: 6px 6px 0px var(--pink, #ff006e);
+  box-shadow: 6px 6px 0px var(--base-color, #ff006e);
   border-radius: 12px;
   padding: 1.5rem;
   display: flex;
@@ -48,7 +48,7 @@
 
 .sport-level-card:hover {
   transform: translate(-3px, -3px);
-  box-shadow: 9px 9px 0px #000;
+  box-shadow: 9px 9px 0px var(--base-color, #000);
 }
 
 .sport-image-container {
@@ -106,10 +106,6 @@
   font-weight: 800;
   font-size: 1.1rem;
   color: #000;
-  background: #FFE800;
-  padding: 0.2rem 0.6rem;
-  border: 2px solid #000;
-  border-radius: 6px;
 }
 
 .xp-container {
@@ -145,7 +141,7 @@
   background: #000;
   color: #fff;
   border: 2px solid #000;
-  box-shadow: 4px 4px 0px var(--pink, #ff006e);
+  box-shadow: 4px 4px 0px var(--base-color, #ff006e);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-weight: 800;
@@ -158,7 +154,7 @@
 
 .matches-played-badge:hover {
   transform: translateY(-2px);
-  box-shadow: 5px 5px 0px var(--pink, #ff006e);
+  box-shadow: 5px 5px 0px var(--base-color, #ff006e);
 }
 
 .fire-icon {

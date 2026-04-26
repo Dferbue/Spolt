@@ -178,31 +178,45 @@
 
       <!-- MODAL DE CONFIRMACIÓN DE CIERRE DE SESIÓN -->
       @if (showLogoutConfirm) {
-        <div class="ventana-emergente">
-          <h3>¿ESTÁS SEGURO QUE QUIERES CERRAR SESIÓN?</h3>
-          <button (click)="confirmLogout()">Confirmar</button>
-          <button (click)="toggleLogoutConfirm()">Cancelar</button>
+        <div class="targetaAmistad-overlay" (click)="toggleLogoutConfirm()">
+          <div class="ventana-emergente" (click)="$event.stopPropagation()">
+            <h3>¿ESTÁS SEGURO QUE QUIERES CERRAR SESIÓN?</h3>
+            <p style="color: #666; font-weight: 800; font-size: 0.9rem;">VAS A ABANDONAR LA PARTIDA</p>
+            <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+              <button class="btn-confirm-delete" (click)="confirmLogout()">SÍ, CERRAR SESIÓN</button>
+              <button class="btn-cancel-delete" (click)="toggleLogoutConfirm()">CANCELAR</button>
+            </div>
+          </div>
         </div>
       }
 
       <!-- MODAL PARA ACTUALIZAR IMAGEN -->
       @if (showImageConfirm && selectedFilePreview) {
-        <div class="ventana-emergente">
-          <h3>¿ACTUALIZAR IMAGEN DE PERFIL?</h3>
-          <div class="preview-container">
-               <img [src]="selectedFilePreview" alt="Preview" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid black; margin: 15px auto; display: block; box-shadow: 4px 4px 0px var(--pink);">
+        <div class="targetaAmistad-overlay" (click)="cancelImageUpload()">
+          <div class="ventana-emergente" (click)="$event.stopPropagation()">
+            <h3>¿ACTUALIZAR IMAGEN DE PERFIL?</h3>
+            <div class="preview-container">
+                 <img [src]="selectedFilePreview" alt="Preview" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid black; margin: 15px auto; display: block; box-shadow: 4px 4px 0px var(--pink);">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+              <button class="btn-confirm-delete" (click)="uploadProfileImage()">CONFIRMAR Y SUBIR</button>
+              <button class="btn-cancel-delete" (click)="cancelImageUpload()">CANCELAR</button>
+            </div>
           </div>
-          <button (click)="uploadProfileImage()">Confirmar y Subir</button>
-          <button (click)="cancelImageUpload()">Cancelar</button>
         </div>
       }
 
       <!-- MODAL DE CONFIRMACIÓN DE CAMBIO DE CONTRASEÑA -->
       @if (showPasswordConfirm) {
-        <div class="ventana-emergente">
-          <h3>¿ESTÁS SEGURO QUE QUIERES CAMBIAR LA CONTRASEÑA?</h3>
-          <button (click)="confirmPasswordChange()">Confirmar</button>
-          <button (click)="cancelPasswordConfirm()">Cancelar</button>
+        <div class="targetaAmistad-overlay" (click)="cancelPasswordConfirm()">
+          <div class="ventana-emergente" (click)="$event.stopPropagation()">
+            <h3>¿ESTÁS SEGURO QUE QUIERES CAMBIAR LA CONTRASEÑA?</h3>
+            <p style="color: #666; font-weight: 800; font-size: 0.9rem;">SE ENVIARÁ UN ENLACE A TU CORREO</p>
+            <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+              <button class="btn-confirm-delete" (click)="confirmPasswordChange()">CONFIRMAR ENVÍO</button>
+              <button class="btn-cancel-delete" (click)="cancelPasswordConfirm()">CANCELAR</button>
+            </div>
+          </div>
         </div>
       }
       } @else {

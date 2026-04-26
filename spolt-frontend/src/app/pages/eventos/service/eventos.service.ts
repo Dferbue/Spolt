@@ -13,9 +13,9 @@ export class EventosService {
 
   // Creamos todas la funciones del servicio
 
-  // Funcion para traernos los datos de los eventos
-  getAllEvents() {
-    return this.http.get<EventInterface[]>(`${this.apiUrl}`);
+  // Funcion para traernos los datos de los eventos (con paginación)
+  getAllEvents(page: number = 1, limit: number = 30) {
+    return this.http.get<any>(`${this.apiUrl}?page=${page}&limit=${limit}`);
   }
 
   // Crear el evento

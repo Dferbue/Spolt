@@ -7,7 +7,7 @@
         <form (ngSubmit)="register()" [formGroup]="registerForm">
           
           <div class="input-block">
-            <label for="nombre_usuario">> USERNAME_</label>
+            <label for="nombre_usuario">USERNAME</label>
             <input
               type="text"
               placeholder="ENTER USERNAME"
@@ -23,7 +23,7 @@
           </div>
 
           <div class="input-block">
-            <label for="email">> EMAIL_</label>
+            <label for="email">EMAIL</label>
             <input
               type="email"
               placeholder="ENTER EMAIL"
@@ -39,7 +39,7 @@
           </div>
 
           <div class="input-block">
-            <label for="password">> PASSWORD_</label>
+            <label for="password">PASSWORD</label>
             <input
               type="password"
               placeholder="********"
@@ -55,14 +55,11 @@
           </div>
 
           <div class="input-block">
-            <label for="fecha_nacimiento">> BIRTHDATE_</label>
-            <input
-              type="date"
+            <label for="fecha_nacimiento">BIRTHDATE</label>
+            <app-custom-calendar
               id="fecha_nacimiento"
               formControlName="fecha_nacimiento"
-              class="pixel-input"
-              required
-            />
+            ></app-custom-calendar>
             @let fecha_nacimiento = registerForm.get('fecha_nacimiento');
             @if (fecha_nacimiento?.touched && fecha_nacimiento?.invalid) {
               <div class="pixel-error">* REQUIRED</div>

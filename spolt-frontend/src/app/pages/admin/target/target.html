@@ -1,0 +1,101 @@
+<!-- EVENTO -->
+@if (tipo() === 'evento') {
+  <div class="data-item" [style.box-shadow]="'3px 3px 0px ' + sportColor" [style.--base-color]="sportColor" [style.--hover-color]="sportDarkColor">
+    <div class="item-main">
+      <div class="sport-icon-container">
+        @if (item()?.deporte?.imagen_icono) {
+          <img [src]="item().deporte.imagen_icono.startsWith('http') || item().deporte.imagen_icono.startsWith('/') ? item().deporte.imagen_icono : '/api/v1/storage/' + item().deporte.imagen_icono" alt="Icono Deporte" class="sport-icon-list">
+        } @else {
+          <span class="sport-icon-fallback">{{ (item()?.deporte?.nombre?.charAt(0) | uppercase) || '?' }}</span>
+        }
+      </div>
+      <div class="item-avatar" style="background: transparent; border: none;">
+        <span class="status-dot" [class.active]="item()?.estado === 'abierto'"></span>
+      </div>
+      <div class="item-info">
+        <span class="item-name">{{ item()?.titulo }}</span>
+        <span class="item-sub">{{ item()?.deporte?.nombre }}</span>
+      </div>
+      
+      <!-- CREADOR -->
+      <div class="creator-info">
+        <div class="creator-avatar">
+          @if (item()?.creador?.imagen_perfil) {
+            <img [src]="item().creador.imagen_perfil.startsWith('http') || item().creador.imagen_perfil.startsWith('/') ? item().creador.imagen_perfil : '/api/v1/storage/' + item().creador.imagen_perfil" alt="Creador">
+          } @else {
+            <span class="avatar-fallback-letter">{{ (item()?.creador?.nombre_usuario?.charAt(0) | uppercase) || '?' }}</span>
+          }
+        </div>
+        <div class="creator-details">
+          <span class="creator-label">Creado por</span>
+          <span class="creator-name">{{ item()?.creador?.nombre_usuario }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="item-actions">
+      <button class="action-btn view" (click)="emitAction('detalles')">DETALLES</button>
+      <button class="delete-btn" (click)="emitAction('eliminar')">
+        <span class="btn-text-desktop">ELIMINAR</span>
+        <span class="btn-text-mobile">✕</span>
+      </button>
+    </div>
+  </div>
+}
+
+<!-- USUARIO -->
+@if (tipo() === 'usuario') {
+  <div class="data-item">
+    <div class="item-main">
+      <div class="item-avatar">
+        @if (item()?.imagen_perfil) {
+          <img [src]="item().imagen_perfil.startsWith('http') || item().imagen_perfil.startsWith('/') ? item().imagen_perfil : '/api/v1/storage/' + item().imagen_perfil" alt="avatar">
+        } @else {
+          <span class="avatar-fallback-letter">{{ (item()?.nombre_usuario?.charAt(0) | uppercase) || 'U' }}</span>
+        }
+      </div>
+      <span class="item-name">{{ item()?.nombre_usuario }}</span>
+    </div>
+    
+    <div class="item-actions">
+      @if (item()?.role === 'admin') {
+        <button class="action-btn" style="background-color: #f59e0b; color: white;" (click)="emitAction('quitar-admin')">QUITAR ADMIN</button>
+      } @else {
+        <button class="action-btn" style="background-color: #22c55e; color: white;" (click)="emitAction('hacer-admin')">HACER ADMIN</button>
+      }
+      <button class="action-btn view" (click)="emitAction('ver-perfil')">VER PERFIL</button>
+      <button class="action-btn friends" (click)="emitAction('ver-amigos')">VER AMIGOS</button>
+      <button class="delete-btn" (click)="emitAction('eliminar')">
+        <span class="btn-text-desktop">ELIMINAR</span>
+        <span class="btn-text-mobile">✕</span>
+      </button>
+    </div>
+  </div>
+}
+
+<!-- DEPORTE -->
+@if (tipo() === 'deporte') {
+  <div class="data-item" [style.border-left]="'4px solid ' + sportColor" [style.--base-color]="sportColor" [style.--hover-color]="sportDarkColor">
+    <div class="item-main">
+      <div class="sport-icon-container" style="position: relative;">
+        @if (item()?.imagen_icono) {
+          <img [src]="item().imagen_icono.startsWith('http') || item().imagen_icono.startsWith('/') ? item().imagen_icono : '/api/v1/storage/' + item().imagen_icono" alt="Icono Deporte" class="sport-icon-list">
+        } @else {
+          <span class="sport-icon-fallback">{{ (item()?.nombre?.charAt(0) | uppercase) || '?' }}</span>
+        }
+        <!-- Punto de color en la esquina del icono -->
+        <span style="position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--sport-color); border: 1.5px solid #fff; box-shadow: 0 0 0 1px #111;" [style.background]="sportColor"></span>
+      </div>
+      <span class="item-name">{{ item()?.nombre }}</span>
+    </div>
+    
+    <div class="item-actions">
+      <button class="action-btn view" (click)="emitAction('editar')">EDITAR</button>
+      <button class="delete-btn" (click)="emitAction('eliminar')">
+        <span class="btn-text-desktop">ELIMINAR</span>
+        <span class="btn-text-mobile">✕</span>
+      </button>
+    </div>
+  </div>
+}
+

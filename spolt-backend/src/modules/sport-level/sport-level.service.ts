@@ -72,7 +72,8 @@ export class SportLevelService {
                     deporte: {
                         select: {
                             nombre: true,
-                            imagen_icono: true
+                            imagen_icono: true,
+                            color: true
                         }
                     }
                 }

@@ -1,21 +1,25 @@
 import { Component, inject, OnInit, signal, ViewEncapsulation, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EventosService } from '../service/eventos.service';
-import { CreateEvent, TipoEvento, EventInterface, eventAction } from '../models/createEvent';
+import { CreateEvent, EventInterface, eventAction } from '../models/createEvent';
 import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
 import { ListEvents } from '../list-events/list-events';
+import { SportColorService } from '../../../shared/services/sport-color.service';
+
+import { CustomCalendar } from '../../../shared/components/custom-calendar/custom-calendar';
 
 @Component({
   selector: 'app-my-events',
   standalone: true,
-  imports: [CommonModule, ListEvents, FormsModule],
+  imports: [CommonModule, ListEvents, FormsModule, CustomCalendar],
   templateUrl: './my-events.html',
   styleUrl: './my-events.css',
   encapsulation: ViewEncapsulation.None,
 })
 export class MyEvents implements OnInit {
   private readonly eventService = inject(EventosService);
+  public readonly sportColorService = inject(SportColorService);
 
   public tabActiva = signal<'creados' | 'unidos'>('creados');
   public mensajeEnvio = signal('');
@@ -25,6 +29,12 @@ export class MyEvents implements OnInit {
   public rawJoinedEvents = signal<EventInterface[]>([]);
   public joinedIds = signal<number[]>([]);
 
+  getUserLevel(participante: any, id_deporte: number): number {
+    if (!participante?.usuario?.niveles_deportivos) return 1;
+    const nivelObj = participante.usuario.niveles_deportivos.find((nd: any) => nd.id_deporte === id_deporte);
+    return nivelObj ? nivelObj.nivel : 1;
+  }
+
   // ── FILTROS (Espejo de unirse-eventos) ──
   public mostrarVentanaDeFiltros = signal<boolean>(false);
   public filtroDeporte = signal<number | null>(null);
@@ -33,6 +43,7 @@ export class MyEvents implements OnInit {
   public filtroPlazasLibres = signal<boolean>(false);
   public filtroFechaDesde = signal<string>('');
   public filtroFechaHasta = signal<string>('');
+  public ordenarPor = signal<string>('recientes');
 
   public filtrosActivos = computed(() => {
     let count = 0;
@@ -73,6 +84,22 @@ export class MyEvents implements OnInit {
     if (this.filtroFechaHasta()) {
       resultado = resultado.filter(e => new Date(e.fecha_evento) <= new Date(this.filtroFechaHasta()));
     }
+    // Ordenación
+    const orden = this.ordenarPor();
+    resultado = [...resultado]; // Copia para no mutar el original y forzar reactividad
+    
+    if (orden === 'recientes') {
+      resultado.sort((a, b) => new Date(b.fecha_evento).getTime() - new Date(a.fecha_evento).getTime());
+    } else if (orden === 'antiguos') {
+      resultado.sort((a, b) => new Date(a.fecha_evento).getTime() - new Date(b.fecha_evento).getTime());
+    } else if (orden === 'titulo') {
+      resultado.sort((a, b) => a.titulo.localeCompare(b.titulo));
+    } else if (orden === 'deporte') {
+      resultado.sort((a, b) => (a.deporte?.nombre || a.nombre_deporte || '').localeCompare(b.deporte?.nombre || b.nombre_deporte || ''));
+    } else if (orden === 'estado') {
+      resultado.sort((a, b) => (a.estado || '').localeCompare(b.estado || ''));
+    }
+
     return resultado;
   }
 
@@ -115,11 +142,11 @@ export class MyEvents implements OnInit {
     
     // Cargar eventos creados por mí
     this.eventService.getMyEvents().subscribe({
-      next: (data) => {
+      next: (data: EventInterface[]) => {
         this.rawMyEvents.set(data || []);
         this.checkLoading();
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error fetching my events:', err);
         this.checkLoading();
       }
@@ -127,12 +154,12 @@ export class MyEvents implements OnInit {
 
     // Cargar eventos a los que me he unido
     this.eventService.geteventosEnlosQueParticipamos().subscribe({
-      next: (data) => {
+      next: (data: EventInterface[]) => {
         this.rawJoinedEvents.set(data || []);
         this.joinedIds.set(data?.map(e => Number(e.id_evento || e.id)) || []);
         this.checkLoading();
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error fetching joined events:', err);
         this.checkLoading();
       }
@@ -141,7 +168,6 @@ export class MyEvents implements OnInit {
   }
 
   private checkLoading() {
-    // Si ambas peticiones han terminado (podríamos usar forkJoin pero esto es más simple con signals)
     this.loading.set(false);
   }
 
@@ -160,7 +186,7 @@ export class MyEvents implements OnInit {
     } else if (data.action === 'details') {
       this.eventSelected.set(data.evento);
       this.mostrarModalDetalles.set(true);
-      setTimeout(() => this.initMap(), 50); // Pequeño retraso para que el DOM se actualice
+      setTimeout(() => this.initMap(), 50); 
     } else if (data.action === 'edit') {
       this.abrirEdicionDirecta(data.evento);
     } else if (data.action === 'join') {
@@ -174,7 +200,7 @@ export class MyEvents implements OnInit {
   // Lógica Filtros
   abrirFiltros() {
     if (this.listaDeportes().length === 0) {
-      this.eventService.getSports().subscribe(sports => this.listaDeportes.set(sports || []));
+      this.eventService.getSports().subscribe((sports: any[]) => this.listaDeportes.set(sports || []));
     }
     this.mostrarVentanaDeFiltros.set(true);
   }
@@ -241,7 +267,7 @@ export class MyEvents implements OnInit {
 
     // Load sports
     if (this.listaDeportes().length === 0) {
-      this.eventService.getSports().subscribe(sports => this.listaDeportes.set(sports || []));
+      this.eventService.getSports().subscribe((sports: any[]) => this.listaDeportes.set(sports || []));
     }
 
     this.mostrarModalEditar.set(true);
@@ -258,7 +284,7 @@ export class MyEvents implements OnInit {
     const mapContainer = document.getElementById('map-details');
     if (!mapContainer) return;
 
-    const lat = event.latitud || 40.4168; // Default Madrid si no hay lat
+    const lat = event.latitud || 40.4168; 
     const lng = event.longitud || -3.7038;
 
     this.map = L.map('map-details').setView([lat, lng], 17);
@@ -281,7 +307,6 @@ export class MyEvents implements OnInit {
       .bindPopup(`<b>${event.titulo}</b><br>${event.ubicacion || 'Ubicación por defecto'}`)
       .openPopup();
     
-    // ResizeObserver soluciona definitivamente el problema de renderizado oculto
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
@@ -290,7 +315,6 @@ export class MyEvents implements OnInit {
     });
     this.resizeObserver.observe(mapContainer);
 
-    // Fallback inicial
     setTimeout(() => {
       this.map?.invalidateSize();
     }, 100);
@@ -326,7 +350,7 @@ export class MyEvents implements OnInit {
         this.refreshData();
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       },
-      error: () => {
+      error: (err: any) => {
         this.mensajeEnvio.set('❌ Error al actualizar el evento');
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       }
@@ -366,12 +390,13 @@ export class MyEvents implements OnInit {
 
   deleteEvent(id_evento: number) {
     this.eventService.delete(id_evento).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         this.mensajeEnvio.set('✅ Se ha eliminado este evento correctamente');
-        this.refreshData();
+        // Actualizar localmente en vez de refreshData()
+        this.rawMyEvents.update(list => list.filter(e => Number(e.id_evento || e.id) !== id_evento));
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       },
-      error: (e) => {
+      error: (e: any) => {
         this.mensajeEnvio.set('❌ Error al intentar eliminar este evento');
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       }
@@ -380,12 +405,15 @@ export class MyEvents implements OnInit {
 
   finalizarEvent(id_evento: number) {
     this.eventService.finalizarEvent(id_evento).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         this.mensajeEnvio.set('✅ Evento finalizado y XP repartida correctamente');
-        this.refreshData();
+        // Actualizar localmente: marcar como finalizado
+        this.rawMyEvents.update(list => list.map(e => 
+          Number(e.id_evento || e.id) === id_evento ? { ...e, estado: 'finalizado' } : e
+        ));
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       },
-      error: (e) => {
+      error: (e: any) => {
         const msg = e?.error?.message || 'Error al intentar finalizar este evento';
         this.mensajeEnvio.set(`❌ ${msg}`);
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
@@ -395,12 +423,14 @@ export class MyEvents implements OnInit {
 
   leaveEvent(id_evento: number) {
     this.eventService.leaveEvent(id_evento).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         this.mensajeEnvio.set('✅ Te has salido correctamente de este evento');
-        this.refreshData();
+        // Actualizar localmente
+        this.rawJoinedEvents.update(list => list.filter(e => Number(e.id_evento || e.id) !== id_evento));
+        this.joinedIds.update(ids => ids.filter(id => id !== id_evento));
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.mensajeEnvio.set('❌ Error al intentar salir de este evento');
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       }
@@ -409,20 +439,23 @@ export class MyEvents implements OnInit {
 
   joinEvent(id_evento: number) {
     this.eventService.joinEvent(id_evento).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         this.mensajeEnvio.set('✅ Te has unido correctamente a este evento');
-        this.refreshData();
+        // Actualizar localmente
+        const evento = this.rawMyEvents().find(e => Number(e.id_evento || e.id) === id_evento);
+        if (evento) {
+          this.rawJoinedEvents.update(list => [...list, evento]);
+          this.joinedIds.update(ids => [...ids, id_evento]);
+        }
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.mensajeEnvio.set('❌ Error al intentar unirte a este evento');
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       }
     });
   }
 
-
-  // Helper para formatear la hora en la vista de detalles
   formatTime(time: string | null | undefined): string {
     if (!time) return '--:--';
     if (time.includes('T')) {

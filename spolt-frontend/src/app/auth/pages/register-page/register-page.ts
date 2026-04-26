@@ -17,6 +17,7 @@ export class RegisterPage {
   // Variable para mostrar errores en caso de que el backend los devuelva (ej. "El usuario ya existe").
   errorMessage = "";
   loading = signal(false);
+  registroExitoso = signal(false);
   
   // Usamos un Signal para almacenar el estado del formulario de registro.
   // Lo inicializamos vacío pero con la estructura de RegisterDto que espera NestJS.
@@ -42,12 +43,8 @@ export class RegisterPage {
       // Bloque NEXT: Se ejecuta solo si el servidor responde que TODO FUE BIEN (código 201)
       next: (response) => {
         this.loading.set(false);
+        this.registroExitoso.set(true);
         console.log('Registro exitoso:', response);
-        
-        // Normalmente, cuando un usuario se registra de cero, el backend crea la cuenta
-        // pero no devuelve los tokens directamente, así que lo mandamos a que inicie sesión.
-        // Redirigimos al usuario a la vista de login.
-        this.router.navigate(['/login']); 
       },
       
       // Bloque ERROR: Se ejecuta si el servidor devuelve algún error (código 400, 409, 500...)

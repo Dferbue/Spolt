@@ -55,6 +55,10 @@ export class FrindshipsController {
     return this.frindshipsService.findPeticionesEnviadas(req.user.id_usuario);
   }
 
-
+  //Metodo que usaran los administradores papra ver las amistades de un usuario
+  @Get('admin/:id')
+  findAllFriendsAdmin(@Req() req: any, @Param('id') id_usuario: string) {
+    return this.frindshipsService.findAllFriendsAdmin(req.user.id_usuario, Number(id_usuario));
+  }
   
 }

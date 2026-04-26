@@ -6,6 +6,13 @@
         <span class="filtro-badge">{{ filtrosActivos() }}</span>
       }
     </button>
+    <select class="order-select" [ngModel]="ordenarPor()" (ngModelChange)="ordenarPor.set($event)">
+      <option value="recientes">📅 Más recientes</option>
+      <option value="antiguos">⏳ Más antiguos</option>
+      <option value="deporte">⚽ Deporte (A-Z)</option>
+      <option value="titulo">🔤 Título (A-Z)</option>
+      <option value="estado">✅ Estado</option>
+    </select>
   </div>
 
   <div class="tabs">
@@ -73,75 +80,86 @@
   }
 
   <!-- MODAL DE DETALLES -->
-  <!-- MODAL DE DETALLES (Minimalista con Mapa) -->
+  <!-- MODAL DE DETALLES (ESTILO TARJETA HORIZONTAL) -->
   @if (mostrarModalDetalles() && eventSelected(); as event) {
-    <div class="modal-overlay" (click)="cerrarModalDetalles()">
-      <div class="minimalist-modal-container details-view" (click)="$event.stopPropagation()">
+    <div class="ma-overlay" (click)="cerrarModalDetalles()">
+      <div class="ma-horizontal-card" (click)="$event.stopPropagation()">
         
-        <!-- Información (Izquierda) -->
-        <div class="form-side">
-          <div class="header-row-1">
-            <div class="sport-icon-name">
-              @if (event.deporte?.imagen_icono) {
-                <img [src]="event.deporte!.imagen_icono" alt="Deporte" class="sport-icon-min">
-              } @else {
-                <div class="sport-icon-min sport-question">?</div>
-              }
-              <span class="sport-name">{{ (event.deporte?.nombre || event.nombre_deporte) }}</span>
-            </div>
-            <div class="header-stats">
-              <div class="stat-item"><i class="icon-date">📅</i> {{ event.fecha_evento | date:'dd/MM/yyyy' }}</div>
-              <div class="stat-item"><i class="icon-time">⏰</i> {{ formatTime(event.hora_inicio) }}</div>
-              <div class="stat-item"><i class="icon-users">👥</i> {{ event.numero_participantes_actuales || event.participantes_actuales || 0 }}/{{ event.numero_max_participantes }}</div>
-            </div>
-          </div>
+        <!-- Panel Izquierdo -->
+        <div class="ma-left-panel">
           
-          <div class="creator-row">
-            @if (event.creador?.imagen_perfil) {
-              <img [src]="event.creador!.imagen_perfil" alt="Creador" class="creator-avatar">
-            } @else {
-              <div class="creator-avatar avatar-initial">{{ (event.creador?.nombre_usuario || event.nombre_creador || '?').charAt(0) | uppercase }}</div>
-            }
-            <span class="creator-name">{{ event.creador?.nombre_usuario || event.nombre_creador }}</span>
+          <!-- Header: Avatar, Titulo/Deporte/Org, Fecha/Hora/Plazas -->
+          <div class="ma-top-section">
+            <div class="ma-top-left">
+              <div class="ma-sport-avatar">
+                @if (event.deporte?.imagen_icono) {
+                  <img [src]="event.deporte!.imagen_icono" alt="Sport">
+                } @else {
+                  <div class="ma-placeholder">?</div>
+                }
+              </div>
+              <div class="ma-title-group">
+                <h3 class="ma-title">{{ event.titulo }}</h3>
+                <p class="ma-type">{{ (event.deporte?.nombre || event.nombre_deporte) }}</p>
+                <div class="ma-organizer">
+                  <div class="ma-org-img">
+                    @if (event.creador?.imagen_perfil) {
+                      <img [src]="event.creador?.imagen_perfil" alt="O">
+                    } @else {
+                      <span>{{ (event.creador?.nombre_usuario || event.nombre_creador || '?').charAt(0) | uppercase }}</span>
+                    }
+                  </div>
+                  <span>{{ event.creador?.nombre_usuario || event.nombre_creador }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="ma-top-right">
+              <div class="ma-info-item"><span>📅</span> {{ event.fecha_evento | date:'dd/MM/yyyy' }}</div>
+              <div class="ma-info-item"><span>🕒</span> {{ formatTime(event.hora_inicio) }}</div>
+              <div class="ma-info-item"><span>👥</span> <span class="ma-pink-text">{{ event.numero_participantes_actuales || 0 }}/{{ event.numero_max_participantes }}</span></div>
+            </div>
           </div>
 
-          <div class="details-body-scroll">
-            <div class="description-block">
+          <!-- Biografía -->
+          <div class="ma-bio-section">
+            <h4>Biografía</h4>
+            <div class="ma-bio-box">
               {{ event.descripcion || 'Sin descripción disponible.' }}
             </div>
+          </div>
 
-            <div class="participants-section">
-              <h4>Participantes</h4>
-              <ul class="participants-list">
-                @for (p of event.participantes; track p?.usuario?.id_usuario) {
-                  @if (p?.usuario) {
-                    <li class="participant-item">
-                      @if (p.usuario.imagen_perfil) {
-                        <img [src]="p.usuario.imagen_perfil" alt="Avatar" class="participant-avatar">
-                      } @else {
-                        <div class="participant-avatar avatar-initial">{{ p.usuario.nombre_usuario.charAt(0) | uppercase }}</div>
-                      }
-                      <span class="participant-name">{{ p.usuario.nombre_usuario }}</span>
-                    </li>
-                  }
-                }
-                @if (!event.participantes || event.participantes.length === 0) {
-                  <li class="no-participants">Aún no hay participantes unidos.</li>
-                }
-              </ul>
+          <!-- Participantes -->
+          <div class="ma-participants-section">
+            <h4>Participantes <span class="ma-badge">{{ event.participantes?.length || 0 }}</span></h4>
+            <div class="ma-participants-list">
+              @for (p of event.participantes; track p?.usuario?.id_usuario) {
+                <div class="ma-p-item">
+                  <div class="ma-p-img">
+                    @if (p.usuario.imagen_perfil) {
+                      <img [src]="p.usuario.imagen_perfil" alt="P">
+                    } @else {
+                      <span>{{ p.usuario.nombre_usuario.charAt(0) | uppercase }}</span>
+                    }
+                  </div>
+                  <div class="ma-p-name-level" style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; line-height: 1.2;">
+                    <span class="ma-p-name">{{ p.usuario.nombre_usuario }}</span>
+                    <span class="ma-p-level" style="font-size: 0.65rem; font-weight: 900; text-transform: uppercase;" [style.color]="sportColorService.getColor(event.deporte)">Nvl {{ getUserLevel(p, event.id_deporte) }}</span>
+                  </div>
+                </div>
+              }
             </div>
           </div>
 
-          <div class="filtros-footer details-footer">
-            <button class="btn-cancel-edit close-full" (click)="cerrarModalDetalles()">CERRAR</button>
+        </div>
+
+        <!-- Panel Derecho: Mapa -->
+        <div class="ma-right-panel">
+          <div class="ma-map-wrapper">
+            <div id="map-details" class="ma-map-view"></div>
           </div>
+          <button class="ma-btn-close" (click)="cerrarModalDetalles()">CERRAR VENTANA</button>
         </div>
-
-        <!-- Mapa (Derecha) -->
-        <div class="image-side map-wrapper">
-          <div id="map-details" class="map-container"></div>
-        </div>
-
+        
       </div>
     </div>
   }
@@ -186,7 +204,7 @@
             <div class="filtro-group row-group">
               <div class="sub-group">
                 <label class="filtro-label">Fecha</label>
-                <input type="date" class="filtro-input min" [(ngModel)]="edit_fecha_evento">
+                <app-custom-calendar [(ngModel)]="edit_fecha_evento" theme="light" position="top" size="small"></app-custom-calendar>
               </div>
               <div class="sub-group">
                 <label class="filtro-label">Hora</label>
@@ -289,13 +307,13 @@
           <!-- Fecha desde -->
           <div class="filtro-group">
             <label class="filtro-label">Fecha desde</label>
-            <input type="date" class="filtro-input-p" [value]="filtroFechaDesde()" (change)="filtroFechaDesde.set($any($event.target).value)">
+            <app-custom-calendar [ngModel]="filtroFechaDesde()" (ngModelChange)="filtroFechaDesde.set($event)" theme="light" position="top" size="small"></app-custom-calendar>
           </div>
 
           <!-- Fecha hasta -->
           <div class="filtro-group">
             <label class="filtro-label">Fecha hasta</label>
-            <input type="date" class="filtro-input-p" [value]="filtroFechaHasta()" (change)="filtroFechaHasta.set($any($event.target).value)">
+            <app-custom-calendar [ngModel]="filtroFechaHasta()" (ngModelChange)="filtroFechaHasta.set($event)" theme="light" position="top" size="small"></app-custom-calendar>
           </div>
         </div>
 

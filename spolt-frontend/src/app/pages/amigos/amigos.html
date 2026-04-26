@@ -13,13 +13,15 @@
         <div>
           <button (click)="cambioEstadoVentana()" class="addFriend">Añadir Amigo</button>
           @if(wiewForm){
-          <div class="ventana-overlay" (click)="cambioEstadoVentana()"></div>
-          <div class="ventana-emergente">
-            <h3>Introduzca el nombre del Usuario</h3>
-            <input type="text" #userName placeholder="Nombre de usuario...">
-            <button (click)="sendFrindsShip(userName.value)">Enviar solicutud</button>
-
-            <button (click)="cambioEstadoVentana()">Cerrar</button>
+          <div class="targetaAmistad-overlay" (click)="cambioEstadoVentana()">
+            <div class="ventana-emergente" (click)="$event.stopPropagation()">
+              <h3>Introduzca el nombre del Usuario</h3>
+              <input type="text" #userName placeholder="Nombre de usuario..." class="form-input" style="width: 100%; margin-bottom: 5px;">
+              <div class="modal-actions-container" style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+                <button class="btn-confirm-delete" (click)="sendFrindsShip(userName.value)">ENVIAR SOLICITUD</button>
+                <button class="btn-cancel-delete" (click)="cambioEstadoVentana()">CERRAR VENTANA</button>
+              </div>
+            </div>
           </div>
           }
         </div>

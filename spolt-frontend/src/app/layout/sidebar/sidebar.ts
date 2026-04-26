@@ -11,8 +11,9 @@ import { AuthService } from '../../auth/services/auth.service';
   styleUrl: './sidebar.css',
 })
 export class Sidebar {
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
   private router = inject(Router);
+  public profile$ = this.authService.getProfile();
 
   @HostBinding('class.modal-open') showLogoutConfirm = false;
 

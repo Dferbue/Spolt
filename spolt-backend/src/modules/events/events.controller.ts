@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -16,9 +16,32 @@ export class EventsController {
     return this.eventsService.create(createEventDto, Number(userId));
   }
 
+  @Get('count-active')
+  countActive() {
+    return this.eventsService.countActive();
+  }
+
   @Get()
-  findAll() {
-    return this.eventsService.findAll();
+  findAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+    @Query('estado') estado?: string,
+    @Query('id_deporte') id_deporte?: string,
+    @Query('mes') mes?: string,
+    @Query('anio') anio?: string,
+    @Query('sort') sort?: string,
+  ) {
+    return this.eventsService.findAll({
+      page: page ? parseInt(page, 10) : 1,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      search,
+      estado,
+      id_deporte: id_deporte ? parseInt(id_deporte, 10) : undefined,
+      mes,
+      anio,
+      sort
+    });
   }
 
   //Eventos de amgos

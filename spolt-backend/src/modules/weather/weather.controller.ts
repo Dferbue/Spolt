@@ -12,9 +12,15 @@ export class WeatherController {
     const lon = lonStr ? parseFloat(lonStr) : -3.7038;
 
     try {
-      return await this.weatherService.getSevenDayForecast(lat, lon);
+      const forecast = await this.weatherService.getSevenDayForecast(lat, lon);
+      return { available: true, forecast };
     } catch (error) {
-       throw new HttpException(error.message || 'Error al obtener datos de AEMET', HttpStatus.SERVICE_UNAVAILABLE);
+       console.error('WeatherService fallback triggered:', error.message);
+       return { 
+         available: false, 
+         reason: 'weather_service_unavailable', 
+         forecast: [] 
+       };
     }
   }
 }

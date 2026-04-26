@@ -19,8 +19,7 @@
 
     <button class="btn-option btn-playday" (click)="abrirFormulario(TipoEvento.playday)">
       <div class="icon-wrapper">
-        <!-- Reusamos el icono de partido temporalmente -->
-        <img src="eventos/iconos/Partidos.png" alt="Playday" class="option-icon">
+        <img src="eventos/iconos/playday.png" alt="Playday" class="option-icon">
       </div>
       <h2>Crear Playday</h2>
       <p>Organiza un día de juegos casuales y variados</p>
@@ -73,7 +72,7 @@
             <div class="filtro-group row-group">
               <div class="sub-group">
                 <label class="filtro-label">Fecha</label>
-                <input type="date" class="filtro-input min" [(ngModel)]="fecha_evento">
+                <app-custom-calendar [(ngModel)]="fecha_evento" theme="light" position="top" size="small"></app-custom-calendar>
               </div>
               <div class="sub-group">
                 <label class="filtro-label">Hora</label>
@@ -100,7 +99,7 @@
           } @else if(tipoSeleccionado() === TipoEvento.torneo) {
             <img src="eventos/img/TorneoImg.jpg" alt="Torneo" class="modal-img">
           } @else {
-            <img src="eventos/img/partidoImg.jpg" alt="Playday" class="modal-img">
+            <img src="eventos/img/playDay.jpeg" alt="Playday" class="modal-img">
           }
         </div>
 

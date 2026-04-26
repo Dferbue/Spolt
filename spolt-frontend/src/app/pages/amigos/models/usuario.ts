@@ -6,4 +6,8 @@ export interface usuario {
     nombre_usuario:string
 
     ultimo_acceso?:string
+    
+    biografia?:string
+
+    niveles_deportivos?: any[];
 }

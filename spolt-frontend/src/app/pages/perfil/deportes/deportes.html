@@ -12,11 +12,11 @@
     } @else {
       <div class="sport-levels-grid">
         @for (nivel of niveles; track nivel.id_nivel_deportivo) {
-          <div class="sport-level-card">
+          <div class="sport-level-card" [style.--base-color]="getSportColor(nivel)">
             
             <div class="sport-image-container">
               @if (nivel.deporte.imagen_icono) {
-                <img [src]="nivel.deporte.imagen_icono" alt="icono deporte">
+                <img [src]="nivel.deporte.imagen_icono.startsWith('http') || nivel.deporte.imagen_icono.startsWith('/') ? nivel.deporte.imagen_icono : '/api/v1/storage/' + nivel.deporte.imagen_icono" alt="icono deporte">
               } @else {
                 <span class="sport-icon-fallback">❓</span>
               }
@@ -25,18 +25,18 @@
             <div class="sport-info-container">
               <div class="sport-title-row">
                 <h3>{{ nivel.deporte.nombre || 'Deporte' }}</h3>
-                <span class="level-indicator">Lvl {{ nivel.nivel }}</span>
+                <span class="level-indicator" [style.color]="getSportColor(nivel)">Lvl {{ nivel.nivel }}</span>
               </div>
 
               <div class="xp-container">
                 <div class="xp-bar-wrapper" title="{{ nivel.experiencia_actual }}/{{ nivel.xp_siguiente_nivel || '?' }} XP">
-                  <div class="xp-progress-bar" [style.width.%]="getProgreso(nivel.experiencia_actual, nivel.xp_siguiente_nivel)"></div>
+                  <div class="xp-progress-bar" [style.background]="getSportColor(nivel)" [style.width.%]="getProgreso(nivel.experiencia_actual, nivel.xp_siguiente_nivel)"></div>
                 </div>
               </div>
 
               <div class="stats-footer">
                 <span class="matches-played-badge">
-                  <span class="fire-icon">🔥</span> 
+                  <span class="fire-icon">{{ getSportEmoji(nivel.deporte) }}</span>
                   @if (nivel.partidos_jugados === 0 || nivel.partidos_jugados === 1) {
                     1 evento
                   } @else {

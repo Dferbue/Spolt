@@ -3,10 +3,11 @@ import { FormsModule } from '@angular/forms';
 import { CreateEvent, EventInterface, TipoEvento } from '../models/createEvent';
 import { EventosService } from '../service/eventos.service';
 import { HttpClient } from '@angular/common/http';
+import { CustomCalendar } from '../../../shared/components/custom-calendar/custom-calendar';
 
 @Component({
   selector: 'app-create-event',
-  imports: [FormsModule],
+  imports: [FormsModule, CustomCalendar],
   templateUrl: './create-event.html',
   styleUrl: './create-event.css',
 })

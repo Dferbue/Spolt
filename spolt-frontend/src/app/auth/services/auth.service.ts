@@ -134,4 +134,12 @@ export class AuthService {
   confirmEmailChange(token: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/confirm-email-change`, { token });
   }
+
+  confirmRegistration(token: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/confirm-register`, { token });
+  }
+
+  pingOnline(): Observable<any> {
+    return this.http.patch(`/api/v1/users/ping`, {});
+  }
 }

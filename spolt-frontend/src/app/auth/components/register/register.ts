@@ -1,10 +1,11 @@
 import { Component, output, Input } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService, RegisterDto } from '../../services/auth.service';
+import { CustomCalendar } from '../../../shared/components/custom-calendar/custom-calendar';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CustomCalendar],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })

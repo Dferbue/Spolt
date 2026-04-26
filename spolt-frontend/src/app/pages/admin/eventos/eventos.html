@@ -1,0 +1,191 @@
+<div class="view-container">
+  <div class="header-actions">
+    <div class="title-box">
+      <h1>GESTIÓN DE EVENTOS</h1>
+    </div>
+    <button class="btn-volver" routerLink="/admin/dashboard">VOLVER AL MENÚ &gt;</button>
+  </div>
+
+  <div class="management-controls">
+    <div class="list-title">
+      <h2>LISTA EVENTOS <span style="font-size: 1rem; color: #ff006e; margin-left: 10px;">({{ totalItems() }})</span></h2>
+    </div>
+
+    <div class="action-buttons">
+      <button class="btn-filtros" (click)="abrirFiltros()">
+        <span>⚙ FILTROS</span>
+        @if (filtrosActivosCount() > 0) {
+          <span class="filtro-badge">{{ filtrosActivosCount() }}</span>
+        }
+      </button>
+      <select class="order-select" (change)="onOrderChange($any($event.target).value)">
+        <option value="recientes">📅 Más recientes</option>
+        <option value="antiguos">⏳ Más antiguos</option>
+        <option value="deporte">⚽ Deporte (A-Z)</option>
+        <option value="titulo">🔤 Título (A-Z)</option>
+        <option value="estado">✅ Estado</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- COMPONENTE LISTA (padre) con TARGETS (hijos) -->
+  <app-list
+    [items]="eventosFiltrados()"
+    tipo="evento"
+    trackField="id_evento"
+    [loading]="loading"
+    [paginaActual]="paginaActual()"
+    [totalPaginas]="totalPaginas()"
+    [totalItems]="totalItems()"
+    textoVacio="No se han encontrado eventos"
+    (onItemAction)="handleItemAction($event)"
+    (onCambiarPagina)="cambiarPagina($event)">
+  </app-list>
+
+  <!-- MODAL DE FILTROS -->
+  @if (mostrarVentanaDeFiltros()) {
+    <div class="modal-overlay" (click)="cerrarFiltros()">
+      <div class="filtros-panel" (click)="$event.stopPropagation()">
+        <div class="filtros-header">
+          <h3>⚙ Filtros Eventos</h3>
+          <button class="filtros-close" (click)="cerrarFiltros()">✕</button>
+        </div>
+
+        <div class="filtros-body">
+          <div class="filtro-group">
+            <label class="filtro-label">Buscar Evento</label>
+            <input type="text" class="filtro-input" placeholder="Título, Ubicación..." [value]="filtroBusqueda()" (input)="filtroBusqueda.set($any($event.target).value)">
+          </div>
+
+          <div class="filtro-group">
+            <label class="filtro-label">Deporte</label>
+            <select class="filtro-select" [value]="filtroDeporte()" (change)="filtroDeporte.set($any($event.target).value)">
+              <option value="">Todos los deportes</option>
+              @for (deporte of listaDeportes(); track deporte.id_deporte) {
+                <option [value]="deporte.id_deporte">{{ deporte.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="filtro-group">
+            <label class="filtro-label">Fecha desde</label>
+            <app-custom-calendar [ngModel]="filtroFechaDesde()" (ngModelChange)="filtroFechaDesde.set($event)" theme="light" position="top" size="small"></app-custom-calendar>
+          </div>
+
+          <div class="filtro-group">
+            <label class="filtro-label">Fecha hasta</label>
+            <app-custom-calendar [ngModel]="filtroFechaHasta()" (ngModelChange)="filtroFechaHasta.set($event)" theme="light" position="top" size="small"></app-custom-calendar>
+          </div>
+
+          <div class="filtro-group">
+            <label class="filtro-label">Estado</label>
+            <select class="filtro-select" [value]="filtroEstado()" (change)="filtroEstado.set($any($event.target).value)">
+              <option value="">Todos los estados</option>
+              <option value="abierto">Abierto</option>
+              <option value="cerrado">Cerrado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="filtros-footer">
+          <button class="btn-cancel-f" (click)="limpiarFiltros(); cerrarFiltros()">Limpiar Todo</button>
+          <button class="btn-confirm-f" (click)="aplicarFiltros()">Aplicar</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- MODAL DE DETALLES (ESTILO TARJETA HORIZONTAL) -->
+@if (mostrarModalDetalles() && eventSelected(); as event) {
+  <div class="ma-overlay" (click)="cerrarModalDetalles()">
+    <div class="ma-horizontal-card" (click)="$event.stopPropagation()">
+      
+      <!-- Panel Izquierdo -->
+      <div class="ma-left-panel">
+        
+        <!-- Header: Avatar, Titulo/Deporte/Org, Fecha/Hora/Plazas -->
+        <div class="ma-top-section">
+          <div class="ma-top-left">
+            <div class="ma-sport-avatar">
+              @if (event.deporte?.imagen_icono) {
+                <img [src]="event.deporte!.imagen_icono" alt="Sport">
+              } @else {
+                <div class="ma-placeholder">?</div>
+              }
+            </div>
+            <div class="ma-title-group">
+              <h3 class="ma-title">{{ event.titulo }}</h3>
+              <p class="ma-type">{{ (event.deporte?.nombre || event.nombre_deporte) }}</p>
+              <div class="ma-organizer">
+                <div class="ma-org-img">
+                  @if (event.creador?.imagen_perfil) {
+                    <img [src]="event.creador?.imagen_perfil" alt="O">
+                  } @else {
+                    <span>{{ (event.creador?.nombre_usuario || event.nombre_creador || '?').charAt(0) | uppercase }}</span>
+                  }
+                </div>
+                <span>{{ event.creador?.nombre_usuario || event.nombre_creador }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="ma-top-right">
+            <div class="ma-info-item"><span>📅</span> {{ event.fecha_evento | date:'dd/MM/yyyy' }}</div>
+            <div class="ma-info-item"><span>🕒</span> {{ formatTime(event.hora_inicio) }}</div>
+            <div class="ma-info-item"><span>👥</span> <span class="ma-pink-text">{{ event.numero_participantes_actuales || 0 }}/{{ event.numero_max_participantes }}</span></div>
+          </div>
+        </div>
+
+        <!-- Biografía -->
+        <div class="ma-bio-section">
+          <h4>Biografía</h4>
+          <div class="ma-bio-box">
+            {{ event.descripcion || 'Sin descripción disponible.' }}
+          </div>
+        </div>
+
+        <!-- Participantes -->
+        <div class="ma-participants-section">
+          <h4>Participantes <span class="ma-badge">{{ event.participantes?.length || 0 }}</span></h4>
+          <div class="ma-participants-list">
+            @for (p of event.participantes; track p?.usuario?.id_usuario) {
+              <div class="ma-p-item">
+                <div class="ma-p-img">
+                  @if (p.usuario?.imagen_perfil) {
+                    <img [src]="p.usuario?.imagen_perfil" alt="P">
+                  } @else {
+                    <span>{{ p.usuario?.nombre_usuario?.charAt(0) | uppercase }}</span>
+                  }
+                </div>
+                <span class="ma-p-name">{{ p.usuario?.nombre_usuario }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Panel Derecho: Mapa -->
+      <div class="ma-right-panel">
+        <div class="ma-map-wrapper">
+          <div id="map-details" class="ma-map-view"></div>
+        </div>
+        <button class="ma-btn-close" (click)="cerrarModalDetalles()">CERRAR VENTANA</button>
+      </div>
+      
+    </div>
+  </div>
+}
+
+<!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN -->
+@if (mostrarConfirmacionEliminar()) {
+  <div class="targetaAmistad-overlay" (click)="cerrarConfirmacionEliminar()"></div>
+  <div class="ventana-emergente">
+      <h3>¿Estás seguro que quieres eliminar este evento?</h3>
+      <p style="margin: 0; color: #666; font-weight: 700;">
+        Estás a punto de eliminar: <span style="color: #ff006e;">{{ eventoAEliminar()?.titulo }}</span>
+      </p>
+      <button class="btn-confirm-delete" (click)="confirmarEliminarEvento()">Confirmar Eliminar</button>
+      <button class="btn-cancel-delete" (click)="cerrarConfirmacionEliminar()">Cancelar</button>
+  </div>
+}

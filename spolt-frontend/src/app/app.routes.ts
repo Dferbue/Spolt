@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/guards/auth.guard';
+import { adminGuard } from './auth/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -32,6 +33,31 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'admin',
+    loadComponent: () => import('./pages/admin/admin')
+      .then(m => m.Admin),
+    canActivate: [authGuard, adminGuard],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { 
+        path: 'dashboard', 
+        loadComponent: () => import('./pages/admin/dashboard/dashboard').then(m => m.AdminDashboard) 
+      },
+      { 
+        path: 'usuarios', 
+        loadComponent: () => import('./pages/admin/usuarios/usuarios').then(m => m.Usuarios) 
+      },
+      { 
+        path: 'eventos', 
+        loadComponent: () => import('./pages/admin/eventos/eventos').then(m => m.Eventos) 
+      },
+      { 
+        path: 'deportes', 
+        loadComponent: () => import('./pages/admin/deportes/deportes').then(m => m.Deportes) 
+      }
+    ]
+  },
+  {
     path: 'login',
     loadComponent: () => import('./auth/pages/login-page/login-page')
       .then(m => m.LoginPage)
@@ -51,6 +77,11 @@ export const routes: Routes = [
     path: 'confirm-email',
     loadComponent: () => import('./auth/pages/confirm-email-page/confirm-email-page')
       .then(m => m.ConfirmEmailPage)
+  },
+  {
+    path: 'confirm-register',
+    loadComponent: () => import('./auth/pages/confirm-register-page/confirm-register-page')
+      .then(m => m.ConfirmRegisterPage)
   },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];

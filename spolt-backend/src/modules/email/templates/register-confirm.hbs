@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: 30px auto; background: #ffffff; border: 3px solid #111; border-radius: 12px; overflow: hidden; box-shadow: 8px 8px 0px #ff006e; }
+        .header { background-color: #111; color: white; padding: 30px 40px; text-align: center; }
+        .header h1 { margin: 0; font-size: 28px; font-weight: 900; letter-spacing: -1px; text-transform: uppercase; }
+        .header .brand { color: #ff006e; }
+        .content { padding: 40px; line-height: 1.7; color: #333; }
+        .content p { margin: 0 0 16px 0; font-size: 16px; }
+        .button-wrapper { text-align: center; margin: 32px 0; }
+        .button { display: inline-block; background-color: #ff006e; color: white; padding: 14px 36px; text-decoration: none; border-radius: 8px; font-weight: 900; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; border: 3px solid #111; box-shadow: 4px 4px 0px #111; }
+        .divider { border: none; border-top: 3px solid #111; margin: 30px 0; }
+        .warning { background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 14px 18px; margin-top: 20px; font-size: 14px; color: #856404; }
+        .warning strong { font-weight: 900; }
+        .footer { background-color: #f8f8f8; border-top: 3px solid #111; padding: 20px 40px; text-align: center; font-size: 12px; color: #777; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span class="brand">SPOLT</span> — Confirma tu cuenta</h1>
+        </div>
+        <div class="content">
+            <p>Hola <strong>{{name}}</strong>,</p>
+            <p>¡Gracias por registrarte en <strong>Spolt</strong>! Estás a un solo clic de activar tu cuenta y empezar a disfrutar de todos nuestros eventos deportivos.</p>
+            <p>Pulsa el botón de abajo para confirmar tu dirección de correo y activar tu cuenta:</p>
+
+            <div class="button-wrapper">
+                <a href="{{confirmUrl}}" class="button">✓ Confirmar mi cuenta</a>
+            </div>
+
+            <hr class="divider">
+
+            <p style="font-size: 14px; color: #555;">Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
+            <p style="font-size: 13px; color: #ff006e; word-break: break-all;">{{confirmUrl}}</p>
+
+            <div class="warning">
+                <strong>Nota:</strong> Si no has creado esta cuenta, puedes ignorar este correo con total seguridad. El enlace expirará en 24 horas.
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 Spolt Application. Todos los derechos reservados.</p>
+            <p>Este es un correo automático, no respondas a este mensaje.</p>
+        </div>
+    </div>
+</body>
+</html>

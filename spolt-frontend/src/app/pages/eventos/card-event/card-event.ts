@@ -1,7 +1,9 @@
-import { Component, input, output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EventInterface , eventAction } from '../models/createEvent';
 import { environment } from '../../../../environments/environment';
+import { SportColorService } from '../../../shared/services/sport-color.service';
+
 @Component({
   selector: 'app-card-event',
   imports: [CommonModule],
@@ -15,6 +17,19 @@ export class CardEvent {
     public isOwner=input<boolean>(false);
 
     public apiUrl = environment.apiUrl;
+    private sportColorService = inject(SportColorService);
+
+    get sportColor(): string {
+      return this.sportColorService.getColor(this.evento()?.deporte);
+    }
+
+    get sportShadow(): string {
+      return this.sportColorService.getShadow(this.evento()?.deporte);
+    }
+
+    get sportDarkColor(): string {
+      return this.sportColorService.getDarkColor(this.evento()?.deporte, 30);
+    }
 
     //Output
     protected out_Id_Event=output<eventAction>();

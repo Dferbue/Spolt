@@ -5,17 +5,21 @@ import { FormsModule } from '@angular/forms';
 import { EventosService } from '../service/eventos.service';
 import { EventInterface, eventAction } from '../models/createEvent';
 import * as L from 'leaflet';
+import { SportColorService } from '../../../shared/services/sport-color.service';
+
+import { CustomCalendar } from '../../../shared/components/custom-calendar/custom-calendar';
 
 @Component({
   selector: 'app-unirse-eventos',
   standalone: true,
-  imports: [CommonModule, ListEvents, FormsModule],
+  imports: [CommonModule, ListEvents, FormsModule, CustomCalendar],
   templateUrl: './unirse-eventos.html',
   styleUrl: './unirse-eventos.css',
   encapsulation: ViewEncapsulation.None,
 })
 export class UnirseEventos {
-  private readonly eventService = inject(EventosService)
+  private readonly eventService = inject(EventosService);
+  public readonly sportColorService = inject(SportColorService);
 
   tabActiva = signal("public");
   mensajeEnvio = signal('');
@@ -29,6 +33,12 @@ export class UnirseEventos {
   public mostrarModalDetalles = signal<boolean>(false);
   public eventSelected = signal<EventInterface | null>(null);
 
+  getUserLevel(participante: any, id_deporte: number): number {
+    if (!participante?.usuario?.niveles_deportivos) return 1;
+    const nivelObj = participante.usuario.niveles_deportivos.find((nd: any) => nd.id_deporte === id_deporte);
+    return nivelObj ? nivelObj.nivel : 1;
+  }
+
   // ── FILTROS ──
   public mostrarVentanaDeFiltros = signal<boolean>(false);
   public listaDeportes = signal<any[]>([]);
@@ -40,6 +50,7 @@ export class UnirseEventos {
   public filtroPlazasLibres = signal<boolean>(false);
   public filtroFechaDesde = signal<string>('');
   public filtroFechaHasta = signal<string>('');
+  public ordenarPor = signal<string>('recientes');
 
   // Contamos cuántos filtros están activos
   public filtrosActivos = computed(() => {
@@ -76,11 +87,10 @@ export class UnirseEventos {
 
 
 
-  // Función genérica que aplica los filtros a cualquier lista de eventos
+  // Función que aplica filtros a listas de eventos disponibles (solo abiertos)
   private aplicarFiltrosALista(eventos: EventInterface[]): EventInterface[] {
     let resultado = eventos;
 
-    // Filtro por búsqueda de texto (título, ubicación, descripción)
     const busqueda = this.filtroBusqueda().toLowerCase().trim();
     if (busqueda) {
       resultado = resultado.filter(e =>
@@ -90,22 +100,15 @@ export class UnirseEventos {
       );
     }
 
-    // Filtro por deporte
     const deporte = this.filtroDeporte();
-    if (deporte) {
-      resultado = resultado.filter(e => e.id_deporte === deporte);
-    }
+    if (deporte) resultado = resultado.filter(e => e.id_deporte === deporte);
 
-    // Filtro por tipo de evento (partido / torneo)
     const tipo = this.filtroTipoEvento();
-    if (tipo) {
-      resultado = resultado.filter(e => e.tipo_evento === tipo);
-    }
+    if (tipo) resultado = resultado.filter(e => e.tipo_evento === tipo);
 
-    // Solo mostrar eventos abiertos
+    // Solo eventos abiertos
     resultado = resultado.filter(e => e.estado === 'abierto' || !e.estado);
 
-    // Filtro por plazas libres
     if (this.filtroPlazasLibres()) {
       resultado = resultado.filter(e => {
         const actuales = e.numero_participantes_actuales || e.participantes_actuales || 0;
@@ -113,18 +116,58 @@ export class UnirseEventos {
       });
     }
 
-    // Filtro por fecha desde
     const fechaDesde = this.filtroFechaDesde();
-    if (fechaDesde) {
-      resultado = resultado.filter(e => new Date(e.fecha_evento) >= new Date(fechaDesde));
-    }
+    if (fechaDesde) resultado = resultado.filter(e => new Date(e.fecha_evento) >= new Date(fechaDesde));
 
-    // Filtro por fecha hasta
     const fechaHasta = this.filtroFechaHasta();
-    if (fechaHasta) {
-      resultado = resultado.filter(e => new Date(e.fecha_evento) <= new Date(fechaHasta));
+    if (fechaHasta) resultado = resultado.filter(e => new Date(e.fecha_evento) <= new Date(fechaHasta));
+
+    return this.ordenarLista(resultado);
+  }
+
+  // Función para la tab de eventos a los que estás unido (sin filtro de estado)
+  private aplicarFiltrosUnidos(eventos: EventInterface[]): EventInterface[] {
+    let resultado = eventos;
+
+    const busqueda = this.filtroBusqueda().toLowerCase().trim();
+    if (busqueda) {
+      resultado = resultado.filter(e =>
+        e.titulo.toLowerCase().includes(busqueda) ||
+        (e.ubicacion && e.ubicacion.toLowerCase().includes(busqueda)) ||
+        (e.descripcion && e.descripcion.toLowerCase().includes(busqueda))
+      );
     }
 
+    const deporte = this.filtroDeporte();
+    if (deporte) resultado = resultado.filter(e => e.id_deporte === deporte);
+
+    const tipo = this.filtroTipoEvento();
+    if (tipo) resultado = resultado.filter(e => e.tipo_evento === tipo);
+
+    const fechaDesde = this.filtroFechaDesde();
+    if (fechaDesde) resultado = resultado.filter(e => new Date(e.fecha_evento) >= new Date(fechaDesde));
+
+    const fechaHasta = this.filtroFechaHasta();
+    if (fechaHasta) resultado = resultado.filter(e => new Date(e.fecha_evento) <= new Date(fechaHasta));
+
+    return this.ordenarLista(resultado);
+  }
+
+  // Función de ordenación compartida
+  private ordenarLista(lista: EventInterface[]): EventInterface[] {
+    const orden = this.ordenarPor();
+    const resultado = [...lista];
+    if (orden === 'recientes') {
+      resultado.sort((a, b) => new Date(b.fecha_evento).getTime() - new Date(a.fecha_evento).getTime());
+    } else if (orden === 'antiguos') {
+      resultado.sort((a, b) => new Date(a.fecha_evento).getTime() - new Date(b.fecha_evento).getTime());
+    } else if (orden === 'titulo') {
+      resultado.sort((a, b) => a.titulo.localeCompare(b.titulo));
+    } else if (orden === 'deporte') {
+      resultado.sort((a, b) => (a.deporte?.nombre || a.nombre_deporte || '').localeCompare(b.deporte?.nombre || b.nombre_deporte || ''));
+    } else if (orden === 'estado') {
+      resultado.sort((a, b) => (a.estado || '').localeCompare(b.estado || ''));
+    }
     return resultado;
   }
 
@@ -149,12 +192,18 @@ export class UnirseEventos {
   public listEventosAmigos = computed(() => this.aplicarFiltrosALista(
     this.rawListEventosAmigos().filter(e => !this.joinedIds().includes(Number(e.id_evento || e.id)))
   ));
+  public listaEventosUnidos = computed(() => this.aplicarFiltrosUnidos(
+    this.lisEventosEnLosQueParticipamos()
+  ));
 
   // Función para volver a traer los datos del servidor sin recargar la página
   refreshData() {
-    this.eventService.getAllEvents().subscribe(data=>this.rawListaEventos.set(data || []))
-    this.eventService.getEventosDeAmigos().subscribe(data => this.rawListEventosAmigos.set(data || []));
-    this.eventService.geteventosEnlosQueParticipamos().subscribe(data => this.lisEventosEnLosQueParticipamos.set(data || []));
+    this.eventService.getAllEvents().subscribe((res: any) => {
+      const data = res?.data || res || [];
+      this.rawListaEventos.set(data);
+    });
+    this.eventService.getEventosDeAmigos().subscribe((data: EventInterface[]) => this.rawListEventosAmigos.set(data || []));
+    this.eventService.geteventosEnlosQueParticipamos().subscribe((data: EventInterface[]) => this.lisEventosEnLosQueParticipamos.set(data || []));
   }
 
 
@@ -166,17 +215,20 @@ export class UnirseEventos {
 
   //Funcion para unirnos a un evento
   joinEvent(id_evento:number){
-    //En el caso de que no exista el id del evento no hagas nada
     if(!id_evento) return ;
 
-    //Llamamos a la funcion que no unira al evento 
     this.eventService.joinEvent(id_evento).subscribe({
-      next:(response)=>{
+      next:(response: any)=>{
         this.mensajeEnvio.set('✅ Te has unido correctamente a este evento ');
-        this.refreshData() //Recargamos para que nos salga en la ventana de los evetos en los que estamos unidos
-        setTimeout(() => this.mensajeEnvio.set(''), 3000); //Esto es para que se cierre a los 3 segundos
+        // Actualizar arrays localmente en vez de refreshData()
+        const evento = this.rawListaEventos().find(e => Number(e.id_evento || e.id) === id_evento)
+          || this.rawListEventosAmigos().find(e => Number(e.id_evento || e.id) === id_evento);
+        if (evento) {
+          this.lisEventosEnLosQueParticipamos.update(list => [...list, evento]);
+        }
+        setTimeout(() => this.mensajeEnvio.set(''), 3000); 
       },
-      error:(err)=>{
+      error:(err: any)=>{
         this.mensajeEnvio.set('❌ Error al intentar unirte a este evento');
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       }
@@ -187,15 +239,17 @@ export class UnirseEventos {
   leaveEvent(id_evento:number){
     if(!id_evento) return ;
 
-    //Llamamos al servicio para salrinos del evento
     this.eventService.leaveEvent(id_evento).subscribe({
-      next:(response)=>{
-        this.mensajeEnvio.set('✅ Te has salido correctamente a este evento ');
-        this.refreshData() //Recargamos para que nos salga en la ventana de los evetos en los que estamos unidos
-        setTimeout(() => this.mensajeEnvio.set(''), 3000); //Esto es para que se cierre a los 3 segundos
+      next:(response: any)=>{
+        this.mensajeEnvio.set('✅ Te has salido correctamente de este evento ');
+        // Actualizar arrays localmente en vez de refreshData()
+        this.lisEventosEnLosQueParticipamos.update(list => 
+          list.filter(e => Number(e.id_evento || e.id) !== id_evento)
+        );
+        setTimeout(() => this.mensajeEnvio.set(''), 3000); 
       },
-      error:(err)=>{
-        this.mensajeEnvio.set('❌ Error al intentar salirte a este evento');
+      error:(err: any)=>{
+        this.mensajeEnvio.set('❌ Error al intentar salirte de este evento');
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       }
     })
@@ -302,4 +356,3 @@ export class UnirseEventos {
     this.eventoIdParaSalir.set(null);
   }
 }
-

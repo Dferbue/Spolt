@@ -30,6 +30,15 @@ export class AuthService {
   async login(dto: LoginDto) {
     const user = await this.validateUser(dto.email, dto.password);
     if (!user) throw new UnauthorizedException('Credenciales inválidas');
+
+    // Bloquear login si el email no está verificado
+    const fullUser = await this.prisma.usuario.findUnique({
+      where: { id_usuario: user.id_usuario },
+    });
+    if (!fullUser?.email_verificado) {
+      throw new UnauthorizedException('Debes confirmar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada.');
+    }
+
     const tokens = await this.getTokens(user.id_usuario, user.email, user.role);
     await this.updateRefreshToken(user.id_usuario, tokens.refreshToken);
     // Actualizar último acceso
@@ -226,6 +235,39 @@ export class AuthService {
     });
 
     return { message: 'Correo electrónico actualizado con éxito' };
+  }
+
+  // Confirmación de registro 
+
+  async confirmRegistration(token: string) {
+    const user = await this.prisma.usuario.findFirst({
+      where: { email_token: token },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Token de confirmación inválido o ya utilizado');
+    }
+
+    if (user.email_verificado) {
+      throw new BadRequestException('Esta cuenta ya ha sido verificada');
+    }
+
+    // Marcar como verificado y limpiar el token
+    await this.prisma.usuario.update({
+      where: { id_usuario: user.id_usuario },
+      data: {
+        email_verificado: true,
+        email_token: null,
+      },
+    });
+
+    // Ahora sí enviamos el correo de bienvenida
+    await this.emailService.emailWelcome({
+      email: user.email,
+      name: user.nombre_usuario,
+    });
+
+    return { message: 'Cuenta verificada correctamente. Ya puedes iniciar sesión.' };
   }
 }
 

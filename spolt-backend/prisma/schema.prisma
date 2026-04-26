@@ -26,6 +26,8 @@ model Usuario {
   ultimo_acceso   DateTime?
   activo          Boolean   @default(true)
   role            String    @default("user")
+  email_verificado Boolean  @default(false)
+  email_token      String?  @db.VarChar(255)
   refresh_token_hash String? @db.VarChar(255)
   reset_token         String? @db.VarChar(255)
   reset_token_expires DateTime?
@@ -81,6 +83,7 @@ model Deporte {
   nombre      String  @unique @db.VarChar(50)
   descripcion String? @db.Text
   imagen_icono String? @db.VarChar(255)
+  color        String? @db.VarChar(7)  // Color HEX, ej: "#ff006e"
 
   // Relaciones
   eventos EventoDeportivo[]

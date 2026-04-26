@@ -55,6 +55,39 @@
     </div>
     <h3 class="targeta-name">{{ amigoAMostrar().nombre_usuario }}</h3>
     <p class="targeta-date">Amistad forjada desde: {{ amigo().fecha_respuesta | date:'dd/MM/yyyy' }}</p>
+    
+    @if (amigoAMostrar().biografia) {
+      <div class="targeta-descripcion">
+        <span class="targeta-descripcion-label">BIOGRAFÍA</span>
+        <span class="targeta-descripcion-text">"{{ amigoAMostrar().biografia }}"</span>
+      </div>
+    }
+
+    
+    @if (amigoAMostrar().niveles_deportivos; as deportes) {
+      @if (deportes.length > 0) {
+        <div class="sports-section">
+          <div class="sports-header">
+            <span>Niveles Deportivos</span>
+            <span style="font-size: 0.6rem; opacity: 0.7;">{{ deportes.length }} DEPORTES</span>
+          </div>
+          <div class="sports-grid">
+            @for (nd of deportes; track nd.id_deporte) {
+              <div class="sport-badge">
+                @if (nd.deporte?.imagen_icono) {
+                  <img [src]="nd.deporte.imagen_icono" alt="icono" class="sport-badge-icon">
+                }
+                <div class="sport-badge-info">
+                  <span class="sport-badge-name">{{ nd.deporte?.nombre }}</span>
+                  <span class="sport-badge-level" [style.color]="getSportColor(nd.deporte)">Nvl {{ nd.nivel }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+
     <button class="btn-close" (click)="changeStatusTargetaAmistad()">CERRAR</button>
 </div>
 }

@@ -1,0 +1,67 @@
+<div class="admin-header-section">
+  <div class="brand-header-box main-title">
+    <h1 class="brand-title">PANEL DE CONTROL</h1>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="label">USUARIOS TOTALES</span>
+      <span class="value">{{ totalUsuarios }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="label">EVENTOS ACTIVOS</span>
+      <span class="value">{{ eventosActivos }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="label">DEPORTES</span>
+      <span class="value">{{ totalDeportes }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="consultas-section">
+  <div class="title-box">
+    <h1>CONSULTAS</h1>
+  </div>
+</div>
+
+<div class="components-grid">
+  <!-- Botón Usuarios -->
+  <button class="btn-menu" (click)="navigateTo('usuarios')">
+    <div class="btn-image-container">
+      <div class="btn-icon">
+        <img src="eventos/iconos/Unirse.png" alt="Usuarios">
+      </div>
+    </div>
+    <div class="btn-texts">
+      <h2>USUARIOS</h2>
+      <p>Gestión y administración de perfiles</p>
+    </div>
+  </button>
+
+  <!-- Botón Eventos -->
+  <button class="btn-menu" (click)="navigateTo('eventos')">
+    <div class="btn-image-container">
+      <div class="btn-icon">
+        <img src="eventos/iconos/Crear.png" alt="Eventos">
+      </div>
+    </div>
+    <div class="btn-texts">
+      <h2>EVENTOS</h2>
+      <p>Supervisión de encuentros deportivos</p>
+    </div>
+  </button>
+
+  <!-- Botón Deportes -->
+  <button class="btn-menu" (click)="navigateTo('deportes')">
+    <div class="btn-image-container">
+      <div class="btn-icon">
+        <img src="eventos/iconos/deportes.png" alt="Deportes">
+      </div>
+    </div>
+    <div class="btn-texts">
+      <h2>DEPORTES</h2>
+      <p>Configuración de disciplinas y niveles</p>
+    </div>
+  </button>
+</div>

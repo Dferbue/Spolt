@@ -29,7 +29,7 @@
             <div class="day-num">{{ day }}</div>
             <div class="event-indicators">
               @for (ev of getEventsForDay(day).slice(0, 2); track ev.id) {
-                <div class="ev-chip" [ngClass]="ev.color">{{ ev.name }}</div>
+                <div class="ev-chip" [style.background]="ev.color" style="color: white; border: 1px solid #111;">{{ ev.name }}</div>
               }
               @if (getEventsForDay(day).length > 2) {
                 <div class="more-tag">+{{ getEventsForDay(day).length - 2 }} MÁS</div>
@@ -57,7 +57,7 @@
           } @else {
             @for (ev of selectedDateEvents(); track ev.id) {
               <div class="event-item">
-                <div class="event-color-bar" [ngClass]="ev.color"></div>
+                <div class="event-color-bar" [style.background]="ev.color"></div>
                 <div class="event-content">
                   <div class="event-name">{{ ev.name }}</div>
                   <div class="event-time">{{ ev.time }}</div>
@@ -84,7 +84,7 @@
         <div class="upcoming-list">
           @for (ev of upcomingEvents(); track ev.id) {
             <div class="upcoming-item">
-              <div class="mini-dot" [ngClass]="ev.color"></div>
+              <div class="mini-dot" [style.background]="ev.color"></div>
               <div class="upcoming-details">
                 <div class="upcoming-name">{{ ev.name }}</div>
                 <div class="upcoming-meta">{{ formatDateLabel(ev.date) }} · {{ ev.time }}</div>

@@ -1,0 +1,128 @@
+<div class="view-container">
+  <div class="header-actions">
+    <div class="title-box">
+      <h1>GESTIÓN DE DEPORTES</h1>
+    </div>
+    <button class="btn-volver" routerLink="/admin/dashboard">VOLVER AL MENÚ &gt;</button>
+  </div>
+
+  <div class="management-controls" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div class="list-title" style="margin: 0;">
+      <h2 style="margin: 0;">LISTA DEPORTES <span style="font-size: 1rem; color: #ff006e; margin-left: 10px;">({{ deportes().length }})</span></h2>
+    </div>
+    <button style="padding: 10px 24px; background: #ff006e; border: 2px solid #000; color: #fff; font-weight: 800; cursor: pointer; text-transform: uppercase; border-radius: 0; font-family: inherit; font-size: 1.1rem; box-shadow: 4px 4px 0px #000; transition: transform 0.1s, box-shadow 0.1s;" (click)="abrirModalCrear()" onmousedown="this.style.transform='translate(2px, 2px)'; this.style.boxShadow='2px 2px 0px #000';" onmouseup="this.style.transform='translate(0, 0)'; this.style.boxShadow='4px 4px 0px #000';" onmouseleave="this.style.transform='translate(0, 0)'; this.style.boxShadow='4px 4px 0px #000';">CREAR</button>
+  </div>
+
+  <!-- COMPONENTE LISTA -->
+  <app-list
+    [items]="deportes()"
+    tipo="deporte"
+    trackField="id_deporte"
+    [loading]="loading"
+    [mostrarPaginacion]="false"
+    textoVacio="No se han encontrado deportes"
+    (onItemAction)="handleItemAction($event)">
+  </app-list>
+</div>
+
+<!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN -->
+@if (mostrarConfirmacionEliminar()) {
+  <div class="targetaAmistad-overlay" (click)="cerrarConfirmacionEliminar()"></div>
+  <div class="ventana-emergente">
+      <h3>¿Estás seguro que quieres eliminar este deporte?</h3>
+      <p style="margin: 0; color: #666; font-weight: 700;">
+        Estás a punto de eliminar: <span style="color: #ff006e;">{{ deporteAEliminar()?.nombre }}</span>
+      </p>
+      <p style="margin: 8px 0 0; color: #999; font-size: 0.85rem; font-weight: 600;">
+        ⚠️ Se eliminarán todos los niveles deportivos y eventos asociados.
+      </p>
+      <button class="btn-confirm-delete" (click)="confirmarEliminarDeporte()">Confirmar Eliminar</button>
+      <button class="btn-cancel-delete" (click)="cerrarConfirmacionEliminar()">Cancelar</button>
+  </div>
+}
+
+<!-- MODAL DE EDICIÓN -->
+@if (mostrarModalEditar() && deporteAEditar(); as deporte) {
+  <div class="targetaAmistad-overlay" (click)="cerrarModalEditar()"></div>
+  <div class="ventana-emergente ventana-editar">
+      <h3>EDITAR DEPORTE</h3>
+
+      <div class="edit-field">
+        <label>Nombre</label>
+        <input type="text" [(ngModel)]="edit_nombre" placeholder="Nombre del deporte" class="edit-input">
+      </div>
+
+      <div class="edit-field">
+        <label>Descripción</label>
+        <textarea [(ngModel)]="edit_descripcion" placeholder="Descripción del deporte" class="edit-input edit-textarea" rows="3"></textarea>
+      </div>
+
+      <div class="edit-field">
+        <label>Color del Deporte (HEX)</label>
+        <div style="display: flex; gap: 10px;">
+          <input type="color" [(ngModel)]="edit_color" style="width: 60px; height: 44px; cursor: pointer; border: 2px solid #111; padding: 2px; background: #fff;">
+          <input type="text" [(ngModel)]="edit_color" placeholder="#ff006e" class="edit-input" style="flex: 1; font-family: monospace; text-transform: uppercase;">
+        </div>
+      </div>
+
+      <div class="edit-field">
+        <label>Icono del Deporte</label>
+        <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/png, image/jpeg, image/jpg, image/svg+xml" style="display: none;">
+        <button class="action-btn view" style="width: 100%; text-align: center; padding: 12px; margin-top: 5px; background: #fff; border: 2px solid #111; color: #111;" (click)="triggerFileInput()">
+          📸 SELECCIONAR IMAGEN
+        </button>
+      </div>
+
+      @if (edit_imagen_icono) {
+        <div class="edit-preview">
+          <img [src]="edit_imagen_icono" alt="Preview" class="edit-preview-img">
+        </div>
+      }
+
+      <button class="btn-confirm-delete" style="background: #111;" (click)="guardarEdicion()">GUARDAR CAMBIOS</button>
+      <button class="btn-cancel-delete" (click)="cerrarModalEditar()">CANCELAR</button>
+  </div>
+}
+
+<!-- MODAL DE CREACIÓN -->
+@if (mostrarModalCrear()) {
+  <div class="targetaAmistad-overlay" (click)="cerrarModalCrear()"></div>
+  <div class="ventana-emergente ventana-editar">
+      <h3>CREAR DEPORTE</h3>
+
+      <div class="edit-field">
+        <label>Nombre</label>
+        <input type="text" [(ngModel)]="crear_nombre" placeholder="Nombre del deporte" class="edit-input">
+      </div>
+
+      <div class="edit-field">
+        <label>Descripción</label>
+        <textarea [(ngModel)]="crear_descripcion" placeholder="Descripción del deporte" class="edit-input edit-textarea" rows="3"></textarea>
+      </div>
+
+      <div class="edit-field">
+        <label>Color del Deporte (HEX)</label>
+        <div style="display: flex; gap: 10px;">
+          <input type="color" [(ngModel)]="crear_color" style="width: 60px; height: 44px; cursor: pointer; border: 2px solid #111; padding: 2px; background: #fff;">
+          <input type="text" [(ngModel)]="crear_color" placeholder="#ff006e" class="edit-input" style="flex: 1; font-family: monospace; text-transform: uppercase;">
+        </div>
+      </div>
+
+      <div class="edit-field">
+        <label>Icono del Deporte</label>
+        <input type="file" #fileInputCrear (change)="onFileSelectedCrear($event)" accept="image/png, image/jpeg, image/jpg, image/svg+xml" style="display: none;">
+        <button class="action-btn view" style="width: 100%; text-align: center; padding: 12px; margin-top: 5px; background: #fff; border: 2px solid #111; color: #111;" (click)="triggerFileInputCrear()">
+          📸 SELECCIONAR IMAGEN
+        </button>
+      </div>
+
+      @if (crear_imagen_icono) {
+        <div class="edit-preview">
+          <img [src]="crear_imagen_icono" alt="Preview" class="edit-preview-img">
+        </div>
+      }
+
+      <button class="btn-confirm-delete" style="background: #111;" (click)="guardarCreacion()">CREAR DEPORTE</button>
+      <button class="btn-cancel-delete" (click)="cerrarModalCrear()">CANCELAR</button>
+  </div>
+}

@@ -40,4 +40,52 @@ export class Login {
       this.sendLogin.emit(loginData);
     }
   }
+
+  // --- Forgot Password Logic ---
+  showForgotModal = false;
+  forgotForm!: FormGroup;
+  forgotMsg = '';
+  forgotError = '';
+  isSubmittingForgot = false;
+
+  openForgotModal() {
+    this.showForgotModal = true;
+    this.forgotMsg = '';
+    this.forgotError = '';
+    if (!this.forgotForm) {
+      this.forgotForm = this.fb.group({
+        email: ['', [Validators.required, Validators.email]]
+      });
+    } else {
+      this.forgotForm.reset();
+    }
+  }
+
+  closeForgotModal() {
+    this.showForgotModal = false;
+  }
+
+  sendForgotPassword() {
+    if (this.forgotForm.invalid) {
+      this.forgotForm.markAllAsTouched();
+      return;
+    }
+    this.isSubmittingForgot = true;
+    this.forgotError = '';
+    this.forgotMsg = '';
+
+    const email = this.forgotForm.value.email;
+    this.authService.forgotPassword(email).subscribe({
+      next: (res) => {
+        this.forgotMsg = 'Si el correo existe, te hemos enviado un enlace para restablecer la contraseña.';
+        this.isSubmittingForgot = false;
+      },
+      error: (err) => {
+        // En un caso real, por seguridad no se suele decir si el correo existe o no,
+        // pero podemos mostrar el error si hay un fallo real del servidor.
+        this.forgotError = err.error?.message || 'Hubo un error al procesar tu solicitud.';
+        this.isSubmittingForgot = false;
+      }
+    });
+  }
 }

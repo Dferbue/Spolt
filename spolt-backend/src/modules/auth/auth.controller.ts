@@ -115,10 +115,28 @@ export class AuthController {
     return await this.authService.confirmEmailChange(token);
   }
 
+  @Post('confirm-register')
+  @HttpCode(HttpStatus.OK)
+  async confirmRegister(@Body('token') token: string) {
+    return await this.authService.confirmRegistration(token);
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
   async getUserProfile(@Req() req: any) {
     const user = await this.usersService.findById(req.user.id_usuario);
-    return user; // Devuelve el usuario completo sin envolver
+    if (!user) return null;
+    
+    // Eliminamos campos sensibles antes de enviar al frontend
+    const { 
+      contrasena_hash, 
+      refresh_token_hash, 
+      reset_token, 
+      reset_token_expires, 
+      new_email, 
+      ...safeUser 
+    } = user as any;
+    
+    return safeUser;
   }
 }

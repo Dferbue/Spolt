@@ -1,0 +1,46 @@
+<div class="auth-layout">
+    <div class="auth-container">
+      <div class="auth-card">
+        
+        <div class="brand-header">
+          <h1 class="brand-title">SPOLT</h1>
+          <p class="brand-subtitle">ACTIVACIÓN DE CUENTA</p>
+        </div>
+  
+        <div class="status-content">
+          @if (loading()) {
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <h2>Verificando tu cuenta...</h2>
+              <p>Por favor, espera un momento.</p>
+            </div>
+          }
+          
+          @if (!loading() && success()) {
+            <div class="success-state">
+              <div class="status-icon success">✓</div>
+              <h2>¡Cuenta Activada!</h2>
+              <p>Tu correo electrónico ha sido verificado correctamente.</p>
+              <p class="redirect-text">Serás redirigido al login en unos segundos...</p>
+              
+              <button class="btn-primary" routerLink="/login">IR AL LOGIN AHORA</button>
+            </div>
+          }
+  
+          @if (!loading() && errorMessage()) {
+            <div class="error-state">
+              <div class="status-icon error">✕</div>
+              <h2>Error de Activación</h2>
+              <p>{{ errorMessage() }}</p>
+              
+              <div class="action-buttons">
+                <button class="btn-primary" routerLink="/login">IR AL LOGIN</button>
+                <button class="btn-secondary" routerLink="/register">VOLVER A REGISTRARSE</button>
+              </div>
+            </div>
+          }
+        </div>
+  
+      </div>
+    </div>
+  </div>

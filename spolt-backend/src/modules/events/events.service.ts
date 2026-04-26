@@ -11,6 +11,10 @@ export class EventsService {
 
   constructor(private prisma: PrismaService, private sportLevel: SportLevelService) { }
 
+  // Conteo ligero para el dashboard admin
+  async countActive(): Promise<number> {
+    return this.prisma.eventoDeportivo.count({ where: { estado: 'abierto' } });
+  }
 
   create(createEventDto: CreateEventDto, id_creador: number) {
     const { fecha_evento, hora_inicio, hora_fin, ...rest } = createEventDto;
@@ -36,20 +40,137 @@ export class EventsService {
   }
 
 
-  //Nos trameos todos los eventos deportivos que existen , depues lo borraremos esto solo es para el desarrollo
-  findAll() {
-    return this.prisma.eventoDeportivo.findMany({
+  async findAll(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    estado?: string;
+    id_deporte?: number;
+    mes?: string;
+    anio?: string;
+    fecha_desde?: string;
+    fecha_hasta?: string;
+    sort?: string;
+  } = {}) {
+    const { page = 1, limit, search, estado, id_deporte, mes, anio, fecha_desde, fecha_hasta, sort } = params;
+
+    const where: any = {};
+
+    if (estado) {
+      where.estado = estado;
+    }
+
+    if (id_deporte) {
+      where.id_deporte = id_deporte;
+    }
+
+    if (search) {
+      where.OR = [
+        { titulo: { contains: search } },
+        { descripcion: { contains: search } },
+        { ubicacion: { contains: search } },
+        { deporte: { nombre: { contains: search } } }
+      ];
+    }
+
+    if (fecha_desde || fecha_hasta) {
+      where.fecha_evento = {};
+      if (fecha_desde) {
+        where.fecha_evento.gte = new Date(fecha_desde);
+      }
+      if (fecha_hasta) {
+        const end = new Date(fecha_hasta);
+        end.setUTCHours(23, 59, 59, 999);
+        where.fecha_evento.lte = end;
+      }
+    } else if (mes || anio) {
+      const yearStr = anio || new Date().getFullYear().toString();
+      
+      if (mes) {
+        const startDate = new Date(`${yearStr}-${mes}-01T00:00:00.000Z`);
+        const endDate = new Date(startDate);
+        endDate.setMonth(endDate.getMonth() + 1);
+        
+        where.fecha_evento = {
+          gte: startDate,
+          lt: endDate
+        };
+      } else {
+        const startDate = new Date(`${yearStr}-01-01T00:00:00.000Z`);
+        const endDate = new Date(`${parseInt(yearStr) + 1}-01-01T00:00:00.000Z`);
+        
+        where.fecha_evento = {
+          gte: startDate,
+          lt: endDate
+        };
+      }
+    }
+
+    let orderBy: any = { fecha_evento: 'asc' };
+    
+    if (sort) {
+      switch (sort) {
+        case 'recientes':
+          orderBy = { fecha_evento: 'desc' };
+          break;
+        case 'antiguos':
+          orderBy = { fecha_evento: 'asc' };
+          break;
+        case 'titulo':
+          orderBy = { titulo: 'asc' };
+          break;
+        case 'deporte':
+          orderBy = { deporte: { nombre: 'asc' } };
+          break;
+        case 'estado':
+          orderBy = { estado: 'asc' };
+          break;
+      }
+    }
+
+    const queryOptions: any = {
+      where,
       include: {
         creador: { select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true } },
         deporte: true,
         participantes: {
           include: {
-            usuario: { select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true } }
+            usuario: { 
+              select: { 
+                id_usuario: true, 
+                nombre_usuario: true, 
+                imagen_perfil: true,
+                niveles_deportivos: true 
+              } 
+            }
           }
         }
       },
-      orderBy: { fecha_evento: 'asc' }
-    });
+      orderBy
+    };
+
+    if (limit) {
+      const skip = (page - 1) * limit;
+      queryOptions.skip = skip;
+      queryOptions.take = limit;
+      
+      const [total, data] = await Promise.all([
+        this.prisma.eventoDeportivo.count({ where }),
+        this.prisma.eventoDeportivo.findMany(queryOptions)
+      ]);
+      
+      return {
+        data,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit)
+        }
+      };
+    }
+
+    return this.prisma.eventoDeportivo.findMany(queryOptions);
   }
 
 
@@ -64,7 +185,14 @@ export class EventsService {
         deporte: true,
         participantes: {
           include: {
-            usuario: { select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true } }
+            usuario: { 
+              select: { 
+                id_usuario: true, 
+                nombre_usuario: true, 
+                imagen_perfil: true,
+                niveles_deportivos: true 
+              } 
+            }
           }
         }
       }
@@ -107,7 +235,14 @@ export class EventsService {
         deporte: true,
         participantes: {
           include: {
-            usuario: { select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true } }
+            usuario: { 
+              select: { 
+                id_usuario: true, 
+                nombre_usuario: true, 
+                imagen_perfil: true,
+                niveles_deportivos: true 
+              } 
+            }
           }
         }
       },
@@ -294,7 +429,14 @@ export class EventsService {
         deporte: true,
         participantes: {
           include: {
-            usuario: { select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true } }
+            usuario: { 
+              select: { 
+                id_usuario: true, 
+                nombre_usuario: true, 
+                imagen_perfil: true,
+                niveles_deportivos: true 
+              } 
+            }
           }
         }
       },
@@ -307,13 +449,13 @@ export class EventsService {
 
   //Funcion que ceirra el evento y ya reparte la experiencia 
   private async finalizarEventoInterno(evento: any) {
-    // 1. Cambiar estado a 'finalizado'
+    // Cambiar estado a 'finalizado'
     await this.prisma.eventoDeportivo.update({
       where: { id_evento: evento.id_evento },
       data: { estado: 'finalizado' }
     });
 
-    // 2. Solo repartir XP si el evento estaba lleno
+    // Solo repartir XP si el evento estaba lleno
     const estaLleno = evento.numero_participantes_actuales >= evento.numero_max_participantes;
 
     if (!estaLleno) {
@@ -321,17 +463,17 @@ export class EventsService {
       return;
     }
 
-    // 3. Obtener participantes confirmados
+    // Obtener participantes confirmados
     const participantes = await this.prisma.participanteEvento.findMany({
       where: { id_evento: evento.id_evento, estado: 'confirmado' }
     });
 
-    // 4. Dar XP a cada participante
+    // Dar XP a cada participante
     for (const p of participantes) {
       await this.sportLevel.darExeperiencia(p.id_usuario, evento.id_deporte, evento.tipo_evento);
     }
 
-    // 5. Dar XP al creador también (si no está ya como participante)
+    // Dar XP al creador también (si no está ya como participante)
     const creadorEsParticipante = participantes.some(p => p.id_usuario === evento.id_creador);
     if (!creadorEsParticipante) {
       await this.sportLevel.darExeperiencia(evento.id_creador, evento.id_deporte, evento.tipo_evento);

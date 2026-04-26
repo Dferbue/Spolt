@@ -1,8 +1,9 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output, inject } from '@angular/core';
 import { Amistad } from '../../models/amistad';
 import { DatePipe, CommonModule } from '@angular/common';
 import { AmistadAction } from '../../models/asmitadAction';
 import { environment } from '../../../../../environments/environment';
+import { SportColorService } from '../../../../shared/services/sport-color.service';
 
 @Component({
   selector: 'app-card',
@@ -18,6 +19,11 @@ export class Card {
   public readonly listamostrada= input.required<string>()
 
   public apiUrl = environment.apiUrl;
+  private readonly sportColorService = inject(SportColorService);
+
+  getSportColor(deporte: any): string {
+    return this.sportColorService.getColor(deporte);
+  }
 
 
   //Outputs que mandaremos al padre y al abuelo para trabajar con el servicio

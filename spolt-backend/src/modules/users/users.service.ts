@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Usuario } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { EmailService } from '../email/email.service';
 
 @Injectable()
@@ -34,11 +35,13 @@ export class UsersService {
       throw new ConflictException(`El nombre de usuario ${nombre_usuario} ya está en uso`);
     }
 
-    // Hasheamos la contraseña por seguridad
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Generar token de confirmación de email
+    const emailToken = crypto.randomBytes(32).toString('hex');
+
     // Preparamos la creación del registro
-    const newUser= await this.prisma.usuario.create({
+    const newUser = await this.prisma.usuario.create({
       data: {
         ...rest,
         email,
@@ -46,21 +49,84 @@ export class UsersService {
         // Convertimos el string de la fecha a un objeto Date real de JS
         fecha_nacimiento: fecha_nacimiento ? new Date(fecha_nacimiento) : null,
         contrasena_hash: hashedPassword,
+        email_verificado: false,
+        email_token: emailToken,
       },
     });
 
-    //Mandamos el correo de vienvenida justo despues de crear e usuario en la base de datos
-    await this.emailService.emailWelcome({
-      email:newUser.email,
-      name:newUser.nombre_usuario
-    });
+    // Enviamos el correo de CONFIRMACIÓN (el de bienvenida se envía solo después de confirmar)
+    await this.emailService.sendRegistrationConfirmation(
+      newUser.email,
+      newUser.nombre_usuario,
+      emailToken,
+    );
 
     //Devolvemos el usuario que hemos creado
     return newUser;
   }
 
-  async findAll() {
-    return this.prisma.usuario.findMany();
+  async findAll(page: number = 1, limit: number = 30, search?: string, role?: string, year?: string) {
+    const skip = (page - 1) * limit;
+    
+    const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { nombre_usuario: { contains: search } },
+        { email: { contains: search } },
+        { nombre_completo: { contains: search } },
+      ];
+    }
+
+    if (role) {
+      where.role = role;
+    }
+
+    if (year) {
+      where.fecha_registro = {
+        gte: new Date(`${year}-01-01T00:00:00.000Z`),
+        lt: new Date(`${parseInt(year) + 1}-01-01T00:00:00.000Z`)
+      };
+    }
+
+    const [users, total] = await Promise.all([
+      this.prisma.usuario.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: {
+          fecha_registro: 'desc',
+        },
+        select: {
+          id_usuario: true,
+          nombre_usuario: true,
+          email: true,
+          nombre_completo: true,
+          biografia: true,
+          imagen_perfil: true,
+          fecha_nacimiento: true,
+          fecha_registro: true,
+          ultimo_acceso: true,
+          activo: true,
+          role: true,
+          niveles_deportivos: {
+            include: {
+              deporte: true
+            }
+          }
+        },
+      }),
+      this.prisma.usuario.count({ where }),
+    ]);
+
+    return {
+      data: users,
+      meta: {
+        total,
+        page,
+        lastPage: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findByEmail(email: string) {
@@ -70,8 +136,16 @@ export class UsersService {
   }
 
   async findOne(userid: number) {
-  return await this.prisma.usuario.findUnique({ where: { id_usuario: userid } });
-}
+    return await this.prisma.usuario.findUnique({ where: { id_usuario: userid } });
+  }
+
+  async updateAccessTime(id: number) {
+    return this.prisma.usuario.update({
+      where: { id_usuario: id },
+      data: { ultimo_acceso: new Date() },
+      select: { id_usuario: true, ultimo_acceso: true }
+    });
+  }
 
   async update(id: number, updateUserDto: UpdateUserDto | any) {
     const dataToUpdate: any = { ...updateUserDto };
@@ -92,14 +166,46 @@ export class UsersService {
   }
 
   async remove(id: number) {
-    return this.prisma.usuario.delete({
-      where: { id_usuario: id },
+    return await this.prisma.$transaction(async (tx) => {
+      // 1. Buscamos las participaciones confirmadas del usuario para saber de qué eventos restarle el cupo
+      const participaciones = await tx.participanteEvento.findMany({
+        where: {
+          id_usuario: id,
+          estado: 'confirmado',
+        },
+      });
+
+      // 2. Extraemos los IDs de esos eventos
+      const eventIds = participaciones.map((p) => p.id_evento);
+
+      if (eventIds.length > 0) {
+        // 3. Decrementamos el contador de participantes en esos eventos de forma atómica
+        await tx.eventoDeportivo.updateMany({
+          where: {
+            id_evento: { in: eventIds },
+          },
+          data: {
+            numero_participantes_actuales: {
+              decrement: 1,
+            },
+          },
+        });
+      }
+
+      // 4. Eliminamos al usuario. La cascada configurada en Prisma borrará:
+      // - Sus amistades enviadas y recibidas
+      // - Sus niveles deportivos
+      // - Sus eventos creados
+      // - Sus registros de participación en otros eventos
+      return tx.usuario.delete({
+        where: { id_usuario: id },
+      });
     });
   }
 
   async findById(id: number) {
     return this.prisma.usuario.findUnique({
-      where: { id_usuario:id },
+      where: { id_usuario: id },
     });
   }
 

@@ -41,6 +41,21 @@ export class EmailService {
     });
   }
 
+  // Correo de confirmación de registro (antes de crear la cuenta definitivamente)
+  async sendRegistrationConfirmation(email: string, name: string, token: string) {
+    const confirmUrl = `http://localhost:4200/confirm-register?token=${token}`;
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Confirma tu cuenta - Spolt',
+      template: './register-confirm',
+      context: {
+        name,
+        confirmUrl,
+      },
+    });
+  }
+
   // Correo para confirmar cambio de email
   async sendEmailChangeConfirmation(newEmail: string, name: string, token: string) {
     const confirmationUrl = `http://localhost:4200/confirm-email?token=${token}`;

@@ -1,0 +1,183 @@
+<div class="view-container">
+  <div class="header-actions">
+    <div class="title-box">
+      <h1>GESTIÓN DE USUARIOS</h1>
+    </div>
+    <button class="btn-volver" routerLink="/admin/dashboard">VOLVER AL MENÚ &gt;</button>
+  </div>
+
+  <div class="management-controls">
+    <div class="list-title">
+      <h2>LISTA USUARIOS <span style="font-size: 1rem; color: #ff006e; margin-left: 10px;">({{ totalItems() }})</span></h2>
+    </div>
+
+    <div class="action-buttons">
+      <button class="btn-filtros" (click)="abrirFiltros()">
+        <span>⚙ FILTROS</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- COMPONENTE LISTA -->
+  <app-list
+    [items]="usuariosFiltrados()"
+    tipo="usuario"
+    trackField="id_usuario"
+    [loading]="loading"
+    [paginaActual]="paginaActual()"
+    [totalPaginas]="totalPaginas()"
+    [totalItems]="totalItems()"
+    textoVacio="No se han encontrado usuarios"
+    (onItemAction)="handleItemAction($event)"
+    (onCambiarPagina)="cambiarPagina($event)">
+  </app-list>
+
+  <!-- MODAL DE FILTROS -->
+  @if (mostrarVentanaDeFiltros()) {
+    <div class="modal-overlay" (click)="cerrarFiltros()">
+      <div class="filtros-panel" (click)="$event.stopPropagation()">
+        <div class="filtros-header">
+          <h3>⚙ Filtros Usuarios</h3>
+          <button class="filtros-close" (click)="cerrarFiltros()">✕</button>
+        </div>
+
+        <div class="filtros-body">
+          <div class="filtro-group">
+            <label class="filtro-label">Buscar Usuario</label>
+            <input type="text" class="filtro-input" placeholder="Nombre, email..." [value]="filtroBusqueda()" (input)="filtroBusqueda.set($any($event.target).value)">
+          </div>
+
+          <div class="filtro-group">
+            <label class="filtro-label">Rol</label>
+            <select class="filtro-select" [value]="filtroRol()" (change)="filtroRol.set($any($event.target).value)">
+              <option value="">Todos</option>
+              <option value="user">Usuario</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+
+          <div class="filtro-group">
+            <label class="filtro-label">Año de Registro</label>
+            <input type="number" class="filtro-input" placeholder="Ej: 2024" [value]="filtroAnio()" (input)="filtroAnio.set($any($event.target).value)">
+          </div>
+        </div>
+
+        <div class="filtros-footer">
+          <button class="btn-cancel-f" (click)="limpiarFiltros(); cerrarFiltros()">Limpiar Todo</button>
+          <button class="btn-confirm-f" (click)="aplicarFiltros()">Aplicar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL DE PERFIL (Estilo Tarjeta) -->
+  @if (mostrarPerfil() && usuarioSeleccionado()) {
+    <div class="targetaAmistad-overlay" (click)="cerrarPerfil()"></div>
+    <div class="targetaAmistad">
+      <div class="targeta-avatar">
+        @if (usuarioSeleccionado().imagen_perfil; as img) {
+          <img [src]="img.startsWith('http') || img.startsWith('/') ? img : 'http://localhost:3000/storage/' + img" alt="Avatar" class="avatar-img">
+        } @else {
+          <div class="avatar-placeholder">
+            <span>{{ usuarioSeleccionado().nombre_usuario.charAt(0).toUpperCase() }}</span>
+          </div>
+        }
+      </div>
+      <h3 class="targeta-name">{{ usuarioSeleccionado().nombre_usuario }}</h3>
+      <p class="targeta-date">Registrado el: {{ usuarioSeleccionado().fecha_registro | date:'dd/MM/yyyy' }}</p>
+      
+      <div class="targeta-info">
+        <p><span class="label">Nombre:</span> <span>{{ usuarioSeleccionado().nombre_completo || 'No especificado' }}</span></p>
+        <p><span class="label">Email:</span> <span>{{ usuarioSeleccionado().email }}</span></p>
+        <p><span class="label">Rol:</span> <span>{{ usuarioSeleccionado().role === 'admin' ? 'Administrador' : 'Usuario' }}</span></p>
+        <p><span class="label">Estado:</span> <span>{{ usuarioSeleccionado().activo ? 'Activo' : 'Inactivo' }}</span></p>
+        @if (usuarioSeleccionado().fecha_nacimiento) {
+          <p><span class="label">Nacimiento:</span> <span>{{ usuarioSeleccionado().fecha_nacimiento | date:'dd/MM/yyyy' }}</span></p>
+        }
+      </div>
+      
+      @if (usuarioSeleccionado().niveles_deportivos?.length > 0) {
+        <div class="sports-section">
+          <div class="sports-header">
+            <span>Niveles Deportivos</span>
+            <span style="font-size: 0.6rem; opacity: 0.7;">{{ usuarioSeleccionado().niveles_deportivos.length }} DEPORTES</span>
+          </div>
+          <div class="sports-grid">
+            @for (nd of usuarioSeleccionado().niveles_deportivos; track nd.id_deporte) {
+              <div class="sport-badge">
+                @if (nd.deporte?.imagen_icono) {
+                  <img [src]="nd.deporte.imagen_icono" alt="icono" class="sport-badge-icon">
+                }
+                <div class="sport-badge-info">
+                  <span class="sport-badge-name">{{ nd.deporte?.nombre }}</span>
+                  <span class="sport-badge-level" [style.color]="getSportColor(nd.deporte)">Nvl {{ nd.nivel }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (usuarioSeleccionado().biografia) {
+        <div style="font-size: 0.75rem; text-align: center; margin-bottom: 20px; color: #666; font-style: italic;">
+          "{{ usuarioSeleccionado().biografia }}"
+        </div>
+      }
+
+      <button class="btn-close" (click)="cerrarPerfil()">CERRAR</button>
+    </div>
+  }
+
+  <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN -->
+  @if (mostrarConfirmacionEliminar()) {
+    <div class="targetaAmistad-overlay" (click)="cerrarConfirmacionEliminar()"></div>
+    <div class="ventana-emergente">
+        <h3>¿Estás seguro que quieres eliminar este usuario?</h3>
+        <p style="margin: 0; color: #666; font-weight: 700;">
+          Estás a punto de eliminar a: <span style="color: #ff006e;">{{ usuarioAEliminar()?.nombre_usuario }}</span>
+        </p>
+        <button class="btn-confirm-delete" (click)="confirmarEliminarUsuario()">Confirmar Eliminar</button>
+        <button class="btn-cancel-delete" (click)="cerrarConfirmacionEliminar()">Cancelar</button>
+    </div>
+  }
+
+  <!-- MODAL DE LISTA DE AMIGOS (Estilo Tarjeta) -->
+  @if (mostrarAmigos()) {
+    <div class="targetaAmistad-overlay" (click)="cerrarAmigos()"></div>
+    <div class="targetaAmistad" style="width: 420px; padding: 2.5rem 2rem;">
+      <h3 class="targeta-name" style="margin-bottom: 2px; font-size: 1.4rem;">Amigos de</h3>
+      <h4 style="font-weight: 950; color: var(--pink, #ff006e); margin-bottom: 20px; font-size: 1.6rem; text-transform: uppercase; letter-spacing: -1px;">{{ usuarioSeleccionado()?.nombre_usuario }}</h4>
+      
+      <div class="sports-section" style="width: 100%; margin-bottom: 2rem;">
+        <div class="sports-header">
+          <span>Lista de Contactos</span>
+          <span style="font-size: 0.6rem; opacity: 0.7;">{{ amigosUsuario().length }} AMIGOS</span>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px; width: 100%; max-height: 350px; overflow-y: auto; padding: 5px 10px; scrollbar-width: none; box-sizing: border-box;">
+          @if (amigosUsuario().length === 0) {
+            <p style="text-align: center; padding: 30px 0; font-weight: 800; color: #666; font-style: italic; border: 2px dashed #ccc; border-radius: 10px;">Este usuario aún no tiene amigos.</p>
+          } @else {
+            @for (amistad of amigosUsuario(); track amistad.id_amistad) {
+              <div class="friend-badge">
+                <div class="friend-avatar-container">
+                  @if (getAmigoDeAmistad(amistad, usuarioSeleccionado()?.id_usuario)?.imagen_perfil; as img) {
+                    <img [src]="img.startsWith('http') || img.startsWith('/') ? img : 'http://localhost:3000/storage/' + img" alt="Avatar">
+                  } @else {
+                    <span class="avatar-fallback-letter" style="font-size: 1.4rem;">{{ getAmigoDeAmistad(amistad, usuarioSeleccionado()?.id_usuario)?.nombre_usuario?.charAt(0).toUpperCase() }}</span>
+                  }
+                </div>
+                <div class="friend-info">
+                  <span class="friend-name">{{ getAmigoDeAmistad(amistad, usuarioSeleccionado()?.id_usuario)?.nombre_usuario }}</span>
+                  <span class="friend-email">{{ getAmigoDeAmistad(amistad, usuarioSeleccionado()?.id_usuario)?.email }}</span>
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <button class="btn-close" (click)="cerrarAmigos()">CERRAR VENTANA</button>
+    </div>
+  }
+</div>

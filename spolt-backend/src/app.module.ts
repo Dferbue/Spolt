@@ -13,7 +13,7 @@ import { WeatherModule } from './modules/weather/weather.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { SportLevelModule } from './modules/sport-level/sport-level.module';
 import { ScheduleModule } from '@nestjs/schedule';
-
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -28,7 +28,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     EmailModule,
     WeatherModule,
     StorageModule,
-    SportLevelModule
+    SportLevelModule,
+    AdminModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Not } from '@sinclair/typebox';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -24,7 +25,7 @@ export class FrindshipsService {
     if (payload.id_solicitante === id_receptor) {
       throw new BadRequestException('No puedes enviarte una solicitud a ti mismo');
     }
-    
+
     // Comprobar si ya existe una relación previa
     const existingFriendship = await this.prisma.amistad.findFirst({
       where: {
@@ -37,7 +38,7 @@ export class FrindshipsService {
     if (existingFriendship) {
       throw new BadRequestException('Ya existe una solicitud o amistad entre estos usuarios');
     }
-    
+
     // Crear si todo está OK
     return await this.prisma.amistad.create({
       data: {
@@ -61,10 +62,10 @@ export class FrindshipsService {
       include: {
         // Es muy útil incluir los datos del usuario para no recibir solo IDs
         solicitante: {
-          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true, ultimo_acceso: true }
+          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true, biografia: true, ultimo_acceso: true, niveles_deportivos: { include: { deporte: true } } }
         },
         receptor: {
-          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true, ultimo_acceso: true }
+          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true, biografia: true, ultimo_acceso: true, niveles_deportivos: { include: { deporte: true } } }
         },
       },
     });
@@ -99,10 +100,10 @@ export class FrindshipsService {
       },
       include: {
         solicitante: {
-          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true }
+          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true, biografia: true }
         },
         receptor: {
-          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true }
+          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true, biografia: true }
         }
       }
     });
@@ -117,10 +118,10 @@ export class FrindshipsService {
       },
       include: {
         solicitante: {
-          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true }
+          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true, biografia: true }
         },
         receptor: {
-          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true }
+          select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true, biografia: true }
         }
       }
     });
@@ -153,5 +154,41 @@ export class FrindshipsService {
         fecha_respuesta: new Date(),
       },
     });
+  }
+
+  //Metodo que van a usar los administradores
+  async findAllFriendsAdmin(id_admin: number, id_usuario: number) {
+    //Comporbamos que el el usuario que esta haciendo la consulta es un administrador
+    const admin = await this.prisma.usuario.findUnique({
+      where: {
+        id_usuario: id_admin
+      }
+    });
+
+    //Validaciones
+    if (!admin) {
+      throw new NotFoundException("no se ha encontrado este administrador")
+    } else if (admin.role !== "admin") {
+      throw new UnauthorizedException('Credenciales inválidas');
+    } else {
+      return await this.prisma.amistad.findMany({
+        where: {
+          OR: [
+            { id_usuario_solicitante: id_usuario },
+            { id_usuario_receptor: id_usuario },
+          ],
+          estado: 'aceptada', // Solo queremos los que ya son amigos
+        },
+        include: {
+          // Es muy útil incluir los datos del usuario para no recibir solo IDs
+          solicitante: {
+            select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true, ultimo_acceso: true }
+          },
+          receptor: {
+            select: { id_usuario: true, nombre_usuario: true, imagen_perfil: true, ultimo_acceso: true }
+          },
+        },
+      });
+    }
   }
 }
