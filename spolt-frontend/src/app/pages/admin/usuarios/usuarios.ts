@@ -1,8 +1,9 @@
-import { Component, inject, OnInit, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectorRef, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AdminService } from '../service/admin.service';
 import { SportColorService } from '../../../shared/services/sport-color.service';
+import { AuthService } from '../../../auth/services/auth.service';
 import { List } from '../list/list';
 import { TargetAction } from '../target/target';
 
@@ -16,8 +17,11 @@ import { TargetAction } from '../target/target';
 export class Usuarios implements OnInit {
   private adminService = inject(AdminService);
   private sportColorService = inject(SportColorService);
+  private authService = inject(AuthService);
+  private renderer = inject(Renderer2);
   private cdr = inject(ChangeDetectorRef);
   
+  public currentUserRole = signal<string>('user');
   public usuariosFiltrados = signal<any[]>([]);
   public loading = false;
 
@@ -46,6 +50,13 @@ export class Usuarios implements OnInit {
   public amigosUsuario = signal<any[]>([]);
 
   ngOnInit() {
+    this.authService.getProfile().subscribe({
+      next: (user) => {
+        if (user) {
+          this.currentUserRole.set(user.role);
+        }
+      }
+    });
     this.loadUsuarios();
   }
 
@@ -93,8 +104,14 @@ export class Usuarios implements OnInit {
     this.cerrarFiltros();
   }
 
-  abrirFiltros() { this.mostrarVentanaDeFiltros.set(true); }
-  cerrarFiltros() { this.mostrarVentanaDeFiltros.set(false); }
+  abrirFiltros() { 
+    this.mostrarVentanaDeFiltros.set(true); 
+    this.renderer.addClass(document.body, 'modal-open');
+  }
+  cerrarFiltros() { 
+    this.mostrarVentanaDeFiltros.set(false); 
+    this.renderer.removeClass(document.body, 'modal-open');
+  }
   
   limpiarFiltros() {
     this.filtroBusqueda.set('');
@@ -107,17 +124,20 @@ export class Usuarios implements OnInit {
   cerrarPerfil() {
     this.mostrarPerfil.set(false);
     this.usuarioSeleccionado.set(null);
+    this.renderer.removeClass(document.body, 'modal-open');
   }
 
   cerrarConfirmacionEliminar() {
     this.mostrarConfirmacionEliminar.set(false);
     this.usuarioAEliminar.set(null);
+    this.renderer.removeClass(document.body, 'modal-open');
   }
 
   cerrarAmigos() {
     this.mostrarAmigos.set(false);
     this.amigosUsuario.set([]);
     this.usuarioSeleccionado.set(null);
+    this.renderer.removeClass(document.body, 'modal-open');
   }
 
   confirmarEliminarUsuario() {
@@ -154,6 +174,7 @@ export class Usuarios implements OnInit {
       case 'ver-perfil':
         this.usuarioSeleccionado.set(item);
         this.mostrarPerfil.set(true);
+        this.renderer.addClass(document.body, 'modal-open');
         break;
       case 'ver-amigos':
         this.usuarioSeleccionado.set(item);
@@ -161,6 +182,7 @@ export class Usuarios implements OnInit {
           next: (amigos) => {
             this.amigosUsuario.set(amigos);
             this.mostrarAmigos.set(true);
+            this.renderer.addClass(document.body, 'modal-open');
           },
           error: (err) => {
             console.error('Error cargando amigos:', err);
@@ -171,6 +193,7 @@ export class Usuarios implements OnInit {
       case 'eliminar':
         this.usuarioAEliminar.set(item);
         this.mostrarConfirmacionEliminar.set(true);
+        this.renderer.addClass(document.body, 'modal-open');
         break;
       case 'hacer-admin':
         if (confirm(`¿Estás seguro de hacer a ${item.nombre_usuario} administrador?`)) {

@@ -1,12 +1,12 @@
-import { Component, inject, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, input, output, signal } from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { EventInterface , eventAction } from '../models/createEvent';
 import { environment } from '../../../../environments/environment';
 import { SportColorService } from '../../../shared/services/sport-color.service';
 
 @Component({
   selector: 'app-card-event',
-  imports: [CommonModule],
+  imports: [CommonModule, DecimalPipe],
   templateUrl: './card-event.html',
   styleUrl: './card-event.css',
 })
@@ -74,5 +74,18 @@ export class CardEvent {
       }
 
       return new Date() >= fecha;
+    }
+
+    public menuOpen = signal<boolean>(false);
+
+    toggleMenu(event: Event) {
+      event.stopPropagation();
+      this.menuOpen.set(!this.menuOpen());
+    }
+
+    // Opcionalmente, para cerrar el menú si se hace click en una opción
+    handleAction(actionData: eventAction) {
+      this.sendIDevent(actionData);
+      this.menuOpen.set(false);
     }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewEncapsulation, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +17,7 @@ import { environment } from '../../../../environments/environment';
 })
 export class Deportes implements OnInit {
   private adminService = inject(AdminService);
+  private renderer = inject(Renderer2);
   
   public deportes = signal<any[]>([]);
   public loading = false;
@@ -74,6 +75,7 @@ export class Deportes implements OnInit {
       case 'eliminar':
         this.deporteAEliminar.set(item);
         this.mostrarConfirmacionEliminar.set(true);
+        this.renderer.addClass(document.body, 'modal-open');
         break;
     }
   }
@@ -82,6 +84,7 @@ export class Deportes implements OnInit {
   cerrarConfirmacionEliminar() {
     this.mostrarConfirmacionEliminar.set(false);
     this.deporteAEliminar.set(null);
+    this.renderer.removeClass(document.body, 'modal-open');
   }
 
   confirmarEliminarDeporte() {
@@ -106,12 +109,14 @@ export class Deportes implements OnInit {
     this.edit_color = item.color || '#ff006e';
     this.selectedFile = null;
     this.mostrarModalEditar.set(true);
+    this.renderer.addClass(document.body, 'modal-open');
   }
 
   cerrarModalEditar() {
     this.mostrarModalEditar.set(false);
     this.deporteAEditar.set(null);
     this.selectedFile = null;
+    this.renderer.removeClass(document.body, 'modal-open');
   }
 
   triggerFileInput() {
@@ -180,11 +185,13 @@ export class Deportes implements OnInit {
     this.crear_color = '#ff006e';
     this.selectedFileCrear = null;
     this.mostrarModalCrear.set(true);
+    this.renderer.addClass(document.body, 'modal-open');
   }
 
   cerrarModalCrear() {
     this.mostrarModalCrear.set(false);
     this.selectedFileCrear = null;
+    this.renderer.removeClass(document.body, 'modal-open');
   }
 
   triggerFileInputCrear() {

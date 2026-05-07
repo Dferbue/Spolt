@@ -25,7 +25,12 @@
             <div class="sport-info-container">
               <div class="sport-title-row">
                 <h3>{{ nivel.deporte.nombre || 'Deporte' }}</h3>
-                <span class="level-indicator" [style.color]="getSportColor(nivel)">Lvl {{ nivel.nivel }}</span>
+                <div class="level-and-matches">
+                  <span class="level-indicator" [style.color]="getSportColor(nivel)">Lvl {{ nivel.nivel }}</span>
+                  <span class="matches-count-inline">
+                    {{ nivel.partidos_jugados }} {{ nivel.partidos_jugados === 1 ? 'evento' : 'eventos' }}
+                  </span>
+                </div>
               </div>
 
               <div class="xp-container">

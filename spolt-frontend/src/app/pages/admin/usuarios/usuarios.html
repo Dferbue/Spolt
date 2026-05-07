@@ -27,6 +27,7 @@
     [paginaActual]="paginaActual()"
     [totalPaginas]="totalPaginas()"
     [totalItems]="totalItems()"
+    [currentUserRole]="currentUserRole()"
     textoVacio="No se han encontrado usuarios"
     (onItemAction)="handleItemAction($event)"
     (onCambiarPagina)="cambiarPagina($event)">
@@ -53,6 +54,7 @@
               <option value="">Todos</option>
               <option value="user">Usuario</option>
               <option value="admin">Administrador</option>
+              <option value="ceo">CEO</option>
             </select>
           </div>
 
@@ -89,7 +91,7 @@
       <div class="targeta-info">
         <p><span class="label">Nombre:</span> <span>{{ usuarioSeleccionado().nombre_completo || 'No especificado' }}</span></p>
         <p><span class="label">Email:</span> <span>{{ usuarioSeleccionado().email }}</span></p>
-        <p><span class="label">Rol:</span> <span>{{ usuarioSeleccionado().role === 'admin' ? 'Administrador' : 'Usuario' }}</span></p>
+        <p><span class="label">Rol:</span> <span>{{ usuarioSeleccionado().role === 'ceo' ? 'CEO' : (usuarioSeleccionado().role === 'admin' ? 'Administrador' : 'Usuario') }}</span></p>
         <p><span class="label">Estado:</span> <span>{{ usuarioSeleccionado().activo ? 'Activo' : 'Inactivo' }}</span></p>
         @if (usuarioSeleccionado().fecha_nacimiento) {
           <p><span class="label">Nacimiento:</span> <span>{{ usuarioSeleccionado().fecha_nacimiento | date:'dd/MM/yyyy' }}</span></p>

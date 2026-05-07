@@ -6,13 +6,14 @@ import { FormsModule } from '@angular/forms';
 import * as L from 'leaflet';
 import { ListEvents } from '../list-events/list-events';
 import { SportColorService } from '../../../shared/services/sport-color.service';
-
+import { GeolocationService } from '../../../shared/services/geolocation.service';
 import { CustomCalendar } from '../../../shared/components/custom-calendar/custom-calendar';
+import { LocationPicker, LocationData } from '../../../shared/components/location-picker/location-picker';
 
 @Component({
   selector: 'app-my-events',
   standalone: true,
-  imports: [CommonModule, ListEvents, FormsModule, CustomCalendar],
+  imports: [CommonModule, ListEvents, FormsModule, CustomCalendar, LocationPicker],
   templateUrl: './my-events.html',
   styleUrl: './my-events.css',
   encapsulation: ViewEncapsulation.None,
@@ -20,10 +21,15 @@ import { CustomCalendar } from '../../../shared/components/custom-calendar/custo
 export class MyEvents implements OnInit {
   private readonly eventService = inject(EventosService);
   public readonly sportColorService = inject(SportColorService);
+  private readonly geoService = inject(GeolocationService);
 
   public tabActiva = signal<'creados' | 'unidos'>('creados');
   public mensajeEnvio = signal('');
   public loading = signal<boolean>(true);
+
+  // Coordenadas del usuario
+  private userLat = signal<number | null>(null);
+  private userLng = signal<number | null>(null);
 
   public rawMyEvents = signal<EventInterface[]>([]);
   public rawJoinedEvents = signal<EventInterface[]>([]);
@@ -43,6 +49,7 @@ export class MyEvents implements OnInit {
   public filtroPlazasLibres = signal<boolean>(false);
   public filtroFechaDesde = signal<string>('');
   public filtroFechaHasta = signal<string>('');
+  public filtroDistanciaKm = signal<number>(250); // Por defecto 250 km en mis eventos para verlos todos casi siempre
   public ordenarPor = signal<string>('recientes');
 
   public filtrosActivos = computed(() => {
@@ -53,6 +60,7 @@ export class MyEvents implements OnInit {
     if (this.filtroPlazasLibres()) count++;
     if (this.filtroFechaDesde()) count++;
     if (this.filtroFechaHasta()) count++;
+    if (this.filtroDistanciaKm() !== 250) count++;
     return count;
   });
 
@@ -84,6 +92,10 @@ export class MyEvents implements OnInit {
     if (this.filtroFechaHasta()) {
       resultado = resultado.filter(e => new Date(e.fecha_evento) <= new Date(this.filtroFechaHasta()));
     }
+    const distMax = this.filtroDistanciaKm();
+    if (distMax && distMax < 250) {
+      resultado = resultado.filter(e => e.distancia != null && e.distancia <= distMax);
+    }
     // Ordenación
     const orden = this.ordenarPor();
     resultado = [...resultado]; // Copia para no mutar el original y forzar reactividad
@@ -98,14 +110,36 @@ export class MyEvents implements OnInit {
       resultado.sort((a, b) => (a.deporte?.nombre || a.nombre_deporte || '').localeCompare(b.deporte?.nombre || b.nombre_deporte || ''));
     } else if (orden === 'estado') {
       resultado.sort((a, b) => (a.estado || '').localeCompare(b.estado || ''));
+    } else if (orden === 'creacion') {
+      resultado.sort((a, b) => {
+        const dateA = a.fecha_creacion ? new Date(a.fecha_creacion).getTime() : 0;
+        const dateB = b.fecha_creacion ? new Date(b.fecha_creacion).getTime() : 0;
+        return dateB - dateA;
+      });
+    } else if (orden === 'cercanos') {
+      const lat = this.userLat();
+      const lng = this.userLng();
+      if (lat != null && lng != null) {
+        resultado.sort((a, b) => {
+          const distA = (a.latitud && a.longitud) ? this.geoService.calcularDistancia(lat, lng, a.latitud, a.longitud) : 99999;
+          const distB = (b.latitud && b.longitud) ? this.geoService.calcularDistancia(lat, lng, b.latitud, b.longitud) : 99999;
+          return distA - distB;
+        });
+      }
     }
 
     return resultado;
   }
 
-  // Señales filtradas para la vista
-  public myEvents = computed(() => this.aplicarFiltrosALista(this.rawMyEvents()));
-  public joinedEvents = computed(() => this.aplicarFiltrosALista(this.rawJoinedEvents()));
+  // Señales filtradas para la vista (paginadas)
+  public myEvents = computed(() => {
+    const start = (this.paginaCreados() - 1) * this.ITEMS_POR_PAGINA;
+    return this._creadosBase().slice(start, start + this.ITEMS_POR_PAGINA);
+  });
+  public joinedEvents = computed(() => {
+    const start = (this.paginaUnidos() - 1) * this.ITEMS_POR_PAGINA;
+    return this._unidosBase().slice(start, start + this.ITEMS_POR_PAGINA);
+  });
 
 
   private map: L.Map | undefined;
@@ -133,8 +167,47 @@ export class MyEvents implements OnInit {
   public edit_hora_fin = '';
   public edit_numero_max_participantes: number | null = null;
 
+  // Paginación
+  public readonly ITEMS_POR_PAGINA = 20;
+  public paginaCreados = signal<number>(1);
+  public paginaUnidos = signal<number>(1);
+
+  private _creadosBase = computed(() => this.aplicarFiltrosALista(this.rawMyEvents()));
+  private _unidosBase = computed(() => this.aplicarFiltrosALista(this.rawJoinedEvents()));
+
+  public totalPaginasCreados = computed(() => Math.max(1, Math.ceil(this._creadosBase().length / this.ITEMS_POR_PAGINA)));
+  public totalPaginasUnidos = computed(() => Math.max(1, Math.ceil(this._unidosBase().length / this.ITEMS_POR_PAGINA)));
+
+  irPaginaCreados(p: number) { if (p >= 1 && p <= this.totalPaginasCreados()) this.paginaCreados.set(p); }
+  irPaginaUnidos(p: number) { if (p >= 1 && p <= this.totalPaginasUnidos()) this.paginaUnidos.set(p); }
+  getPagesArray(total: number): number[] { return Array.from({ length: total }, (_, i) => i + 1); }
+  
+  public edit_ubicacion = signal<string>('');
+  public edit_latitud = signal<number | null>(null);
+  public edit_longitud = signal<number | null>(null);
+  public mostrarMapaEdicion = signal<boolean>(false);
+
+  abrirMapaEdicion() {
+    this.mostrarMapaEdicion.set(true);
+  }
+
+  cerrarMapaEdicion() {
+    this.mostrarMapaEdicion.set(false);
+  }
+
+  onEditLocationChange(location: LocationData) {
+    this.edit_latitud.set(location.lat);
+    this.edit_longitud.set(location.lng);
+    this.edit_ubicacion.set(location.address);
+  }
+
   ngOnInit() {
-    this.refreshData();
+    // Primero obtenemos la ubicación del usuario y luego cargamos los eventos
+    this.geoService.getUserLocation().then(loc => {
+      this.userLat.set(loc.lat);
+      this.userLng.set(loc.lng);
+      this.refreshData();
+    });
   }
 
   refreshData() {
@@ -143,7 +216,7 @@ export class MyEvents implements OnInit {
     // Cargar eventos creados por mí
     this.eventService.getMyEvents().subscribe({
       next: (data: EventInterface[]) => {
-        this.rawMyEvents.set(data || []);
+        this.rawMyEvents.set(this.enriquecerConDistancia(data || []));
         this.checkLoading();
       },
       error: (err: any) => {
@@ -155,7 +228,7 @@ export class MyEvents implements OnInit {
     // Cargar eventos a los que me he unido
     this.eventService.geteventosEnlosQueParticipamos().subscribe({
       next: (data: EventInterface[]) => {
-        this.rawJoinedEvents.set(data || []);
+        this.rawJoinedEvents.set(this.enriquecerConDistancia(data || []));
         this.joinedIds.set(data?.map(e => Number(e.id_evento || e.id)) || []);
         this.checkLoading();
       },
@@ -164,7 +237,18 @@ export class MyEvents implements OnInit {
         this.checkLoading();
       }
     });
+  }
 
+  private enriquecerConDistancia(eventos: EventInterface[]): EventInterface[] {
+    const lat = this.userLat();
+    const lng = this.userLng();
+    if (lat == null || lng == null) return eventos;
+    return eventos.map(e => ({
+      ...e,
+      distancia: (e.latitud != null && e.longitud != null)
+        ? this.geoService.calcularDistancia(lat, lng, e.latitud, e.longitud)
+        : undefined
+    }));
   }
 
   private checkLoading() {
@@ -186,7 +270,7 @@ export class MyEvents implements OnInit {
     } else if (data.action === 'details') {
       this.eventSelected.set(data.evento);
       this.mostrarModalDetalles.set(true);
-      setTimeout(() => this.initMap(), 50); 
+      setTimeout(() => this.initMap(), 200); 
     } else if (data.action === 'edit') {
       this.abrirEdicionDirecta(data.evento);
     } else if (data.action === 'join') {
@@ -216,6 +300,7 @@ export class MyEvents implements OnInit {
     this.filtroPlazasLibres.set(false);
     this.filtroFechaDesde.set('');
     this.filtroFechaHasta.set('');
+    this.filtroDistanciaKm.set(250);
   }
 
 
@@ -265,6 +350,10 @@ export class MyEvents implements OnInit {
 
     this.edit_numero_max_participantes = event.numero_max_participantes;
 
+    this.edit_ubicacion.set(event.ubicacion || '');
+    this.edit_latitud.set(event.latitud);
+    this.edit_longitud.set(event.longitud);
+
     // Load sports
     if (this.listaDeportes().length === 0) {
       this.eventService.getSports().subscribe((sports: any[]) => this.listaDeportes.set(sports || []));
@@ -281,13 +370,13 @@ export class MyEvents implements OnInit {
       this.map.remove();
     }
 
-    const mapContainer = document.getElementById('map-details');
+    const mapContainer = document.getElementById('map-details-my');
     if (!mapContainer) return;
 
     const lat = event.latitud || 40.4168; 
     const lng = event.longitud || -3.7038;
 
-    this.map = L.map('map-details').setView([lat, lng], 17);
+    this.map = L.map('map-details-my').setView([lat, lng], 17);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
@@ -341,6 +430,9 @@ export class MyEvents implements OnInit {
       hora_inicio: this.edit_hora_inicio,
       hora_fin: this.edit_hora_fin || undefined,
       numero_max_participantes: this.edit_numero_max_participantes!,
+      ubicacion: this.edit_ubicacion() || undefined,
+      latitud: this.edit_latitud() ?? undefined,
+      longitud: this.edit_longitud() ?? undefined,
     };
 
     this.eventService.updateEvent(id, data).subscribe({
@@ -453,6 +545,14 @@ export class MyEvents implements OnInit {
         this.mensajeEnvio.set('❌ Error al intentar unirte a este evento');
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       }
+    });
+  }
+
+  copiarCoordenadas(event: EventInterface) {
+    const text = `${event.latitud}, ${event.longitud}`;
+    navigator.clipboard.writeText(text).then(() => {
+      this.mensajeEnvio.set('✅ Coordenadas copiadas al portapapeles');
+      setTimeout(() => this.mensajeEnvio.set(''), 2500);
     });
   }
 

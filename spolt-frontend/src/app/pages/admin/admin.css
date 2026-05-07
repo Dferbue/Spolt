@@ -258,6 +258,20 @@
         z-index: 2000;
     }
 
+    .filtros-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(4px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 3000;
+    }
+
     .filtros-panel {
         background: #ffffff;
         border: 3px solid #111;
@@ -384,6 +398,19 @@
         transform: translateX(5px);
         border-color: var(--hover-color, #ff006e);
         box-shadow: 6px 6px 0px var(--hover-color, #ff006e);
+    }
+
+    /* Elevar la tarjeta cuando su menú está abierto para que no quede detrás de las siguientes */
+    .data-item:has(.show-menu) {
+        z-index: 1000;
+        position: relative;
+    }
+
+    /* Anular el efecto hover si el menú está abierto (el overlay invisible ocupa toda la pantalla y dispararía el hover desde cualquier sitio) */
+    .data-item:has(.show-menu):hover {
+        transform: none;
+        border-color: #000;
+        box-shadow: 6px 6px 0px #000;
     }
 
     .item-main {
@@ -522,6 +549,21 @@
         color: #111;
     }
 
+    .actions-wrapper {
+        position: relative;
+    }
+
+    .dots-btn {
+        display: none;
+        background: transparent;
+        border: none;
+        font-size: 24px;
+        font-weight: 900;
+        cursor: pointer;
+        padding: 5px 10px;
+        color: #000;
+    }
+
     .item-actions {
         display: flex;
         align-items: center;
@@ -600,6 +642,50 @@
         .btn-text-mobile {
             display: inline;
             font-size: 1.2rem;
+        }
+        .action-btn .btn-text-mobile {
+            font-size: 0.85rem;
+            font-weight: 900;
+        }
+        .dots-btn {
+            display: block;
+            position: relative;
+            z-index: 101; /* Above the invisible overlay */
+        }
+        .menu-invisible-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: transparent;
+            z-index: 90;
+        }
+        .actions-wrapper .item-actions {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            flex-direction: column;
+            border: 3px solid #000;
+            box-shadow: 4px 4px 0px #ff006e;
+            padding: 10px;
+            border-radius: 8px;
+            z-index: 100;
+            gap: 10px;
+            min-width: 150px;
+        }
+        .actions-wrapper .item-actions.show-menu {
+            display: flex;
+        }
+        .action-btn {
+            width: auto; /* Revert global action-btn width */
+        }
+        .actions-wrapper .action-btn,
+        .actions-wrapper .delete-btn {
+            width: 100%;
+            padding: 10px;
         }
         .delete-btn {
             padding: 0;
@@ -1002,4 +1088,723 @@
     border-color: var(--pink, #ff006e);
     box-shadow: 4px 4px 0px #111;
     transform: translateY(-2px);
+}
+
+/* =========================================
+   RESPONSIVE: TABLET (601px - 850px)
+   ========================================= */
+@media (min-width: 601px) and (max-width: 850px) {
+
+    .page-content {
+        padding: 25px 20px;
+    }
+
+    .page-container {
+        gap: 25px;
+    }
+
+    /* Header / Titles */
+    .brand-header-box {
+        padding: 12px 25px;
+        gap: 30px;
+        box-shadow: 6px 6px 0px #ff006e;
+        margin-bottom: 20px;
+    }
+
+    .brand-title {
+        font-size: 26px;
+        letter-spacing: -1px;
+    }
+
+    .title-box {
+        padding: 8px 25px;
+        box-shadow: 4px 4px 0px #ff006e;
+    }
+
+    .title-box h1 {
+        font-size: 1.4rem;
+        letter-spacing: 1px;
+    }
+
+    /* Stats */
+    .stats-row {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .stat-card {
+        padding: 15px 18px;
+    }
+
+    .stat-card .value {
+        font-size: 22px;
+    }
+
+    .stat-card .label {
+        font-size: 10px;
+    }
+
+    /* Grid de cards (dashboard) */
+    .components-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    /* View Container */
+    .view-container {
+        gap: 20px;
+    }
+
+    /* Header Actions */
+    .header-actions {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .btn-volver {
+        display: none;
+    }
+
+    /* Management Controls */
+    .management-controls {
+        gap: 15px;
+    }
+
+    .list-title h2 {
+        font-size: 1.2rem;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        gap: 10px;
+    }
+
+    .btn-filtros {
+        padding: 8px 18px;
+        font-size: 0.8rem;
+        box-shadow: 3px 3px 0px #ff006e;
+    }
+
+    /* Data Items (list rows) */
+    .data-item {
+        padding: 12px 18px;
+        box-shadow: 4px 4px 0px #000;
+        border-radius: 12px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .item-info {
+        width: auto;
+        max-width: 200px;
+    }
+
+    .item-name {
+        font-size: 1rem;
+    }
+
+    .item-sub {
+        font-size: 11px;
+    }
+
+    .item-avatar {
+        width: 42px;
+        height: 42px;
+    }
+
+    /* Creator info en eventos */
+    .creator-info {
+        margin-left: 15px;
+        padding-left: 15px;
+    }
+
+    .creator-avatar {
+        width: 30px;
+        height: 30px;
+    }
+
+    .creator-name {
+        font-size: 0.75rem;
+    }
+
+    .creator-label {
+        font-size: 0.55rem;
+    }
+
+    /* Actions */
+    .item-actions {
+        gap: 10px;
+    }
+
+    .action-btn {
+        padding: 6px 14px;
+        font-size: 11px;
+        box-shadow: 3px 3px 0px #111;
+    }
+
+    .delete-btn {
+        height: 38px;
+        min-width: 38px;
+        padding: 0 12px;
+    }
+
+    /* Pagination */
+    .pagination-section {
+        padding: 15px;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .pagination-info {
+        font-size: 0.75rem;
+    }
+
+    .pagination-controls {
+        padding: 4px 10px;
+    }
+
+    .pag-btn {
+        font-size: 12px;
+    }
+
+    /* Filtros Panel */
+    .filtros-panel {
+        max-width: 420px;
+    }
+
+    /* Modal tarjeta perfil */
+    .targetaAmistad {
+        width: 340px;
+        padding: 2rem 1.5rem;
+    }
+
+    .targeta-avatar {
+        width: 110px;
+        height: 110px;
+    }
+
+    .targeta-name {
+        font-size: 1.5rem;
+    }
+
+    /* Component view */
+    .component-view {
+        padding: 25px;
+        box-shadow: 6px 6px 0px #000;
+    }
+
+    /* Admin Card Wrapper */
+    .admin-card-wrapper {
+        padding: 20px;
+        min-height: 200px;
+        box-shadow: 6px 6px 0px #ff006e;
+    }
+
+    .card-label {
+        font-size: 20px;
+    }
+
+    .icon-placeholder {
+        font-size: 50px;
+    }
+}
+
+/* =========================================
+   RESPONSIVE: MOBILE (max-width: 600px)
+   ========================================= */
+@media (max-width: 600px) {
+
+    /* Layout principal — padding inferior para el bottom nav */
+    .admin-layout {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .main-content {
+        padding-bottom: 70px; /* espacio para bottom nav */
+        overflow-y: auto;
+        height: 100vh;
+    }
+
+    .page-content {
+        padding: 16px 12px;
+        padding-bottom: 80px;
+    }
+
+    .page-container {
+        gap: 18px;
+        max-width: 100%;
+    }
+
+    /* Header / Titles */
+    .brand-header-box {
+        padding: 10px 18px;
+        gap: 15px;
+        box-shadow: 4px 4px 0px #ff006e;
+        margin-bottom: 15px;
+        border-width: 3px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .brand-title {
+        font-size: 20px;
+        letter-spacing: -1px;
+    }
+
+    .title-box {
+        padding: 6px 18px;
+        box-shadow: 3px 3px 0px #ff006e;
+        border-width: 2px;
+    }
+
+    .title-box h1 {
+        font-size: 1.1rem;
+        letter-spacing: 0.5px;
+    }
+
+    /* Stats */
+    .stats-row {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 18px;
+    }
+
+    .stat-card {
+        padding: 12px 10px;
+        border-width: 2px;
+    }
+
+    .stat-card .value {
+        font-size: 20px;
+    }
+
+    .stat-card .label {
+        font-size: 8px;
+        letter-spacing: 0.5px;
+    }
+
+    /* Consultas section */
+    .consultas-section {
+        margin-bottom: 20px;
+    }
+
+    /* Grid de cards (dashboard) */
+    .components-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    /* View Container */
+    .view-container {
+        gap: 15px;
+    }
+
+    /* Header Actions — stack vertically */
+    .header-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .btn-volver {
+        display: none;
+    }
+
+    /* Management Controls — stack vertically */
+    .management-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .list-title h2 {
+        font-size: 1.1rem;
+        text-align: center;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .btn-filtros {
+        padding: 8px 16px;
+        font-size: 0.75rem;
+        box-shadow: 3px 3px 0px #ff006e;
+        border-radius: 8px;
+        flex: 1;
+        justify-content: center;
+    }
+
+    /* Data Items (list rows) — stack horizontalmente compacto */
+    .data-item {
+        padding: 12px;
+        box-shadow: 4px 4px 0px #000;
+        border-radius: 12px;
+        border-width: 3px;
+        flex-wrap: nowrap; /* Cambiado de wrap a nowrap para mantener línea única */
+        gap: 12px;
+        align-items: center;
+    }
+
+    .item-main {
+        gap: 12px;
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .item-info {
+        width: auto;
+        max-width: none;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .item-name {
+        font-size: 1rem;
+        line-height: 1.2;
+    }
+
+    .item-sub {
+        font-size: 12px;
+        opacity: 0.8;
+    }
+
+    .item-avatar {
+        width: 40px;
+        height: 40px;
+        border-width: 2px;
+        flex-shrink: 0;
+    }
+
+    /* Ocultamos el contenedor de avatar en eventos para que no ocupe espacio innecesario */
+    .data-item .item-main div[style*="background: transparent"] {
+        display: none;
+    }
+
+    .avatar-fallback-letter {
+        font-size: 1.1rem;
+    }
+
+    .sport-icon-container {
+        width: 60px; /* Mucho más grande como pidió el usuario */
+        height: 60px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        border-width: 2.5px;
+    }
+
+    /* Creator info — ocultar en móvil para ahorrar espacio */
+    .creator-info {
+        display: none;
+    }
+
+    /* Actions — se quedan a la derecha */
+    .item-actions {
+        gap: 6px;
+        width: auto; /* Ya no ocupa el 100% para quedarse a la derecha */
+        justify-content: flex-end;
+        flex-shrink: 0;
+        display: flex;
+    }
+
+    .action-btn {
+        padding: 6px 10px;
+        font-size: 10px;
+        box-shadow: 2px 2px 0px #111;
+        border-width: 2px;
+        border-radius: 6px;
+    }
+
+    .delete-btn {
+        height: 34px;
+        min-width: 34px;
+        padding: 0;
+        width: 34px;
+        border-width: 2px;
+        box-shadow: 2px 2px 0px #111;
+        border-radius: 6px;
+    }
+
+    .status-dot {
+        width: 10px;
+        height: 10px;
+    }
+
+    /* Pagination */
+    .pagination-section {
+        padding: 12px;
+        flex-direction: column;
+        gap: 10px;
+        border-width: 2px;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+
+    .pagination-info {
+        font-size: 0.7rem;
+        text-align: center;
+    }
+
+    .pagination-controls {
+        padding: 4px 8px;
+        gap: 6px;
+        border-radius: 6px;
+    }
+
+    .pag-btn {
+        font-size: 11px;
+        padding: 0 5px;
+    }
+
+    .page-indicator {
+        font-size: 10px;
+    }
+
+    /* Ajustes específicos para 320px (dispositivos muy pequeños) */
+    @media (max-width: 350px) {
+        .pagination-section {
+            padding: 8px;
+            gap: 6px;
+        }
+
+        .pagination-info {
+            font-size: 0.65rem;
+        }
+
+        .pagination-controls {
+            padding: 6px 10px;
+            gap: 8px; /* Más cerca del centro */
+            width: 100%;
+            justify-content: center;
+        }
+
+        .pag-btn {
+            font-size: 11px; /* Más grandes */
+            padding: 4px 6px;
+            letter-spacing: -0.2px;
+        }
+
+        .page-indicator {
+            font-size: 9px;
+            letter-spacing: -0.3px;
+            opacity: 0.9;
+        }
+    }
+
+    /* ── FILTROS MODAL ── */
+    .filtros-overlay {
+        backdrop-filter: blur(5px);
+        background: rgba(0, 0, 0, 0.4);
+    }
+
+    .filtros-panel {
+        max-width: 100%;
+        width: 100%;
+        border-radius: 24px 24px 0 0;
+        max-height: 90vh;
+        border-width: 4px 0 0 0;
+        box-shadow: 0 -15px 30px rgba(0,0,0,0.15);
+        border-color: #111;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        animation: slideUpFiltros 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideUpFiltros {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
+
+    .filtros-header {
+        padding: 1.2rem 1.5rem;
+        background: #111;
+        border-bottom: 2px solid #333;
+        border-radius: 0;
+    }
+
+    .filtros-header h3 {
+        font-size: 1.2rem;
+        letter-spacing: 0.5px;
+    }
+
+    .filtros-body {
+        padding: 1.5rem;
+        gap: 1.2rem;
+        background: #fff;
+        overflow-y: auto;
+    }
+
+    .filtro-group {
+        gap: 6px;
+    }
+
+    .filtro-label {
+        font-size: 0.75rem;
+        color: #666;
+        margin-left: 2px;
+    }
+
+    .filtro-input, .filtro-select {
+        padding: 12px 14px;
+        font-size: 0.9rem;
+        background-color: #f8f8f8;
+        border-width: 2px;
+        border-radius: 10px;
+    }
+
+    .filtro-input:focus, .filtro-select:focus {
+        background-color: #fff;
+        border-color: #ff006e;
+    }
+
+    .filtro-row {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+    }
+
+    .filtros-footer {
+        padding: 1.2rem 1.5rem;
+        background: #fff;
+        border-top: 2px solid #eee;
+        gap: 12px;
+    }
+
+    .btn-cancel-f, .btn-confirm-f {
+        padding: 12px 0;
+        font-size: 0.9rem;
+        border-radius: 10px;
+        font-weight: 800;
+        border-width: 2px;
+        box-shadow: 3px 3px 0px #000;
+    }
+
+    .btn-confirm-f {
+        background: #ff006e;
+        color: #fff;
+        border-color: #000;
+        box-shadow: 4px 4px 0px #000;
+    }
+
+    /* ── MODAL TARJETA DE PERFIL ── */
+    .targetaAmistad {
+        width: 92vw;
+        max-width: 380px;
+        padding: 1.8rem 1.2rem;
+        box-shadow: 8px 8px 0px var(--pink, #ff006e);
+    }
+
+    .targeta-avatar {
+        width: 100px;
+        height: 100px;
+        border-width: 3px;
+        margin-bottom: 1rem;
+        box-shadow: 5px 5px 0px rgba(0,0,0,0.1);
+    }
+
+    .targeta-avatar .avatar-placeholder {
+        font-size: 3.5rem;
+    }
+
+    .targeta-name {
+        font-size: 1.4rem;
+    }
+
+    .targeta-date {
+        font-size: 0.7rem;
+        margin-top: 5px;
+        margin-bottom: 12px;
+    }
+
+    .targeta-info {
+        font-size: 0.75rem;
+        gap: 6px;
+        margin-bottom: 1.2rem;
+    }
+
+    /* Sports section en tarjeta */
+    .sports-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .sport-badge {
+        padding: 6px 8px;
+        gap: 6px;
+        box-shadow: 2px 2px 0px #111;
+    }
+
+    .sport-badge-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .sport-badge-name {
+        font-size: 0.65rem;
+    }
+
+    .sport-badge-level {
+        font-size: 0.55rem;
+    }
+
+    /* Friend badges */
+    .friend-badge {
+        padding: 10px 12px;
+        gap: 10px;
+        box-shadow: 3px 3px 0px #111;
+        border-radius: 10px;
+    }
+
+    .friend-avatar-container {
+        width: 40px;
+        height: 40px;
+    }
+
+    .friend-name {
+        font-size: 0.95rem;
+    }
+
+    .friend-email {
+        font-size: 0.65rem;
+    }
+
+    /* Component view */
+    .component-view {
+        padding: 18px;
+        box-shadow: 4px 4px 0px #000;
+        border-width: 3px;
+    }
+
+    /* Admin Card Wrapper */
+    .admin-card-wrapper {
+        padding: 18px;
+        min-height: 180px;
+        box-shadow: 5px 5px 0px #ff006e;
+        border-width: 3px;
+    }
+
+    .card-label {
+        font-size: 18px;
+    }
+
+    .icon-placeholder {
+        font-size: 44px;
+        margin-bottom: 10px;
+    }
+
+    /* Close buttons inside modals */
+    .targetaAmistad .btn-close {
+        padding: 10px 16px;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+    }
 }

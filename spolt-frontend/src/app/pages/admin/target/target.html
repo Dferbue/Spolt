@@ -55,20 +55,46 @@
         }
       </div>
       <span class="item-name">{{ item()?.nombre_usuario }}</span>
+      @if (item()?.role === 'ceo') {
+        <span class="role-badge ceo" style="background-color: #000; color: #ff006e; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; margin-left: 8px;">CEO</span>
+      } @else if (item()?.role === 'admin') {
+        <span class="role-badge admin" style="background-color: #f59e0b; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; margin-left: 8px;">ADMIN</span>
+      }
     </div>
     
-    <div class="item-actions">
-      @if (item()?.role === 'admin') {
-        <button class="action-btn" style="background-color: #f59e0b; color: white;" (click)="emitAction('quitar-admin')">QUITAR ADMIN</button>
-      } @else {
-        <button class="action-btn" style="background-color: #22c55e; color: white;" (click)="emitAction('hacer-admin')">HACER ADMIN</button>
+    <div class="actions-wrapper">
+      @if (menuOpen()) {
+        <div class="menu-invisible-overlay" (click)="menuOpen.set(false)"></div>
       }
-      <button class="action-btn view" (click)="emitAction('ver-perfil')">VER PERFIL</button>
-      <button class="action-btn friends" (click)="emitAction('ver-amigos')">VER AMIGOS</button>
-      <button class="delete-btn" (click)="emitAction('eliminar')">
-        <span class="btn-text-desktop">ELIMINAR</span>
-        <span class="btn-text-mobile">✕</span>
-      </button>
+      <button class="dots-btn" (click)="toggleMenu()">⋮</button>
+      <div class="item-actions" [class.show-menu]="menuOpen()">
+        @if (currentUserRole() === 'ceo' && item()?.role !== 'ceo') {
+          @if (item()?.role === 'admin') {
+            <button class="action-btn" style="background-color: #f59e0b; color: white;" (click)="emitAction('quitar-admin'); menuOpen.set(false)">
+              <span class="btn-text-desktop">QUITAR ADMIN</span>
+              <span class="btn-text-mobile">ADMIN</span>
+            </button>
+          } @else {
+            <button class="action-btn" style="background-color: #22c55e; color: white;" (click)="emitAction('hacer-admin'); menuOpen.set(false)">
+              <span class="btn-text-desktop">HACER ADMIN</span>
+              <span class="btn-text-mobile">ADMIN</span>
+            </button>
+          }
+        }
+        <button class="action-btn view" (click)="emitAction('ver-perfil'); menuOpen.set(false)">
+          <span class="btn-text-desktop">VER PERFIL</span>
+          <span class="btn-text-mobile">PERFIL</span>
+        </button>
+        <button class="action-btn friends" (click)="emitAction('ver-amigos'); menuOpen.set(false)">
+          <span class="btn-text-desktop">VER AMIGOS</span>
+          <span class="btn-text-mobile">AMIGOS</span>
+        </button>
+        @if (item()?.role !== 'ceo') {
+          <button class="delete-btn" (click)="emitAction('eliminar'); menuOpen.set(false)">
+            ELIMINAR
+          </button>
+        }
+      </div>
     </div>
   </div>
 }

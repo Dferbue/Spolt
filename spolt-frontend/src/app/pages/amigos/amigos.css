@@ -103,6 +103,20 @@
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon {
+    display: none;
+    width: 24px;
+    height: 24px;
+}
+
+.btn-icon svg {
+    width: 100%;
+    height: 100%;
 }
 
 .addFriend:hover {
@@ -139,8 +153,10 @@
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
-    width: 90%;
+    width: calc(100% - 32px);
     max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
     animation: modalIn 0.2s ease;
 }
 
@@ -194,24 +210,27 @@
 .tabs {
     display: flex;
     gap: 0;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     border: 3px solid #000;
     background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 4px 4px 0px #000;
 }
 .tab {
     flex: 1;
     text-align: center;
-    padding: 12px;
+    padding: 14px 10px;
     cursor: pointer;
     border-right: 3px solid #000;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 .tab:last-child {
     border-right: none;
 }
 .tab h2 {
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -221,7 +240,8 @@
     color: white;
 }
 .tab:hover:not(.active) {
-    background-color: #f0f0f0;
+    background-color: #f8f8f8;
+    color: var(--pink);
 }
 
 /* =========================================
@@ -234,34 +254,41 @@
     }
 
     .header-actions {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 1.5rem;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
         margin-bottom: 2rem;
     }
 
     .title-box {
-        align-self: flex-start;
-        padding: 8px 20px;
+        padding: 8px 15px;
+        flex: 1;
+        max-width: 200px;
     }
 
     .title-box h1 {
-        font-size: 1.5rem;
-    }
-
-    .tab {
-        padding: 8px 6px;
-    }
-
-    .tab h2 {
-        font-size: 0.8rem;
+        font-size: 1.25rem;
     }
 
     .addFriend {
+        width: 48px;
+        height: 48px;
+        padding: 8px;
+        border-radius: 12px;
+        flex-shrink: 0;
+    }
+
+    .btn-text {
+        display: none;
+    }
+
+    .btn-icon {
+        display: flex;
         width: 100%;
-        text-align: center;
-        padding: 8px 16px;
-        font-size: 0.8rem;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
     }
 
     .status-info {
@@ -270,6 +297,35 @@
 
     .main-content {
         padding-bottom: 90px;
+    }
+}
+
+@media (max-width: 400px) {
+    .tab h2 {
+        font-size: 0.75rem;
+    }
+    
+    .tab {
+        padding: 10px 5px;
+    }
+
+    .title-box h1 {
+        font-size: 1.15rem;
+    }
+}
+
+@media (max-width: 320px) {
+    .tab h2 {
+        font-size: 0.65rem;
+        letter-spacing: 0.5px;
+    }
+
+    .title-box h1 {
+        font-size: 1rem;
+    }
+
+    .page-content {
+        padding: 1rem;
     }
 }
 

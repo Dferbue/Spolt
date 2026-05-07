@@ -76,3 +76,28 @@
 @keyframes blinker {
     50% { opacity: 0.3; }
 }
+
+@media (max-width: 600px) {
+    .inicio-header {
+        padding: 0 15px;
+        height: 60px;
+    }
+
+    .header-user {
+        gap: 12px;
+    }
+
+    .user-name {
+        font-size: 13px;
+    }
+
+    .user-avatar {
+        width: 35px;
+        height: 35px;
+    }
+
+    .header-breadcrumb .path {
+        font-size: 11px;
+        letter-spacing: 1px;
+    }
+}

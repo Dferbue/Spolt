@@ -18,6 +18,24 @@
             <h3 class="event-title">{{ evento()?.titulo }}</h3>
             <div class="tags-row">
                 <span class="deporte-tag" [style.background]="sportColor" [style.color]="'#fff'">{{ (evento()?.deporte?.nombre || evento()?.nombre_deporte) | uppercase }}</span>
+                @if (isJoined() || isOwner()) {
+                    <span class="estado-tag" [ngClass]="'estado-' + evento()?.estado" [class.is-owner-tag]="isOwner()">
+                        <span class="estado-text">{{ evento()?.estado | uppercase }}</span>
+                        <span class="estado-circle"></span>
+                    </span>
+                }
+            </div>
+        </div>
+
+        <div class="header-right-info">
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                @if (evento()?.distancia != null) {
+                    <div class="distancia-header">
+                      {{ evento()!.distancia! < 1
+                        ? (evento()!.distancia! * 1000 | number:'1.0-0') + ' m'
+                        : (evento()!.distancia! | number:'1.0-1') + ' Km' }}
+                    </div>
+                }
                 <span class="tipo-tag" [ngClass]="{
                     'tag-partido': evento()?.tipo_evento === 'partido',
                     'tag-torneo': evento()?.tipo_evento === 'torneo',
@@ -35,10 +53,29 @@
                         }
                     }
                 </span>
-                @if (isJoined() || isOwner()) {
-                    <span class="estado-tag" [ngClass]="'estado-' + evento()?.estado">{{ evento()?.estado | uppercase }}</span>
-                }
             </div>
+
+            <!-- Menú de opciones 3 puntos (Solo para creador) -->
+            @if (isOwner()) {
+                <div class="options-menu-container">
+                    <button class="btn-dots" (click)="toggleMenu($event)">⋮</button>
+                    @if (menuOpen()) {
+                        <div class="options-dropdown">
+                            @if (evento()?.estado === 'abierto' || evento()?.estado === 'cerrado') {
+                                @if ((evento()?.numero_participantes_actuales || evento()?.participantes_actuales || 0) >= (evento()?.numero_max_participantes || 1) && eventoYaComenzo) {
+                                    <button class="dropdown-item color-finalizar" (click)="handleAction({ evento: evento()!, action: 'finalizar' })">Finalizar</button>
+                                } @else if (!eventoYaComenzo) {
+                                    <button class="dropdown-item disabled-item" title="El evento aún no ha comenzado" disabled>⏳ Finalizar</button>
+                                } @else {
+                                    <button class="dropdown-item disabled-item" title="El evento debe estar lleno para finalizarlo" disabled>🔒 Finalizar</button>
+                                }
+                            }
+                            <button class="dropdown-item" (click)="handleAction({ evento: evento()!, action: 'edit' })">Editar</button>
+                            <button class="dropdown-item color-danger" (click)="handleAction({ evento: evento()!, action: 'delete' })">Eliminar</button>
+                        </div>
+                    }
+                </div>
+            }
         </div>
     </div>
 
@@ -95,26 +132,16 @@
     </div>
 
     <div class="card-actions">
-        @if (isOwner()) {
-            @if (evento()?.estado === 'abierto' || evento()?.estado === 'cerrado') {
-                @if ((evento()?.numero_participantes_actuales || evento()?.participantes_actuales || 0) >= (evento()?.numero_max_participantes || 1) && eventoYaComenzo) {
-                    <button class="btn-join btn-finalizar" style="background-color: #FFE800; border: 2px solid #111; color: #111; font-weight: 900;" (click)="sendIDevent({ evento: evento()!, action: 'finalizar' })">FINALIZAR</button>
-                } @else if (!eventoYaComenzo) {
-                    <button class="btn-join btn-finalizar btn-disabled" title="El evento aún no ha comenzado" disabled style="background-color: #555; border: 2px solid #333; color: #999; font-weight: 900; cursor: not-allowed; opacity: 0.6;">⏳ FINALIZAR</button>
-                } @else {
-                    <button class="btn-join btn-finalizar btn-disabled" title="El evento debe estar lleno para finalizarlo" disabled style="background-color: #555; border: 2px solid #333; color: #999; font-weight: 900; cursor: not-allowed; opacity: 0.6;">🔒 FINALIZAR</button>
-                }
+        @if (!isOwner()) {
+            @if (isJoined()) {
+                <button class="btn-join btn-leave" style="background-color: var(--color-danger, #ff3366); border: 2px solid var(--color-danger, #ff3366);" (click)="handleAction({ evento: evento()!, action: 'leave' })">SALIR</button>
+            } @else {
+                <button class="btn-join" (click)="handleAction({ evento: evento()!, action: 'join' })">UNIRSE</button>
             }
-            <button class="btn-join btn-edit" (click)="sendIDevent({ evento: evento()!, action: 'edit' })">EDITAR</button>
-            <button class="btn-join btn-leave" style="background-color: var(--color-danger, #ff3366); border: 2px solid var(--color-danger, #ff3366);" (click)="sendIDevent({ evento: evento()!, action: 'delete' })">ELIMINAR</button>
         }
-        
-        @if (isJoined()) {
-            <button class="btn-join btn-leave" style="background-color: var(--color-danger, #ff3366); border: 2px solid var(--color-danger, #ff3366);" (click)="sendIDevent({ evento: evento()!, action: 'leave' })">SALIR</button>
-        } @else {
-            <button class="btn-join" (click)="sendIDevent({ evento: evento()!, action: 'join' })">UNIRSE</button>
-        }
-        
-        <button class="btn-details" (click)="sendIDevent({ evento: evento()!, action: 'details' })">DETALLES</button>
+        <button class="btn-details" (click)="handleAction({ evento: evento()!, action: 'details' })">
+            <span class="text-desktop">DETALLES DEL EVENTO</span>
+            <span class="text-mobile">DETALLES EVENTO</span>
+        </button>
     </div>
 </div>

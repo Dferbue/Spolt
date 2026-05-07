@@ -1,13 +1,15 @@
-import { Component, inject, OnInit, signal, computed, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, ChangeDetectorRef, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AdminService } from '../service/admin.service';
 import { List } from '../list/list';
 import { TargetAction } from '../target/target';
 import * as L from 'leaflet';
+import { GeolocationService } from '../../../shared/services/geolocation.service';
 
 import { CustomCalendar } from '../../../shared/components/custom-calendar/custom-calendar';
 import { FormsModule } from '@angular/forms';
+import { SportColorService } from '../../../shared/services/sport-color.service';
 
 @Component({
   selector: 'app-eventos-admin',
@@ -19,10 +21,17 @@ import { FormsModule } from '@angular/forms';
 export class Eventos implements OnInit {
   private adminService = inject(AdminService);
   private cdr = inject(ChangeDetectorRef);
+  private geoService = inject(GeolocationService);
+  private renderer = inject(Renderer2);
+  public sportColorService = inject(SportColorService);
   
   public eventosFiltrados = signal<any[]>([]);
   public listaDeportes = signal<any[]>([]);
   public loading = false;
+
+  // Coordenadas del usuario
+  private userLat = signal<number | null>(null);
+  private userLng = signal<number | null>(null);
 
   // Detalles Evento
   public mostrarModalDetalles = signal<boolean>(false);
@@ -38,7 +47,7 @@ export class Eventos implements OnInit {
   public paginaActual = signal<number>(1);
   public totalPaginas = signal<number>(1);
   public totalItems = signal<number>(0);
-  public itemsPorPagina = 30;
+  public itemsPorPagina = 20;
 
   // Filtros
   public mostrarVentanaDeFiltros = signal<boolean>(false);
@@ -71,7 +80,13 @@ export class Eventos implements OnInit {
   public anios = ['2024', '2025', '2026'];
 
   ngOnInit() {
-    this.loadEventos();
+    this.geoService.getUserLocation().then(loc => {
+      this.userLat.set(loc.lat);
+      this.userLng.set(loc.lng);
+      this.loadEventos();
+    }).catch(() => {
+      this.loadEventos();
+    });
     this.loadDeportes();
   }
 
@@ -87,7 +102,9 @@ export class Eventos implements OnInit {
       id_deporte: this.filtroDeporte(),
       fecha_desde: this.filtroFechaDesde(),
       fecha_hasta: this.filtroFechaHasta(),
-      sort: this.ordenarPor()
+      sort: this.ordenarPor(),
+      lat: this.userLat() ?? undefined,
+      lng: this.userLng() ?? undefined
     };
 
     this.adminService.getEventosList(params).subscribe({
@@ -124,6 +141,12 @@ export class Eventos implements OnInit {
     });
   }
 
+  getUserLevel(participante: any, id_deporte: number): number {
+    if (!participante?.usuario?.niveles_deportivos) return 1;
+    const nivelObj = participante.usuario.niveles_deportivos.find((nd: any) => nd.id_deporte === id_deporte);
+    return nivelObj ? nivelObj.nivel : 1;
+  }
+
   cambiarPagina(nuevaPagina: number) {
     if (nuevaPagina >= 1 && nuevaPagina <= this.totalPaginas()) {
       this.paginaActual.set(nuevaPagina);
@@ -143,8 +166,14 @@ export class Eventos implements OnInit {
     this.cerrarFiltros();
   }
 
-  abrirFiltros() { this.mostrarVentanaDeFiltros.set(true); }
-  cerrarFiltros() { this.mostrarVentanaDeFiltros.set(false); }
+  abrirFiltros() { 
+    this.mostrarVentanaDeFiltros.set(true); 
+    this.renderer.addClass(document.body, 'modal-open');
+  }
+  cerrarFiltros() { 
+    this.mostrarVentanaDeFiltros.set(false); 
+    this.renderer.removeClass(document.body, 'modal-open');
+  }
   
   limpiarFiltros() {
     this.filtroBusqueda.set('');
@@ -163,18 +192,30 @@ export class Eventos implements OnInit {
       case 'detalles':
         this.eventSelected.set(item);
         this.mostrarModalDetalles.set(true);
-        setTimeout(() => this.initMap(), 100);
+        this.renderer.addClass(document.body, 'modal-open');
+        setTimeout(() => this.initMap(), 500);
         break;
       case 'eliminar':
         this.eventoAEliminar.set(item);
         this.mostrarConfirmacionEliminar.set(true);
+        this.renderer.addClass(document.body, 'modal-open');
         break;
     }
+  }
+
+  copiarCoordenadas(event: any) {
+    const text = `${event.latitud}, ${event.longitud}`;
+    navigator.clipboard.writeText(text).then(() => {
+      // Usar un alert simple o si hay mensajeEnvio...
+      // Veo que admin no tiene mensajeEnvio signal como unirse-eventos
+      alert('✅ Coordenadas copiadas al portapapeles');
+    });
   }
 
   cerrarModalDetalles() {
     this.mostrarModalDetalles.set(false);
     this.eventSelected.set(null);
+    this.renderer.removeClass(document.body, 'modal-open');
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
       this.resizeObserver = undefined;
@@ -193,13 +234,13 @@ export class Eventos implements OnInit {
       this.map.remove();
     }
 
-    const mapContainer = document.getElementById('map-details');
+    const mapContainer = document.getElementById('map-admin-details');
     if (!mapContainer) return;
 
     const lat = event.latitud || 40.4168; 
     const lng = event.longitud || -3.7038;
 
-    this.map = L.map('map-details').setView([lat, lng], 17);
+    this.map = L.map('map-admin-details').setView([lat, lng], 17);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
@@ -226,7 +267,7 @@ export class Eventos implements OnInit {
 
     setTimeout(() => {
       this.map?.invalidateSize();
-    }, 100);
+    }, 500);
   }
 
   formatTime(time: string | null | undefined): string {
@@ -242,6 +283,7 @@ export class Eventos implements OnInit {
   cerrarConfirmacionEliminar() {
     this.mostrarConfirmacionEliminar.set(false);
     this.eventoAEliminar.set(null);
+    this.renderer.removeClass(document.body, 'modal-open');
   }
 
   confirmarEliminarEvento() {

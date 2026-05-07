@@ -12,6 +12,8 @@
       <option value="deporte">⚽ Deporte (A-Z)</option>
       <option value="titulo">🔤 Título (A-Z)</option>
       <option value="estado">✅ Estado</option>
+      <option value="creacion">🆕 Más nuevos (creación)</option>
+      <option value="cercanos">📍 Más cercanos</option>
     </select>
   </div>
 
@@ -31,11 +33,20 @@
     @case ("public") {
       <div class="status-info">
         <div class="dot"></div>
-        <span>Eventos Públicos Disponibles</span>
+        <span>Eventos Públicos Disponibles &mdash; {{ totalItems() }} eventos</span>
       </div>
       @if (listaEventos(); as events) {
         @if (events.length > 0) {
           <app-list-events [listEvents]="events" [joinedEventsId]="joinedIds()" (output_Id_Event)="selectFuntion($event)"></app-list-events>
+          @if (totalPaginas() > 1) {
+            <div class="pagination-bar">
+              <button class="pag-btn" [disabled]="paginaActual() <= 1" (click)="irPaginaPublicos(paginaActual() - 1)">&lsaquo;</button>
+              @for (p of getPagesArray(totalPaginas()); track p) {
+                <button class="pag-btn" [class.pag-active]="p === paginaActual()" (click)="irPaginaPublicos(p)">{{ p }}</button>
+              }
+              <button class="pag-btn" [disabled]="paginaActual() >= totalPaginas()" (click)="irPaginaPublicos(paginaActual() + 1)">&rsaquo;</button>
+            </div>
+          }
         } @else {
           <div class="no-data">
             <p>CONEXIÓN FALLIDA: CERO EVENTOS ENCONTRADOS</p>
@@ -56,6 +67,15 @@
       @if (listEventosAmigos(); as friendEvents) {
         @if (friendEvents.length > 0) {
           <app-list-events [listEvents]="friendEvents" [joinedEventsId]="joinedIds()" (output_Id_Event)="selectFuntion($event)"></app-list-events>
+          @if (totalPaginasAmigos() > 1) {
+            <div class="pagination-bar">
+              <button class="pag-btn" [disabled]="paginaAmigos() <= 1" (click)="irPaginaAmigos(paginaAmigos() - 1)">&lsaquo;</button>
+              @for (p of getPagesArray(totalPaginasAmigos()); track p) {
+                <button class="pag-btn" [class.pag-active]="p === paginaAmigos()" (click)="irPaginaAmigos(p)">{{ p }}</button>
+              }
+              <button class="pag-btn" [disabled]="paginaAmigos() >= totalPaginasAmigos()" (click)="irPaginaAmigos(paginaAmigos() + 1)">&rsaquo;</button>
+            </div>
+          }
         } @else {
           <div class="no-data">
             <p>CONEXIÓN FALLIDA: CERO EVENTOS ENCONTRADOS en tu red cercana</p>
@@ -75,6 +95,15 @@
       </div>
       @if (listaEventosUnidos().length > 0) {
         <app-list-events [listEvents]="listaEventosUnidos()" [joinedEventsId]="joinedIds()" (output_Id_Event)="selectFuntion($event)"></app-list-events>
+        @if (totalPaginasUnidos() > 1) {
+          <div class="pagination-bar">
+            <button class="pag-btn" [disabled]="paginaUnidos() <= 1" (click)="irPaginaUnidos(paginaUnidos() - 1)">&lsaquo;</button>
+            @for (p of getPagesArray(totalPaginasUnidos()); track p) {
+              <button class="pag-btn" [class.pag-active]="p === paginaUnidos()" (click)="irPaginaUnidos(p)">{{ p }}</button>
+            }
+            <button class="pag-btn" [disabled]="paginaUnidos() >= totalPaginasUnidos()" (click)="irPaginaUnidos(paginaUnidos() + 1)">&rsaquo;</button>
+          </div>
+        }
       } @else {
         <div class="no-data">
           <p>AÚN NO ESTÁS UNIDO A NINGÚN EVENTO</p>
@@ -155,6 +184,19 @@
           <div class="filtro-group">
             <label class="filtro-label">Fecha hasta</label>
             <app-custom-calendar [ngModel]="filtroFechaHasta()" (ngModelChange)="filtroFechaHasta.set($event)" theme="light" position="top" size="small"></app-custom-calendar>
+          </div>
+
+          <!-- Distancia máxima -->
+          <div class="filtro-group">
+            <label class="filtro-label">Radio de búsqueda</label>
+            <select class="filtro-select" [ngModel]="filtroDistanciaKm()" (ngModelChange)="filtroDistanciaKm.set(+$event); refreshData()">
+              <option [value]="5">5 km</option>
+              <option [value]="10">10 km</option>
+              <option [value]="25">25 km</option>
+              <option [value]="50">50 km (por defecto)</option>
+              <option [value]="100">100 km</option>
+              <option [value]="250">250 km</option>
+            </select>
           </div>
         </div>
 
@@ -243,6 +285,12 @@
           <div class="ma-map-wrapper">
             <div id="map-details" class="ma-map-view"></div>
           </div>
+          @if (event.latitud && event.longitud) {
+            <div class="ma-coords-row">
+              <span class="ma-coords-text">📍 {{ event.latitud | number:'1.5-5' }}, {{ event.longitud | number:'1.5-5' }}</span>
+              <button class="ma-btn-copy" (click)="copiarCoordenadas(event)">📋 Copiar</button>
+            </div>
+          }
           <button class="ma-btn-close" (click)="cerrarModalDetalles()">CERRAR VENTANA</button>
         </div>
         

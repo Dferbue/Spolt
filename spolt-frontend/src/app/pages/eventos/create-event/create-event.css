@@ -1,9 +1,7 @@
-@import 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-
 .page-content {
     flex: 1;
-    padding: 3rem;
-    max-width: 1400px;
+    padding: 0;
+    max-width: 100%;
     margin: 0 auto;
     width: 100%;
     box-sizing: border-box;
@@ -39,8 +37,45 @@
     display: flex;
     gap: 2rem;
     justify-content: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     margin-top: 4rem;
+    width: 100%;
+}
+
+/* Fluido entre 1440px y 769px */
+@media (max-width: 1440px) and (min-width: 769px) {
+    .main-options {
+        gap: 2vw;
+    }
+
+    .btn-option {
+        flex: 1;
+        min-width: 0;
+        max-width: 320px;
+        height: auto;
+        padding: 2vw 1.5vw;
+        padding-bottom: 2rem;
+    }
+
+    .btn-option .icon-wrapper {
+        width: 100%;
+        max-width: 210px;
+        aspect-ratio: 1;
+        height: auto;
+    }
+
+    .option-icon {
+        width: 65%;
+        max-width: 140px;
+    }
+
+    .btn-option h2 {
+        font-size: clamp(0.9rem, 1.5vw, 1.6rem);
+    }
+
+    .btn-option p {
+        font-size: clamp(0.7rem, 0.9vw, 0.95rem);
+    }
 }
 
 .btn-option {
@@ -114,6 +149,9 @@
     color: #555;
     margin: 0;
 }
+
+.ce-text-mobile { display: none; }
+.ce-text-desktop { display: inline; }
 
 /* ------------------------------------- */
 /* Modal Minimalista (Formulario + Img) */
@@ -341,8 +379,9 @@ textarea.textarea.min {
 @media (max-width: 768px) {
     .form-modal-container {
         flex-direction: column;
-        max-height: 95vh;
-        width: 95%;
+        max-height: 90vh;
+        height: 90vh;
+        width: calc(100% - 24px);
     }
     
     .form-side {
@@ -351,7 +390,83 @@ textarea.textarea.min {
     }
     
     .image-side {
-        display: none; /* Hide image on mobile for better usability */
+        display: none;
+    }
+
+    /* Menú crear: horizontal igual que el menú principal */
+    .main-options {
+        flex-direction: column;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .btn-option {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        min-height: auto;
+        padding: 1rem 1.5rem;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: left;
+        border-radius: 16px;
+    }
+
+    .btn-option .icon-wrapper {
+        width: 100px;
+        height: 100px;
+        min-width: 100px;
+        margin-bottom: 0;
+        margin-right: 2rem;
+        flex-shrink: 0;
+    }
+
+    .option-icon {
+        width: 65px;
+        height: 65px;
+    }
+
+    .btn-option h2 {
+        font-size: 1.4rem;
+        margin: 0 0 0.2rem 0;
+    }
+
+    .btn-option p {
+        font-size: 0.85rem;
+        display: none;
+    }
+
+    .ce-text-desktop { display: none; }
+    .ce-text-mobile { display: inline; }
+}
+
+@media (max-width: 320px) {
+    .main-options {
+        gap: 2rem;
+    }
+
+    .btn-option {
+        padding: 0.8rem 1rem;
+    }
+
+    .btn-option .icon-wrapper {
+        width: 75px;
+        height: 75px;
+        min-width: 75px;
+        margin-right: 1.2rem;
+    }
+
+    .option-icon {
+        width: 50px;
+        height: 50px;
+    }
+
+    .btn-option h2 {
+        font-size: 1.1rem;
+        white-space: nowrap;
     }
 }
 
@@ -363,7 +478,7 @@ textarea.textarea.min {
     padding: 2.5rem 2rem;
     box-shadow: 10px 10px 0px var(--pink, #ff006e);
     max-width: 450px;
-    width: 90%;
+    width: calc(100% - 32px);
     text-align: center;
     animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }

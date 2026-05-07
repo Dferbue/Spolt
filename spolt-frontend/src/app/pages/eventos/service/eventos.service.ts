@@ -13,9 +13,34 @@ export class EventosService {
 
   // Creamos todas la funciones del servicio
 
-  // Funcion para traernos los datos de los eventos (con paginación)
-  getAllEvents(page: number = 1, limit: number = 30) {
-    return this.http.get<any>(`${this.apiUrl}?page=${page}&limit=${limit}`);
+  // Funcion para traernos los datos de los eventos (con paginación y filtros)
+  getAllEvents(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    id_deporte?: number;
+    tipo_evento?: string;
+    fecha_desde?: string;
+    fecha_hasta?: string;
+    lat?: number;
+    lng?: number;
+    radio_km?: number;
+    sort?: string;
+  }) {
+    const { page = 1, limit = 30, search, id_deporte, tipo_evento, fecha_desde, fecha_hasta, lat, lng, radio_km, sort } = params;
+    let url = `${this.apiUrl}?page=${page}&limit=${limit}`;
+
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+    if (id_deporte) url += `&id_deporte=${id_deporte}`;
+    if (tipo_evento) url += `&tipo_evento=${tipo_evento}`;
+    if (fecha_desde) url += `&fecha_desde=${fecha_desde}`;
+    if (fecha_hasta) url += `&fecha_hasta=${fecha_hasta}`;
+    if (sort) url += `&sort=${sort}`;
+    
+    if (lat != null && lng != null && radio_km != null) {
+      url += `&lat=${lat}&lng=${lng}&radio_km=${radio_km}`;
+    }
+    return this.http.get<any>(url);
   }
 
   // Crear el evento

@@ -1,5 +1,6 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { GeolocationService } from '../../../shared/services/geolocation.service';
 
 interface DayForecast {
   date: string;
@@ -21,44 +22,32 @@ interface DayForecast {
   styleUrl: './tiempo.css',
 })
 export class Tiempo implements OnInit {
+  private readonly geoService = inject(GeolocationService);
+
   forecast = signal<DayForecast[]>([]);
   locationName = signal('Cargando...');
   loading = signal(true);
+  isLoadingLocation = signal(false);
   error = signal<string | null>(null);
 
   ngOnInit(): void {
     this.getUserLocation();
   }
 
-  private getUserLocation(): void {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          this.fetchWeatherFromBackend(lat, lon);
-          this.reverseGeocode(lat, lon);
-        },
-        () => {
-          // Si deniega ubicación, intentamos de todas formas (el backend usa Madrid por defecto)
-          this.locationName.set('Madrid');
-          this.fetchWeatherFromBackend(40.41, -3.70);
-        }
-      );
-    } else {
-      this.locationName.set('Madrid');
-      this.fetchWeatherFromBackend(40.41, -3.70);
-    }
+  private async getUserLocation(): Promise<void> {
+    this.isLoadingLocation.set(true);
+    const { lat, lng } = await this.geoService.getUserLocation();
+    this.isLoadingLocation.set(false);
+    this.fetchWeatherFromBackend(lat, lng);
+    this.locationName.set(await this.geoService.reverseGeocode(lat, lng));
   }
 
   // Obtenemos el tiempo a través de nuestro propio backend (conexión segura a AEMET)
   private async fetchWeatherFromBackend(lat: number, lon: number): Promise<void> {
     try {
-      // Hacemos proxy a nuestro backend NestJS. 
-      // Pasamos parámetros aunque el backend por ahora devuelva Madrid fijo de forma segura
       const url = `/api/v1/weather/forecast?lat=${lat}&lon=${lon}`;
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error('Error al conectar con tu backend para el clima');
       }
@@ -69,7 +58,6 @@ export class Tiempo implements OnInit {
         this.error.set('Previsión meteorológica no disponible en este momento');
         this.forecast.set([]);
       } else {
-        // En caso de éxito, backendData.forecast contiene los datos
         this.forecast.set(backendData.forecast || []);
         this.error.set(null);
       }
@@ -78,21 +66,6 @@ export class Tiempo implements OnInit {
       console.error('Error al obtener el clima:', err);
       this.error.set('No se pudo conectar con el servidor para obtener el clima');
       this.loading.set(false);
-    }
-  }
-
-  // Traductor de coordenadas a nombre de ciudad usando Nominatim (gratis)
-  // Nota: Esto nos dice la ciudad visualmente, pero AEMET en el backend 
-  // usará su código INE.
-  private async reverseGeocode(lat: number, lon: number): Promise<void> {
-    try {
-      const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=es`;
-      const response = await fetch(url);
-      const data = await response.json();
-      const city = data.address?.city || data.address?.town || data.address?.village || 'Tu ubicación';
-      this.locationName.set(city);
-    } catch {
-      this.locationName.set('Tu ubicación');
     }
   }
 

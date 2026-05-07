@@ -153,7 +153,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
   border-radius: 4px;
-  color: #000000;
+  color: #ffffff;
+}
+
+.ev-name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ev-chip.green   { background: #22c55e; }
@@ -348,4 +354,108 @@
 @media (max-width: 1150px) {
   .page { grid-template-columns: 1fr; }
   .side-col { order: 2; }
+}
+
+@media (max-width: 768px) {
+  .day-cell {
+    height: 70px;
+    padding: 6px;
+  }
+  
+  .day-num {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .event-indicators {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .ev-chip {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border-radius: 50%;
+    margin-left: -6px;
+    box-shadow: none;
+    flex-shrink: 0;
+    border: 1.5px solid #000;
+  }
+
+  .ev-chip:first-child {
+    margin-left: 0;
+  }
+
+  .ev-name {
+    display: none;
+  }
+
+  .more-tag {
+    font-size: 0;
+    width: 16px;
+    height: 16px;
+    background: #e0e0e0;
+    border-radius: 50%;
+    border: 1.5px solid #000;
+    margin-left: -6px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+  }
+
+  .more-tag::after {
+    content: '+';
+    font-size: 10px;
+    font-weight: 900;
+  }
+
+  .month-title-box {
+    padding: 15px 20px;
+  }
+  
+  .cal-month {
+    font-size: 20px;
+  }
+
+  .weekday {
+    font-size: 10px;
+    padding: 10px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .day-cell {
+    height: 60px;
+    padding: 4px;
+  }
+
+  .day-num {
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+  
+  .day-cell.today .day-num {
+    padding: 2px 5px;
+  }
+
+  .ev-chip {
+    width: 14px;
+    height: 14px;
+    border: 1px solid #000;
+  }
+
+  .more-tag {
+    width: 14px;
+    height: 14px;
+    border: 1px solid #000;
+  }
+  
+  .more-tag::after {
+    font-size: 9px;
+  }
 }

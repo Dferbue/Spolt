@@ -4,10 +4,11 @@ import { CreateEvent, EventInterface, TipoEvento } from '../models/createEvent';
 import { EventosService } from '../service/eventos.service';
 import { HttpClient } from '@angular/common/http';
 import { CustomCalendar } from '../../../shared/components/custom-calendar/custom-calendar';
+import { LocationPicker, LocationData } from '../../../shared/components/location-picker/location-picker';
 
 @Component({
   selector: 'app-create-event',
-  imports: [FormsModule, CustomCalendar],
+  imports: [FormsModule, CustomCalendar, LocationPicker],
   templateUrl: './create-event.html',
   styleUrl: './create-event.css',
 })
@@ -18,6 +19,7 @@ export class CreateEventForm {
 
   mensajeEnvio = signal('');
   mostrarFormulario = signal(false);
+  mostrarMapa = signal(false);
   mostrarModalUnirse = signal(false);
   idEventoCreado = signal<number | null>(null);
   tipoSeleccionado = signal<TipoEvento | null>(null);
@@ -31,10 +33,12 @@ export class CreateEventForm {
   hora_inicio = '';
   hora_fin = '';
   numero_max_participantes: number | null = null;
+  ubicacion = signal('');
+  latitud = signal<number | null>(null);
+  longitud = signal<number | null>(null);
 
   abrirFormulario(tipo: TipoEvento) {
     this.tipoSeleccionado.set(tipo);
-    // Cargar deportes si aún no los tenemos
     if (this.listaDeportes().length === 0) {
       this.eventosService.getSports().subscribe((data: any[]) => this.listaDeportes.set(data || []));
     }
@@ -42,11 +46,26 @@ export class CreateEventForm {
     this.mostrarFormulario.set(true);
   }
 
+  onLocationChange(location: LocationData) {
+    this.latitud.set(location.lat);
+    this.longitud.set(location.lng);
+    this.ubicacion.set(location.address);
+  }
+
   cerrarFormulario() {
     this.mostrarFormulario.set(false);
     this.mostrarModalUnirse.set(false);
+    this.mostrarMapa.set(false);
     this.idEventoCreado.set(null);
     this.tipoSeleccionado.set(null);
+  }
+
+  abrirMapa() {
+    this.mostrarMapa.set(true);
+  }
+
+  cerrarMapa() {
+    this.mostrarMapa.set(false);
   }
 
   limpiarFormulario() {
@@ -57,6 +76,9 @@ export class CreateEventForm {
     this.hora_inicio = '';
     this.hora_fin = '';
     this.numero_max_participantes = null;
+    this.ubicacion.set('');
+    this.latitud.set(null);
+    this.longitud.set(null);
   }
 
   submitFormulario() {
@@ -97,6 +119,9 @@ export class CreateEventForm {
       hora_inicio: this.hora_inicio,
       hora_fin: this.hora_fin || undefined,
       numero_max_participantes: this.numero_max_participantes,
+      ubicacion: this.ubicacion() || undefined,
+      latitud: this.latitud() ?? undefined,
+      longitud: this.longitud() ?? undefined,
     };
 
     this.createEvent(data);

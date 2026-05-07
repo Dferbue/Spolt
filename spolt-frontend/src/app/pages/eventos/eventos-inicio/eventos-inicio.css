@@ -1,0 +1,207 @@
+/* Heredado del eventos.css del shell — solo los estilos del menú */
+.menu-principal-grid {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 3rem;
+    margin-top: 2rem;
+}
+
+.btn-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 320px;
+    height: 460px;
+    padding: 2rem 1.5rem;
+    background: #ffffff;
+    border: 3px solid #000;
+    border-radius: 20px;
+    box-shadow: 10px 10px 0px #000;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    outline: none;
+}
+
+.btn-menu:hover {
+    transform: translate(-5px, -5px);
+    box-shadow: 15px 15px 0px var(--pink, #ff006e);
+}
+
+.btn-menu:active {
+    transform: translate(2px, 2px);
+    box-shadow: 4px 4px 0px #000;
+}
+
+.btn-image-container {
+    width: 210px;
+    height: 210px;
+    background: rgba(0, 0, 0, 0.03);
+    border: 3px dashed rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.btn-menu:hover .btn-image-container {
+    background: rgba(255, 0, 110, 0.05);
+    border-color: var(--pink, #ff006e);
+    border-style: solid;
+    transform: scale(1.05) rotate(3deg);
+}
+
+.btn-icon {
+    width: 140px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(6px 6px 0px rgba(0,0,0,0.1));
+}
+
+.btn-menu:hover .btn-icon {
+    transform: scale(1.1);
+}
+
+.btn-texts {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+}
+
+.text-mobile { display: none; }
+.text-desktop { display: inline; }
+
+.btn-texts h2 {
+    font-size: 1.6rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0 0 0.4rem 0;
+    color: #000;
+    letter-spacing: 0.5px;
+    transition: color 0.2s ease;
+}
+
+.btn-texts p {
+    font-size: 0.95rem;
+    color: #555;
+    margin: 0;
+    font-weight: 700;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1440px) and (min-width: 769px) {
+    .menu-principal-grid {
+        flex-wrap: nowrap;
+        gap: 2vw;
+        width: 100%;
+    }
+
+    .btn-menu {
+        flex: 1;
+        min-width: 0;
+        max-width: 320px;
+        height: auto;
+        padding: 2vw 1.5vw;
+        padding-bottom: 2rem;
+    }
+
+    .btn-image-container {
+        width: 100%;
+        max-width: 210px;
+        aspect-ratio: 1;
+        height: auto;
+    }
+
+    .btn-icon {
+        width: 65%;
+        max-width: 140px;
+        aspect-ratio: 1;
+        height: auto;
+    }
+
+    .btn-texts h2 { font-size: clamp(0.9rem, 1.5vw, 1.6rem); }
+    .btn-texts p  { font-size: clamp(0.7rem, 0.9vw, 0.95rem); }
+}
+
+@media (max-width: 768px) {
+    .menu-principal-grid {
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn-menu {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        padding: 1rem 1.5rem;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        border-radius: 16px;
+    }
+
+    .btn-image-container {
+        width: 100px;
+        height: 100px;
+        min-width: 100px;
+        margin-bottom: 0;
+        margin-right: 2rem;
+    }
+
+    .btn-icon { width: 65px; height: 65px; }
+
+    .btn-texts { align-items: flex-start; text-align: left; }
+    .btn-texts h2 { font-size: 1.8rem; margin: 0; }
+    .btn-texts p  { display: none; }
+}
+
+@media (max-width: 480px) {
+    .btn-menu { padding: 1rem 1.2rem; }
+
+    .btn-image-container {
+        width: 75px;
+        height: 75px;
+        min-width: 75px;
+        margin-right: 1.2rem;
+    }
+
+    .btn-icon { width: 50px; height: 50px; }
+    .btn-texts h2 { font-size: 1.15rem; }
+}
+
+@media (max-width: 375px) {
+    .text-desktop { display: none; }
+    .text-mobile  { display: inline; }
+}
+
+@media (max-width: 320px) {
+    .btn-menu { padding: 0.8rem 1rem; }
+
+    .btn-image-container {
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
+        margin-right: 0.8rem;
+    }
+
+    .btn-icon { width: 40px; height: 40px; }
+    .btn-texts h2 { font-size: 0.95rem; white-space: nowrap; }
+}

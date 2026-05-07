@@ -1,3 +1,7 @@
+:host {
+  display: block;
+}
+
 .pixel-header { 
   display: flex; 
   justify-content: space-between; 
@@ -123,28 +127,26 @@ nav a:hover { color: var(--pink); }
     height: 0;
     background: var(--black);
     flex-direction: column;
-    justify-content: flex-start;
-    padding-top: 50px;
-    gap: 30px;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    gap: 0;
     overflow: hidden;
-    transition: height 0.3s ease;
+    transition: height 0.3s ease, padding 0.3s ease;
     border-bottom: 0px solid var(--white);
   }
 
   nav.open {
-    height: calc(100vh - 90px);
+    height: auto;
+    padding: 30px 0;
     border-bottom: 1px solid rgba(255,255,255,0.1);
   }
 
+  /* Ocultar completamente los enlaces de sección en móvil */
   .nav-links {
-    flex-direction: column;
-    width: 100%;
-    align-items: center;
-    gap: 25px;
+    display: none;
   }
 
-  nav a { font-size: 14px; }
-  
   .mobile-actions {
     display: flex;
     flex-direction: column;

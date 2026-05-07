@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, BadRequestException, Logger, OnModuleInit } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -6,7 +6,7 @@ import { SportLevelService } from '../sport-level/sport-level.service';
 import { Cron } from '@nestjs/schedule';
 
 @Injectable()
-export class EventsService {
+export class EventsService implements OnModuleInit {
   private readonly logger = new Logger(EventsService.name);
 
   constructor(private prisma: PrismaService, private sportLevel: SportLevelService) { }
@@ -51,8 +51,12 @@ export class EventsService {
     fecha_desde?: string;
     fecha_hasta?: string;
     sort?: string;
+    tipo_evento?: string;
+    lat?: number;
+    lng?: number;
+    radio_km?: number;
   } = {}) {
-    const { page = 1, limit, search, estado, id_deporte, mes, anio, fecha_desde, fecha_hasta, sort } = params;
+    const { page = 1, limit, search, estado, id_deporte, mes, anio, fecha_desde, fecha_hasta, sort, tipo_evento, lat, lng, radio_km } = params;
 
     const where: any = {};
 
@@ -62,6 +66,10 @@ export class EventsService {
 
     if (id_deporte) {
       where.id_deporte = id_deporte;
+    }
+
+    if (tipo_evento) {
+      where.tipo_evento = tipo_evento;
     }
 
     if (search) {
@@ -125,6 +133,9 @@ export class EventsService {
         case 'estado':
           orderBy = { estado: 'asc' };
           break;
+        case 'creacion':
+          orderBy = { fecha_creacion: 'desc' };
+          break;
       }
     }
 
@@ -153,14 +164,16 @@ export class EventsService {
       const skip = (page - 1) * limit;
       queryOptions.skip = skip;
       queryOptions.take = limit;
-      
+
       const [total, data] = await Promise.all([
         this.prisma.eventoDeportivo.count({ where }),
         this.prisma.eventoDeportivo.findMany(queryOptions)
       ]);
-      
+
+      const filtrados = this.filtrarPorDistancia(data, lat, lng, radio_km);
+
       return {
-        data,
+        data: filtrados,
         meta: {
           total,
           page,
@@ -170,7 +183,38 @@ export class EventsService {
       };
     }
 
-    return this.prisma.eventoDeportivo.findMany(queryOptions);
+    const data = await this.prisma.eventoDeportivo.findMany(queryOptions);
+    return this.filtrarPorDistancia(data, lat, lng, radio_km);
+  }
+
+  // Filtra eventos por distancia usando Haversine.
+  // Si no se pasan coordenadas, devuelve la lista sin modificar.
+  private filtrarPorDistancia(eventos: any[], lat?: number, lng?: number, radio_km?: number): any[] {
+    // Calculamos la distancia para todos si tenemos coordenadas, incluso si no hay radio de filtrado
+    if (lat != null && lng != null) {
+      eventos.forEach(e => {
+        if (e.latitud != null && e.longitud != null) {
+          e.distancia = this.haversine(lat, lng, Number(e.latitud), Number(e.longitud));
+        }
+      });
+    }
+
+    // Si no hay radio, devolvemos todos con su distancia calculada
+    if (radio_km == null) return eventos;
+
+    // Si hay radio, filtramos
+    return eventos.filter(e => e.distancia != null && e.distancia <= radio_km);
+  }
+
+  private haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lng2 - lng1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
 
 
@@ -507,24 +551,43 @@ export class EventsService {
     return { message: 'Evento finalizado y XP repartida correctamente' };
   }
 
-  //Funcion que finaliza los eventos del dia
-  @Cron('59 23 * * *')
-  async finalizarEventosDelDia() {
-    const hoy = new Date();
-    hoy.setHours(23, 59, 59, 999);
+  // Al arrancar el backend, finaliza cualquier evento pasado que se haya perdido por downtime
+  async onModuleInit() {
+    await this.finalizarEventosPasados('STARTUP');
+  }
+
+  // Lógica compartida: finaliza todos los eventos cuya fecha ya haya pasado y sigan abiertos/cerrados
+  private async finalizarEventosPasados(origen: string) {
+    const ahora = new Date();
 
     const eventosPendientes = await this.prisma.eventoDeportivo.findMany({
       where: {
-        fecha_evento: { lte: hoy },
+        fecha_evento: { lte: ahora },
         estado: { in: ['abierto', 'cerrado'] }
       },
       include: { participantes: true }
     });
 
-    for (const evento of eventosPendientes) {
-      await this.finalizarEventoInterno(evento);
+    if (eventosPendientes.length === 0) {
+      this.logger.log(`[${origen}] No hay eventos pendientes de finalizar.`);
+      return;
     }
 
-    this.logger.log(`CRON: Finalizados ${eventosPendientes.length} eventos del día.`);
+    for (const evento of eventosPendientes) {
+      try {
+        await this.finalizarEventoInterno(evento);
+        this.logger.log(`[${origen}] Evento ${evento.id_evento} finalizado correctamente.`);
+      } catch (err) {
+        this.logger.error(`[${origen}] Error al finalizar evento ${evento.id_evento}: ${err.message}`);
+      }
+    }
+
+    this.logger.log(`[${origen}] Total finalizados: ${eventosPendientes.length} eventos.`);
+  }
+
+  // CRON nocturno — garantía diaria aunque ya se hayan procesado al arrancar
+  @Cron('59 23 * * *')
+  async finalizarEventosDelDia() {
+    await this.finalizarEventosPasados('CRON');
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SportColorService } from '../../../shared/services/sport-color.service';
 
@@ -19,9 +19,17 @@ export class Target {
   // Inputs
   public item = input<any>();
   public tipo = input<'evento' | 'usuario' | 'deporte'>('evento');
+  public currentUserRole = input<string>('user');
 
   // Output
   public onAction = output<TargetAction>();
+
+  // State for mobile 3-dots menu
+  public menuOpen = signal<boolean>(false);
+
+  toggleMenu() {
+    this.menuOpen.set(!this.menuOpen());
+  }
 
   private sportColorService = inject(SportColorService);
 

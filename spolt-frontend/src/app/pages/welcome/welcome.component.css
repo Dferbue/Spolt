@@ -1,3 +1,16 @@
+:host {
+  display: block;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+main {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
 .section-wrapper {
   padding: 40px 0;
   background-color: var(--bg);
@@ -9,7 +22,14 @@
 }
 
 .hero-wrapper {
-  padding: 0;
+  padding: 0 !important;
+  margin: 0 !important;
+  background-color: transparent !important;
+  border-bottom: none !important;
+  height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 @media (max-width: 768px) {

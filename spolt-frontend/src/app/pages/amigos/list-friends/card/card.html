@@ -21,20 +21,34 @@
     @switch (listamostrada()) {
     @case ("amigos") {
     <div class="card-actions">
-        <button class="btn-stats" (click)="changeStatusTargetaAmistad()">Ver amistad</button>
-        <button class="btn-delete" (click)="changeStatusWIindow()">ELIMINAR</button>
+        <button class="btn-stats" (click)="changeStatusTargetaAmistad()">
+            <span class="btn-text-desktop">Ver amistad</span>
+            <span class="btn-text-mobile">AMISTAD</span>
+        </button>
+        <button class="btn-delete" (click)="changeStatusWIindow()">
+            <span class="btn-text-desktop">ELIMINAR</span>
+            <span class="btn-text-mobile">✕</span>
+        </button>
     </div>
     }
     @case ("enviadas") {
     <div class="card-actions">
-        <button class="btn-delete" (click)="changeStatusWIindow()">ELIMINAR</button>
+        <button class="btn-delete" (click)="changeStatusWIindow()">
+            <span class="btn-text-desktop">ELIMINAR</span>
+            <span class="btn-text-mobile">✕</span>
+        </button>
     </div>
     }
     @case ("recibidas") {
     <div class="card-actions">
-        <button class="btn-stats"
-            (click)="sendFatherAmistadAction({ amistad: amigo(), action: 'aceptar' })">Aceptar</button>
-        <button class="btn-delete" (click)="changeStatusWIindow()">Rechazar</button>
+        <button class="btn-stats" (click)="sendFatherAmistadAction({ amistad: amigo(), action: 'aceptar' })">
+            <span class="btn-text-desktop">Aceptar</span>
+            <span class="btn-text-mobile">SI</span>
+        </button>
+        <button class="btn-delete" (click)="changeStatusWIindow()">
+            <span class="btn-text-desktop">Rechazar</span>
+            <span class="btn-text-mobile">✕</span>
+        </button>
     </div>
     }
     }

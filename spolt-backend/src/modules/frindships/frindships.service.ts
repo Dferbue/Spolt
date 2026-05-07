@@ -168,7 +168,7 @@ export class FrindshipsService {
     //Validaciones
     if (!admin) {
       throw new NotFoundException("no se ha encontrado este administrador")
-    } else if (admin.role !== "admin") {
+    } else if (admin.role !== "admin" && admin.role !== "ceo") {
       throw new UnauthorizedException('Credenciales inválidas');
     } else {
       return await this.prisma.amistad.findMany({

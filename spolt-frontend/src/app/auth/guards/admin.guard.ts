@@ -10,10 +10,10 @@ export const adminGuard: CanActivateFn = (route, state) => {
   return authService.getProfile().pipe(
     take(1),
     map(user => {
-      if (user && user.role === 'admin') {
+      if (user && (user.role === 'admin' || user.role === 'ceo')) {
         return true;
       }
-      // Si no es admin, redirigir al inicio o mostrar error
+      // Si no es admin ni ceo, redirigir al inicio o mostrar error
       return router.parseUrl('/inicio');
     })
   );

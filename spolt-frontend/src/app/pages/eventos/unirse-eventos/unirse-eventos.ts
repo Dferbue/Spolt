@@ -6,7 +6,7 @@ import { EventosService } from '../service/eventos.service';
 import { EventInterface, eventAction } from '../models/createEvent';
 import * as L from 'leaflet';
 import { SportColorService } from '../../../shared/services/sport-color.service';
-
+import { GeolocationService } from '../../../shared/services/geolocation.service';
 import { CustomCalendar } from '../../../shared/components/custom-calendar/custom-calendar';
 
 @Component({
@@ -20,9 +20,25 @@ import { CustomCalendar } from '../../../shared/components/custom-calendar/custo
 export class UnirseEventos {
   private readonly eventService = inject(EventosService);
   public readonly sportColorService = inject(SportColorService);
+  private readonly geoService = inject(GeolocationService);
 
   tabActiva = signal("public");
   mensajeEnvio = signal('');
+
+  // Coordenadas del usuario y radio de búsqueda
+  private userLat = signal<number | null>(null);
+  private userLng = signal<number | null>(null);
+  public filtroDistanciaKm = signal<number>(50); // Por defecto 50 km
+
+  // Paginación tab Públicos (server-side)
+  public paginaActual = signal<number>(1);
+  public totalPaginas = signal<number>(1);
+  public totalItems = signal<number>(0);
+  public readonly ITEMS_POR_PAGINA = 20;
+
+  // Paginación local tabs Amigos / Unidos
+  public paginaAmigos = signal<number>(1);
+  public paginaUnidos = signal<number>(1);
 
   private map: L.Map | undefined;
   private resizeObserver: ResizeObserver | undefined;
@@ -61,6 +77,7 @@ export class UnirseEventos {
     if (this.filtroPlazasLibres()) count++;
     if (this.filtroFechaDesde()) count++;
     if (this.filtroFechaHasta()) count++;
+    if (this.filtroDistanciaKm() !== 50) count++; // cuenta si se cambió el radio por defecto
     return count;
   });
 
@@ -74,6 +91,7 @@ export class UnirseEventos {
 
   cerrarFiltros() {
     this.mostrarVentanaDeFiltros.set(false);
+    this.refreshData();
   }
 
   limpiarFiltros() {
@@ -83,6 +101,8 @@ export class UnirseEventos {
     this.filtroPlazasLibres.set(false);
     this.filtroFechaDesde.set('');
     this.filtroFechaHasta.set('');
+    this.filtroDistanciaKm.set(50);
+    this.refreshData();
   }
 
 
@@ -122,6 +142,18 @@ export class UnirseEventos {
     const fechaHasta = this.filtroFechaHasta();
     if (fechaHasta) resultado = resultado.filter(e => new Date(e.fecha_evento) <= new Date(fechaHasta));
 
+    // Filtro de distancia local (para asegurar consistencia)
+    const lat = this.userLat();
+    const lng = this.userLng();
+    const radio = this.filtroDistanciaKm();
+    if (lat != null && lng != null && radio != null) {
+      resultado = resultado.filter(e => {
+        if (e.latitud == null || e.longitud == null) return false;
+        const dist = this.geoService.calcularDistancia(lat, lng, e.latitud, e.longitud);
+        return dist <= radio;
+      });
+    }
+
     return this.ordenarLista(resultado);
   }
 
@@ -150,6 +182,18 @@ export class UnirseEventos {
     const fechaHasta = this.filtroFechaHasta();
     if (fechaHasta) resultado = resultado.filter(e => new Date(e.fecha_evento) <= new Date(fechaHasta));
 
+    // Filtro de distancia local
+    const lat = this.userLat();
+    const lng = this.userLng();
+    const radio = this.filtroDistanciaKm();
+    if (lat != null && lng != null && radio != null) {
+      resultado = resultado.filter(e => {
+        if (e.latitud == null || e.longitud == null) return false;
+        const dist = this.geoService.calcularDistancia(lat, lng, e.latitud, e.longitud);
+        return dist <= radio;
+      });
+    }
+
     return this.ordenarLista(resultado);
   }
 
@@ -167,6 +211,22 @@ export class UnirseEventos {
       resultado.sort((a, b) => (a.deporte?.nombre || a.nombre_deporte || '').localeCompare(b.deporte?.nombre || b.nombre_deporte || ''));
     } else if (orden === 'estado') {
       resultado.sort((a, b) => (a.estado || '').localeCompare(b.estado || ''));
+    } else if (orden === 'creacion') {
+      resultado.sort((a, b) => {
+        const dateA = a.fecha_creacion ? new Date(a.fecha_creacion).getTime() : 0;
+        const dateB = b.fecha_creacion ? new Date(b.fecha_creacion).getTime() : 0;
+        return dateB - dateA;
+      });
+    } else if (orden === 'cercanos') {
+      const lat = this.userLat();
+      const lng = this.userLng();
+      if (lat != null && lng != null) {
+        resultado.sort((a, b) => {
+          const distA = (a.latitud && a.longitud) ? this.geoService.calcularDistancia(lat, lng, a.latitud, a.longitud) : 99999;
+          const distB = (b.latitud && b.longitud) ? this.geoService.calcularDistancia(lat, lng, b.latitud, b.longitud) : 99999;
+          return distA - distB;
+        });
+      }
     }
     return resultado;
   }
@@ -186,31 +246,100 @@ export class UnirseEventos {
   // Computed para saber a qué eventos estamos unidos
   public joinedIds = computed(() => this.lisEventosEnLosQueParticipamos().map(e => Number(e.id_evento || e.id)));
 
-  public listaEventos = computed(() => this.aplicarFiltrosALista(
-    this.rawListaEventos().filter(e => !this.joinedIds().includes(Number(e.id_evento || e.id)))
-  ));
-  public listEventosAmigos = computed(() => this.aplicarFiltrosALista(
+  // Tab Públicos: solo muestra lo que viene del servidor (ya paginado)
+  public listaEventos = computed(() => this.rawListaEventos());
+
+  // Tab Amigos: filtrado + paginación local
+  private _amigosBase = computed(() => this.aplicarFiltrosALista(
     this.rawListEventosAmigos().filter(e => !this.joinedIds().includes(Number(e.id_evento || e.id)))
   ));
-  public listaEventosUnidos = computed(() => this.aplicarFiltrosUnidos(
-    this.lisEventosEnLosQueParticipamos()
-  ));
+  public totalPaginasAmigos = computed(() => Math.max(1, Math.ceil(this._amigosBase().length / this.ITEMS_POR_PAGINA)));
+  public listEventosAmigos = computed(() => {
+    const start = (this.paginaAmigos() - 1) * this.ITEMS_POR_PAGINA;
+    return this._amigosBase().slice(start, start + this.ITEMS_POR_PAGINA);
+  });
+
+  // Tab Unidos: filtrado + paginación local
+  private _unidosBase = computed(() => this.aplicarFiltrosUnidos(this.lisEventosEnLosQueParticipamos()));
+  public totalPaginasUnidos = computed(() => Math.max(1, Math.ceil(this._unidosBase().length / this.ITEMS_POR_PAGINA)));
+  public listaEventosUnidos = computed(() => {
+    const start = (this.paginaUnidos() - 1) * this.ITEMS_POR_PAGINA;
+    return this._unidosBase().slice(start, start + this.ITEMS_POR_PAGINA);
+  });
+
+  // Cargar página específica de eventos públicos (server-side)
+  cargarPaginaPublicos(pagina: number) {
+    this.paginaActual.set(pagina);
+    this.eventService.getAllEvents({
+      page: pagina,
+      limit: this.ITEMS_POR_PAGINA,
+      search: this.filtroBusqueda(),
+      id_deporte: this.filtroDeporte() ?? undefined,
+      tipo_evento: this.filtroTipoEvento() || undefined,
+      fecha_desde: this.filtroFechaDesde() || undefined,
+      fecha_hasta: this.filtroFechaHasta() || undefined,
+      lat: this.userLat() ?? undefined,
+      lng: this.userLng() ?? undefined,
+      radio_km: this.filtroDistanciaKm(),
+      sort: this.ordenarPor()
+    }).subscribe((res: any) => {
+      const data = res?.data || res || [];
+      const meta = res?.meta;
+      this.rawListaEventos.set(this.enriquecerConDistancia(data));
+      if (meta) {
+        this.totalItems.set(meta.total || data.length);
+        this.totalPaginas.set(meta.totalPages || 1);
+      } else {
+        // si la respuesta no tiene meta (array plano), calcular
+        this.totalItems.set(data.length);
+        this.totalPaginas.set(1);
+      }
+    });
+  }
 
   // Función para volver a traer los datos del servidor sin recargar la página
   refreshData() {
-    this.eventService.getAllEvents().subscribe((res: any) => {
-      const data = res?.data || res || [];
-      this.rawListaEventos.set(data);
+    this.paginaActual.set(1);
+    this.cargarPaginaPublicos(1);
+    this.eventService.getEventosDeAmigos().subscribe((data: EventInterface[]) => {
+      this.rawListEventosAmigos.set(this.enriquecerConDistancia(data || []));
+      this.paginaAmigos.set(1);
     });
-    this.eventService.getEventosDeAmigos().subscribe((data: EventInterface[]) => this.rawListEventosAmigos.set(data || []));
-    this.eventService.geteventosEnlosQueParticipamos().subscribe((data: EventInterface[]) => this.lisEventosEnLosQueParticipamos.set(data || []));
+    this.eventService.geteventosEnlosQueParticipamos().subscribe((data: EventInterface[]) => {
+      this.lisEventosEnLosQueParticipamos.set(this.enriquecerConDistancia(data || []));
+      this.paginaUnidos.set(1);
+    });
+  }
+
+  // Helpers de paginación
+  irPaginaPublicos(p: number) { if (p >= 1 && p <= this.totalPaginas()) this.cargarPaginaPublicos(p); }
+  irPaginaAmigos(p: number) { if (p >= 1 && p <= this.totalPaginasAmigos()) this.paginaAmigos.set(p); }
+  irPaginaUnidos(p: number) { if (p >= 1 && p <= this.totalPaginasUnidos()) this.paginaUnidos.set(p); }
+
+  getPagesArray(total: number): number[] { return Array.from({ length: total }, (_, i) => i + 1); }
+
+  private enriquecerConDistancia(eventos: EventInterface[]): EventInterface[] {
+    const lat = this.userLat();
+    const lng = this.userLng();
+    if (lat == null || lng == null) return eventos;
+    return eventos.map(e => ({
+      ...e,
+      distancia: (e.latitud != null && e.longitud != null)
+        ? this.geoService.calcularDistancia(lat, lng, e.latitud, e.longitud)
+        : undefined
+    }));
   }
 
 
 
   //Inizializamos los datos
   constructor(){
-    this.refreshData();
+    // Obtenemos la ubicación del usuario y luego cargamos los eventos
+    this.geoService.getUserLocation().then(loc => {
+      this.userLat.set(loc.lat);
+      this.userLng.set(loc.lng);
+      this.refreshData();
+    });
   }
 
   //Funcion para unirnos a un evento
@@ -267,7 +396,7 @@ export class UnirseEventos {
     }else if (data.action === "details") {
       this.eventSelected.set(data.evento);
       this.mostrarModalDetalles.set(true);
-      setTimeout(() => this.initMap(), 50);
+      setTimeout(() => this.initMap(), 200);
     }
   }
 
@@ -349,6 +478,14 @@ export class UnirseEventos {
       this.leaveEvent(id);
     }
     this.cerrarModalSalir();
+  }
+
+  copiarCoordenadas(event: EventInterface) {
+    const text = `${event.latitud}, ${event.longitud}`;
+    navigator.clipboard.writeText(text).then(() => {
+      this.mensajeEnvio.set('✅ Coordenadas copiadas al portapapeles');
+      setTimeout(() => this.mensajeEnvio.set(''), 2500);
+    });
   }
 
   cerrarModalSalir() {

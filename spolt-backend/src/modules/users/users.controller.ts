@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, Query, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, Query, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -64,21 +64,39 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   async update(@Param('id') id: string, @Req() req: any, @Body() updateUserDto: UpdateUserDto) {
-    // Si se intenta cambiar el rol, verificar que quien lo hace sea admin
-    if (updateUserDto.role && req.user.role !== 'admin') {
-      delete updateUserDto.role; // No permitimos cambiar el rol si no es admin
+    if (updateUserDto.role) {
+      if (req.user.role !== 'ceo') {
+        delete updateUserDto.role;
+      }
+      if (req.user.id_usuario === +id && updateUserDto.role !== 'ceo') {
+        throw new ForbiddenException('El CEO no puede degradar su propio rol');
+      }
     }
 
-    // Un usuario normal solo puede editarse a sí mismo (a menos que sea admin)
-    if (req.user.role !== 'admin' && req.user.id_usuario !== +id) {
+    const isPrivileged = req.user.role === 'admin' || req.user.role === 'ceo';
+    if (!isPrivileged && req.user.id_usuario !== +id) {
       throw new UnauthorizedException('No tienes permiso para actualizar a este usuario');
     }
 
     return this.usersService.update(+id, updateUserDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string, @Req() req: any) {
+    const targetUser = await this.usersService.findOne(+id);
+    if (targetUser?.role === 'ceo') {
+      throw new ForbiddenException('No se puede eliminar al CEO');
+    }
+    const isPrivileged = req.user.role === 'admin' || req.user.role === 'ceo';
+    if (!isPrivileged && req.user.id_usuario !== +id) {
+      throw new UnauthorizedException('No tienes permiso para eliminar a este usuario');
+    }
     return this.usersService.remove(+id);
   }
+  /*
+  @Patch(":id")
+  updateDeveloper(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateDeveloper(+id, updateUserDto);
+  }*/
 }

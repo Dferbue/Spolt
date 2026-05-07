@@ -179,6 +179,9 @@
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
     letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-stats:hover {
@@ -199,6 +202,10 @@
     color: #ef4444;
     box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
     transform: translateY(-2px);
+}
+
+.btn-text-mobile {
+    display: none;
 }
 
 .btn-stats:active, .btn-delete:active {
@@ -416,18 +423,38 @@
 }
 
 /* =========================================
-   RESPONSIVE: TARJETAS EN MÓVIL
+   RESPONSIVE: TARJETAS
    ========================================= */
+@media (max-width: 768px) {
+    .friend-card {
+        padding: 1rem 1.2rem;
+        gap: 1.2rem;
+    }
+    
+    .avatar-frame {
+        width: 55px;
+        height: 55px;
+    }
+    
+    .username {
+        font-size: 1.15rem;
+    }
+}
+
 @media (max-width: 600px) {
     .friend-card {
         padding: 0.8rem 1rem;
-        gap: 1rem;
+        gap: 0.75rem;
         min-height: 70px;
     }
 
+    .card-header {
+        gap: 0.75rem;
+    }
+
     .avatar-frame {
-        width: 45px;
-        height: 45px;
+        width: 50px;
+        height: 50px;
         padding: 2px;
         border-width: 2px;
     }
@@ -449,8 +476,7 @@
     }
 
     .level-tag {
-        padding: 2px 6px;
-        font-size: 0.55rem;
+        display: none;
     }
 
     .card-actions {
@@ -460,7 +486,60 @@
     .btn-stats, .btn-delete {
         padding: 6px 12px;
         font-size: 0.65rem;
-        border-width: 1px;
+        border-width: 1.5px;
+    }
+
+    .btn-text-desktop {
+        display: none;
+    }
+
+    .btn-text-mobile {
+        display: block;
+    }
+
+    .btn-delete {
+        color: #ef4444;
+        border-color: #ef4444;
+        background: #fff0f0;
+        min-width: 35px;
+        font-size: 0.8rem;
+    }
+
+    /* Targeta Detalle Amistad */
+    .targetaAmistad {
+        width: 85%;
+        max-width: 320px;
+        padding: 2rem 1.5rem;
+    }
+
+    .targeta-avatar {
+        width: 110px;
+        height: 110px;
+        margin-bottom: 1.25rem;
+    }
+
+    .targeta-avatar .avatar-placeholder {
+        font-size: 3.5rem;
+    }
+
+    .targeta-name {
+        font-size: 1.4rem;
+    }
+
+    .targeta-date {
+        font-size: 0.7rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .targeta-descripcion {
+        padding: 10px;
+        font-size: 0.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .sports-grid {
+        grid-template-columns: 1fr;
+        gap: 6px;
     }
 
     .ventana-emergente {
@@ -478,8 +557,8 @@
     }
 
     .avatar-frame {
-        width: 35px;
-        height: 35px;
+        width: 45px;
+        height: 45px;
     }
 
     .username {

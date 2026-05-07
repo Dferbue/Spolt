@@ -156,3 +156,28 @@ h2 {
     justify-content: center;
   }
 }
+
+@media (max-width: 480px) {
+  .about-container {
+    width: 100%;
+    padding: 40px 15px;
+  }
+  
+  .content-split {
+    padding: 20px;
+    gap: 30px;
+  }
+  
+  h2 {
+    font-size: 24px;
+  }
+  
+  .header-box {
+    padding: 10px 20px;
+    font-size: 20px;
+  }
+  
+  .bio-content p {
+    font-size: 14px;
+  }
+}

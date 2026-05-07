@@ -1,0 +1,30 @@
+<div class="location-picker">
+  @if (loading) {
+    <div class="location-picker__loading">Obteniendo ubicación...</div>
+  }
+
+  <div class="location-picker__search" [hidden]="loading">
+    <div class="search-input-wrapper">
+      <input type="text" [ngModel]="searchQuery" (ngModelChange)="onSearchInput($event)" (keyup.enter)="searchLocation()" placeholder="Ej: Puerta del Sol, Madrid..." class="location-search-input">
+      
+      @if (showSuggestions) {
+        <ul class="suggestions-dropdown">
+          @for (s of suggestions; track s.place_id) {
+            <li (click)="selectSuggestion(s)">
+              <span class="suggestion-icon">📍</span>
+              <span class="suggestion-text">{{ s.display_name }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+    <button type="button" (click)="searchLocation()" class="location-search-btn" [disabled]="isSearching">
+      {{ isSearching ? '...' : 'Buscar' }}
+    </button>
+  </div>
+  <div #mapContainer class="location-picker__map" [hidden]="loading"></div>
+  <div class="location-picker__address" [hidden]="loading">
+    <span class="location-picker__pin">📍</span>
+    <span>{{ address }}</span>
+  </div>
+</div>

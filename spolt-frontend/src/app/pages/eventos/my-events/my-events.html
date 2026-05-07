@@ -12,6 +12,8 @@
       <option value="deporte">⚽ Deporte (A-Z)</option>
       <option value="titulo">🔤 Título (A-Z)</option>
       <option value="estado">✅ Estado</option>
+      <option value="creacion">🆕 Más nuevos (creación)</option>
+      <option value="cercanos">📍 Más cercanos</option>
     </select>
   </div>
 
@@ -48,6 +50,15 @@
             [isOwner]="true"
             (output_Id_Event)="handleEventAction($event)">
           </app-list-events>
+          @if (totalPaginasCreados() > 1) {
+            <div class="pagination-bar">
+              <button class="pag-btn" [disabled]="paginaCreados() <= 1" (click)="irPaginaCreados(paginaCreados() - 1)">&lsaquo;</button>
+              @for (p of getPagesArray(totalPaginasCreados()); track p) {
+                <button class="pag-btn" [class.pag-active]="p === paginaCreados()" (click)="irPaginaCreados(p)">{{ p }}</button>
+              }
+              <button class="pag-btn" [disabled]="paginaCreados() >= totalPaginasCreados()" (click)="irPaginaCreados(paginaCreados() + 1)">&rsaquo;</button>
+            </div>
+          }
         } @else {
           <div class="no-data">
             <div class="no-data-icon">∅</div>
@@ -64,6 +75,15 @@
             [joinedEventsId]="joinedIds()"
             (output_Id_Event)="handleEventAction($event)">
           </app-list-events>
+          @if (totalPaginasUnidos() > 1) {
+            <div class="pagination-bar">
+              <button class="pag-btn" [disabled]="paginaUnidos() <= 1" (click)="irPaginaUnidos(paginaUnidos() - 1)">&lsaquo;</button>
+              @for (p of getPagesArray(totalPaginasUnidos()); track p) {
+                <button class="pag-btn" [class.pag-active]="p === paginaUnidos()" (click)="irPaginaUnidos(p)">{{ p }}</button>
+              }
+              <button class="pag-btn" [disabled]="paginaUnidos() >= totalPaginasUnidos()" (click)="irPaginaUnidos(paginaUnidos() + 1)">&rsaquo;</button>
+            </div>
+          }
         } @else {
           <div class="no-data">
             <div class="no-data-icon">∅</div>
@@ -155,8 +175,14 @@
         <!-- Panel Derecho: Mapa -->
         <div class="ma-right-panel">
           <div class="ma-map-wrapper">
-            <div id="map-details" class="ma-map-view"></div>
+            <div id="map-details-my" class="ma-map-view"></div>
           </div>
+          @if (event.latitud && event.longitud) {
+            <div class="ma-coords-row">
+              <span class="ma-coords-text">📍 {{ event.latitud | number:'1.5-5' }}, {{ event.longitud | number:'1.5-5' }}</span>
+              <button class="ma-btn-copy" (click)="copiarCoordenadas(event)">📋 Copiar</button>
+            </div>
+          }
           <button class="ma-btn-close" (click)="cerrarModalDetalles()">CERRAR VENTANA</button>
         </div>
         
@@ -216,6 +242,13 @@
               <label class="filtro-label">Descripción</label>
               <textarea class="filtro-input textarea min" [(ngModel)]="edit_descripcion" placeholder="Detalles extra..."></textarea>
             </div>
+
+            <div class="filtro-group">
+              <label class="filtro-label">Ubicación</label>
+              <button type="button" class="btn-cancel-edit" style="width: 100%; text-transform: none; text-align: left; padding: 10px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: space-between;" (click)="abrirMapaEdicion()">
+                <span style="overflow: hidden; text-overflow: ellipsis;">{{ edit_ubicacion() ? edit_ubicacion() : '📍 Seleccionar en el mapa' }}</span>
+              </button>
+            </div>
           </div>
 
           <div class="filtros-footer">
@@ -229,6 +262,24 @@
           <img src="eventos/img/editEvent.jpeg" alt="Editar Evento" class="modal-img">
         </div>
 
+      </div>
+    </div>
+  }
+
+  <!-- MODAL MAPA EDICIÓN -->
+  @if (mostrarMapaEdicion()) {
+    <div class="modal-overlay" style="z-index: 4005;" (click)="cerrarMapaEdicion()">
+      <div class="minimalist-modal-container" style="width: 90%; max-width: 800px; height: 80vh; max-height: 800px; flex-direction: column;" (click)="$event.stopPropagation()">
+        <div class="filtros-header" style="border-bottom: 2px solid #eee;">
+          <h3>📍 Selecciona la ubicación</h3>
+          <button class="filtros-close" (click)="cerrarMapaEdicion()">✕</button>
+        </div>
+        <div style="flex: 1; display: flex; flex-direction: column; width: 100%; min-height: 0;">
+          <app-location-picker (locationChange)="onEditLocationChange($event)" style="display: block; width: 100%; height: 100%; flex: 1;"></app-location-picker>
+        </div>
+        <div class="filtros-footer" style="margin-top: 0; border-top: 2px solid #eee;">
+          <button class="btn-confirm-edit" (click)="cerrarMapaEdicion()" style="width: 100%;">Confirmar ubicación</button>
+        </div>
       </div>
     </div>
   }
@@ -314,6 +365,19 @@
           <div class="filtro-group">
             <label class="filtro-label">Fecha hasta</label>
             <app-custom-calendar [ngModel]="filtroFechaHasta()" (ngModelChange)="filtroFechaHasta.set($event)" theme="light" position="top" size="small"></app-custom-calendar>
+          </div>
+
+          <!-- Distancia máxima -->
+          <div class="filtro-group">
+            <label class="filtro-label">Radio de búsqueda</label>
+            <select class="filtro-select-p" [value]="filtroDistanciaKm()" (change)="filtroDistanciaKm.set(+$any($event.target).value)">
+              <option [value]="5">5 km</option>
+              <option [value]="10">10 km</option>
+              <option [value]="25">25 km</option>
+              <option [value]="50">50 km</option>
+              <option [value]="100">100 km</option>
+              <option [value]="250">Sin límite (250 km)</option>
+            </select>
           </div>
         </div>
 

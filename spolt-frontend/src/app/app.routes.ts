@@ -18,7 +18,30 @@ export const routes: Routes = [
     path: 'eventos',
     loadComponent: () => import('./pages/eventos/eventos')
       .then(m => m.Eventos),
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'inicio' },
+      {
+        path: 'inicio',
+        loadComponent: () => import('./pages/eventos/eventos-inicio/eventos-inicio')
+          .then(m => m.EventosInicio)
+      },
+      {
+        path: 'unirse',
+        loadComponent: () => import('./pages/eventos/unirse-eventos/unirse-eventos')
+          .then(m => m.UnirseEventos)
+      },
+      {
+        path: 'crear',
+        loadComponent: () => import('./pages/eventos/create-event/create-event')
+          .then(m => m.CreateEventForm)
+      },
+      {
+        path: 'mis-eventos',
+        loadComponent: () => import('./pages/eventos/my-events/my-events')
+          .then(m => m.MyEvents)
+      }
+    ]
   },
   {
     path: 'amigos',

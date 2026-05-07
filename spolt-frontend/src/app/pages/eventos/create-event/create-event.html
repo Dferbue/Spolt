@@ -5,7 +5,10 @@
       <div class="icon-wrapper">
         <img src="eventos/iconos/Partidos.png" alt="Partido" class="option-icon">
       </div>
-      <h2>Crear Partido</h2>
+      <h2>
+        <span class="ce-text-desktop">Crear Partido</span>
+        <span class="ce-text-mobile">Partido</span>
+      </h2>
       <p>Organiza un partido amistoso o competitivo con otras personas</p>
     </button>
 
@@ -13,7 +16,10 @@
       <div class="icon-wrapper">
         <img src="eventos/iconos/Torneo.png" alt="Torneo" class="option-icon">
       </div>
-      <h2>Crear Torneo</h2>
+      <h2>
+        <span class="ce-text-desktop">Crear Torneo</span>
+        <span class="ce-text-mobile">Torneo</span>
+      </h2>
       <p>Crea un torneo organizado con múltiples participantes</p>
     </button>
 
@@ -21,7 +27,10 @@
       <div class="icon-wrapper">
         <img src="eventos/iconos/playday.png" alt="Playday" class="option-icon">
       </div>
-      <h2>Crear Playday</h2>
+      <h2>
+        <span class="ce-text-desktop">Crear Playday</span>
+        <span class="ce-text-mobile">Playday</span>
+      </h2>
       <p>Organiza un día de juegos casuales y variados</p>
     </button>
   </div>
@@ -80,10 +89,17 @@
               </div>
             </div>
 
-            <div class="filtro-group">
-              <label class="filtro-label">Descripción</label>
-              <textarea class="filtro-input textarea min" [(ngModel)]="descripcion" placeholder="Detalles extra..."></textarea>
-            </div>
+        <div class="filtro-group">
+          <label class="filtro-label">Descripción</label>
+          <textarea class="filtro-input textarea min" [(ngModel)]="descripcion" placeholder="Detalles extra..."></textarea>
+        </div>
+
+        <div class="filtro-group">
+          <label class="filtro-label">Ubicación</label>
+          <button type="button" class="btn-cancel" style="width: 100%; text-transform: none; text-align: left; padding: 10px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: space-between;" (click)="abrirMapa()">
+            <span style="overflow: hidden; text-overflow: ellipsis;">{{ ubicacion() ? ubicacion() : '📍 Seleccionar en el mapa' }}</span>
+          </button>
+        </div>
           </div>
 
           <div class="filtros-footer">
@@ -103,6 +119,24 @@
           }
         </div>
 
+      </div>
+    </div>
+  }
+
+  <!-- Modal Mapa -->
+  @if (mostrarMapa()) {
+    <div class="modal-overlay" style="z-index: 2005;" (click)="cerrarMapa()">
+      <div class="form-modal-container" style="width: 90%; max-width: 800px; height: 80vh; max-height: 800px; flex-direction: column;" (click)="$event.stopPropagation()">
+        <div class="filtros-header" style="border-bottom: 2px solid #eee;">
+          <h3>📍 Selecciona la ubicación</h3>
+          <button class="filtros-close" (click)="cerrarMapa()">✕</button>
+        </div>
+        <div style="flex: 1; display: flex; flex-direction: column; width: 100%; min-height: 0;">
+          <app-location-picker (locationChange)="onLocationChange($event)" style="display: block; width: 100%; height: 100%; flex: 1;"></app-location-picker>
+        </div>
+        <div class="filtros-footer" style="margin-top: 0; border-top: 2px solid #eee;">
+          <button class="btn-confirm" (click)="cerrarMapa()" style="width: 100%;">Confirmar ubicación</button>
+        </div>
       </div>
     </div>
   }

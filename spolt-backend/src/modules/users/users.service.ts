@@ -227,4 +227,22 @@ export class UsersService {
     })
   }
 
+
+  async updateDeveloper(id: number, data: UpdateUserDto | any) {
+    const dataToUpdate: any = { ...data };
+
+    if (dataToUpdate.password) {
+      dataToUpdate.contrasena_hash = await bcrypt.hash(dataToUpdate.password, 10);
+      delete dataToUpdate.password;
+    }
+
+    if (dataToUpdate.fecha_nacimiento) {
+      dataToUpdate.fecha_nacimiento = new Date(dataToUpdate.fecha_nacimiento);
+    }
+
+    return this.prisma.usuario.update({
+      where: { id_usuario: id },
+      data: dataToUpdate,
+    });
+  }
 }

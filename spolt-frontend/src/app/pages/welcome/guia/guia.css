@@ -36,20 +36,19 @@
 
 .steps-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 30px;
     perspective: 1000px;
     width: 100%;
-    max-width: 1200px;
+    max-width: 800px;
     margin: 0 auto;
-    justify-content: center;
 }
 
 .step-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 220px;
+    width: 100%;
     opacity: 0;
     transform: translateY(30px);
     animation: slideUp 0.6s ease forwards;
@@ -261,29 +260,17 @@ p {
     }
 }
 
-@media (max-width: 1100px) {
-    .steps-grid {
-        grid-template-columns: repeat(2, 1fr);
-        width: fit-content;
-        gap: 40px;
-    }
 
-    .step-card {
-        width: 260px;
-    }
-}
 
 @media (max-width: 600px) {
     .steps-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
         width: 100%;
-        gap: 30px;
+        gap: 12px;
     }
 
     .step-card {
         width: 100%;
-        max-width: 320px;
-        margin: 0 auto;
     }
 
     .header-box {
@@ -293,5 +280,41 @@ p {
 
     .setup-layout {
         padding: 40px 15px;
+    }
+
+    .card-body {
+        box-sizing: border-box;
+        padding: 25px 10px 20px;
+        min-height: 220px;
+    }
+
+    .icon-container {
+        width: 55px;
+        height: 55px;
+        margin-bottom: 15px;
+    }
+
+    h3 {
+        font-size: 11px;
+    }
+
+    p {
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 400px) {
+    .steps-grid {
+        gap: 8px;
+    }
+
+    .card-body {
+        padding: 20px 8px 15px;
+        min-height: 190px;
+    }
+
+    .icon-container {
+        width: 45px;
+        height: 45px;
     }
 }

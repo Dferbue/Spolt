@@ -67,3 +67,36 @@
   max-height: 60px;
   object-fit: contain;
 }
+
+@media (max-width: 600px) {
+  .ventana-editar {
+    padding: 1.5rem 1rem;
+    width: 95%;
+    border-radius: 16px;
+  }
+
+  .ventana-editar h3 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .edit-field {
+    margin-bottom: 1rem;
+    gap: 5px;
+  }
+
+  .edit-field label {
+    font-size: 0.8rem;
+  }
+
+  .edit-input {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .btn-confirm-delete, .btn-cancel-delete {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+}
+

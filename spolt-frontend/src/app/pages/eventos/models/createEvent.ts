@@ -50,6 +50,7 @@ export interface EventInterface{
   nombre_creador?: string;
   nombre_deporte?: string;
   distancia?: number;
+  fecha_creacion?: string;
   participantes?: {
     usuario: {
       id_usuario: number;

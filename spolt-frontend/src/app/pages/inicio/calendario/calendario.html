@@ -29,7 +29,9 @@
             <div class="day-num">{{ day }}</div>
             <div class="event-indicators">
               @for (ev of getEventsForDay(day).slice(0, 2); track ev.id) {
-                <div class="ev-chip" [style.background]="ev.color" style="color: white; border: 1px solid #111;">{{ ev.name }}</div>
+                <div class="ev-chip" [style.background]="ev.color">
+                  <span class="ev-name">{{ ev.name }}</span>
+                </div>
               }
               @if (getEventsForDay(day).length > 2) {
                 <div class="more-tag">+{{ getEventsForDay(day).length - 2 }} MÁS</div>
@@ -42,7 +44,7 @@
   </div>
 
   <!-- Columna lateral -->
-  <div class="side-col">
+  <div class="side-col" id="panel-lateral">
     <!-- Panel del día seleccionado -->
     <div class="panel-card">
       @if (selectedDate()) {

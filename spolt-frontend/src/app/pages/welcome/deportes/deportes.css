@@ -264,13 +264,15 @@ hr {
     .list-side {
         order: 2;
         width: 100%;
+        box-sizing: border-box;
     }
 
     .detail-side {
         order: 1;
         width: 100%;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
         padding: 20px;
+        box-sizing: border-box;
     }
 
     .sport-image-container {
@@ -279,5 +281,26 @@ hr {
 
     .title-info h2 {
         font-size: 24px;
+    }
+
+    .header-box {
+        width: 100%;
+        box-sizing: border-box;
+        font-size: 20px;
+        padding: 10px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 40px 15px;
+    }
+
+    .sport-item {
+        padding: 12px 15px;
+    }
+
+    .sport-item .cursor {
+        right: 15px;
     }
 }

@@ -91,6 +91,16 @@ export class Calendario implements OnInit {
 
   selectDay(day: number) {
     this.selectedDate.set(this.dateKey(day));
+    
+    // Auto-scroll en móviles para ver la info del día seleccionado
+    setTimeout(() => {
+      if (window.innerWidth <= 1150) {
+        const panel = document.getElementById('panel-lateral');
+        if (panel) {
+          panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }, 100);
   }
 
   changeMonth(dir: number) {

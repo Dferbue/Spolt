@@ -2,8 +2,9 @@
       <div class="header-box pixel-frame title">
         HABILIDADES
       </div>
-      
-      <div class="main-content">
+
+      <!-- DESKTOP layout: lista + panel detalle -->
+      <div class="main-content desktop-only">
         <div class="list-side pixel-frame">
           <p class="section-title">SELECCIONA UNA HABILIDAD</p>
           <hr>
@@ -20,14 +21,12 @@
         <div class="detail-side pixel-frame">
           <h3>{{ selected.name }} <span>LV.{{ selected.lv }}</span></h3>
           <p class="desc">{{ selected.desc }}</p>
-          
           <div class="stats">
             <div class="stat-row">
               <span>PODER</span>
               <span class="val">{{selected.pwr}}/100</span>
             </div>
             <div class="bar"><div class="fill green" [style.width.%]="selected.pwr"></div></div>
-            
             <div class="stat-row">
               <span>VELOCIDAD</span>
               <span class="val">{{selected.vel}}/100</span>
@@ -35,5 +34,30 @@
             <div class="bar"><div class="fill pink" [style.width.%]="selected.vel"></div></div>
           </div>
         </div>
+      </div>
+
+      <!-- MOBILE layout: carrusel de tarjetas completas -->
+      <div class="mobile-carousel">
+        @for (s of skills; track s.name) {
+          <div class="carousel-card pixel-frame">
+            <div class="carousel-card-header">
+              <span class="carousel-name">{{ s.name }}</span>
+              <span class="carousel-lv">LV.{{ s.lv }}</span>
+            </div>
+            <p class="desc">{{ s.desc }}</p>
+            <div class="stats">
+              <div class="stat-row">
+                <span>PODER</span>
+                <span class="val">{{ s.pwr }}/100</span>
+              </div>
+              <div class="bar"><div class="fill green" [style.width.%]="s.pwr"></div></div>
+              <div class="stat-row">
+                <span>VELOCIDAD</span>
+                <span class="val">{{ s.vel }}/100</span>
+              </div>
+              <div class="bar"><div class="fill pink" [style.width.%]="s.vel"></div></div>
+            </div>
+          </div>
+        }
       </div>
     </div>

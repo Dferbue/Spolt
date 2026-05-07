@@ -1,6 +1,8 @@
-html {
+html, body {
   /* scroll-behavior: smooth; -- Removed to allow custom script control */
   scroll-padding-top: 80px;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 main {

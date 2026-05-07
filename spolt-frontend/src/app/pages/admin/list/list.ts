@@ -13,6 +13,7 @@ export class List {
   // Inputs
   public items = input<any[]>([]);
   public tipo = input<'evento' | 'usuario' | 'deporte'>('evento');
+  public currentUserRole = input<string>('user');
   public loading = input<boolean>(false);
   public trackField = input<string>('id');
   public textoVacio = input<string>('No se han encontrado resultados');

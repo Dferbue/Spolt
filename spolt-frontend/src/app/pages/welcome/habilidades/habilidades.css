@@ -4,6 +4,11 @@
     margin: 0 auto;
 }
 
+/* El carrusel mobile se oculta en desktop */
+.carousel-container {
+    display: none;
+}
+
 .header-box {
     text-align: center;
     display: inline-block;
@@ -205,17 +210,118 @@ hr {
     .list-side {
         width: 100%;
         order: 2;
+        box-sizing: border-box;
     }
 
     .detail-side {
         width: 100%;
         order: 1;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
         padding: 20px;
+        box-sizing: border-box;
     }
 
     .header-box {
         width: 100%;
         box-sizing: border-box;
+        font-size: 20px;
+        padding: 10px 20px;
+    }
+}
+
+/* ── MOBILE: CARRUSEL DE TARJETAS COMPLETAS ── */
+@media (max-width: 600px) {
+    .container {
+        padding: 30px 0 40px;
+        /* overflow: clip recorta TAMBIÉN las sombras, a diferencia de hidden */
+        overflow-x: clip;
+        max-width: 100vw;
+    }
+
+    .header-box {
+        margin: 0 15px 20px;
+        font-size: 18px;
+        padding: 10px 20px;
+        width: calc(100% - 30px);
+        box-sizing: border-box;
+        /* Sombra hacia abajo-izquierda para que no salga del viewport */
+        box-shadow: -4px 4px 0px var(--pink);
+    }
+
+    /* Ocultar el layout de desktop */
+    .desktop-only {
+        display: none !important;
+    }
+
+    /* Mostrar el carrusel mobile */
+    .mobile-carousel {
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        gap: 20px;
+        padding: 8px 20px 20px;
+        width: 100%;
+        box-sizing: border-box;
+        scrollbar-width: none;
+    }
+
+    .mobile-carousel::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Cada tarjeta = un poco menos del ancho total para que se vea el gap y la siguiente ligeramente */
+    .carousel-card {
+        flex: 0 0 calc(100vw - 40px);
+        min-width: calc(100vw - 40px);
+        scroll-snap-align: center;
+        background: var(--white);
+        border: 2px solid var(--black) !important;
+        /* Sombra hacia abajo, no hacia la derecha → no desborda */
+        box-shadow: 0px 6px 0px var(--pink) !important;
+        border-radius: 2px !important;
+        padding: 24px 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .carousel-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid var(--black);
+        padding-bottom: 12px;
+    }
+
+    .carousel-name {
+        font-size: 15px;
+        font-weight: 900;
+        text-transform: uppercase;
+        color: var(--black);
+        letter-spacing: -0.5px;
+    }
+
+    .carousel-lv {
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--pink);
+        background: var(--black);
+        padding: 3px 8px;
+        border-radius: 2px;
+    }
+
+    .carousel-card .desc {
+        font-size: 13px;
+        color: #444;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .carousel-card .stats {
+        margin-top: 0;
+        padding: 16px;
     }
 }

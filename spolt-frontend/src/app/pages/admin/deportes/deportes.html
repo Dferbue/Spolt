@@ -6,11 +6,11 @@
     <button class="btn-volver" routerLink="/admin/dashboard">VOLVER AL MENÚ &gt;</button>
   </div>
 
-  <div class="management-controls" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <div class="list-title" style="margin: 0;">
-      <h2 style="margin: 0;">LISTA DEPORTES <span style="font-size: 1rem; color: #ff006e; margin-left: 10px;">({{ deportes().length }})</span></h2>
+  <div class="management-controls">
+    <div class="list-title">
+      <h2>LISTA DEPORTES <span style="font-size: 1rem; color: #ff006e; margin-left: 10px;">({{ deportes().length }})</span></h2>
     </div>
-    <button style="padding: 10px 24px; background: #ff006e; border: 2px solid #000; color: #fff; font-weight: 800; cursor: pointer; text-transform: uppercase; border-radius: 0; font-family: inherit; font-size: 1.1rem; box-shadow: 4px 4px 0px #000; transition: transform 0.1s, box-shadow 0.1s;" (click)="abrirModalCrear()" onmousedown="this.style.transform='translate(2px, 2px)'; this.style.boxShadow='2px 2px 0px #000';" onmouseup="this.style.transform='translate(0, 0)'; this.style.boxShadow='4px 4px 0px #000';" onmouseleave="this.style.transform='translate(0, 0)'; this.style.boxShadow='4px 4px 0px #000';">CREAR</button>
+    <button class="btn-filtros" style="background: #ff006e; color: #fff;" (click)="abrirModalCrear()">CREAR</button>
   </div>
 
   <!-- COMPONENTE LISTA -->

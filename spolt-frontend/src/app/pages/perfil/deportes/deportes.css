@@ -29,7 +29,7 @@
 
 .sport-levels-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: 2.5rem;
 }
 
@@ -102,10 +102,26 @@
   line-height: 1.1;
 }
 
+.level-and-matches {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
 .level-indicator {
   font-weight: 800;
   font-size: 1.1rem;
   color: #000;
+  line-height: 1;
+}
+
+.matches-count-inline {
+  display: none;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #666;
+  text-transform: uppercase;
 }
 
 .xp-container {
@@ -159,4 +175,98 @@
 
 .fire-icon {
   font-size: 1.2rem;
+}
+
+/* RESPONSIVE DESIGN */
+
+/* Tablets */
+@media (max-width: 1024px) {
+  .sport-levels-grid {
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+/* Mobiles (Portrait) */
+@media (max-width: 768px) {
+  .sport-levels-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .sport-level-card {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .sport-image-container {
+    width: 150px;
+    height: 150px;
+  }
+
+  .sport-title-row h3 {
+    font-size: 1.2rem;
+  }
+}
+
+/* Small Mobiles */
+@media (max-width: 480px) {
+  .sport-levels-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .sport-level-card {
+    padding: 0.75rem;
+    gap: 0.75rem;
+    box-shadow: 4px 4px 0px var(--base-color, #ff006e);
+    border-width: 2px;
+  }
+
+  .sport-image-container {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1/1;
+    border-width: 2px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 0px #000;
+  }
+
+  .sport-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding-bottom: 0.35rem;
+    border-bottom-width: 2px;
+  }
+
+  .sport-title-row h3 {
+    font-size: 0.9rem;
+  }
+
+  .level-and-matches {
+    align-items: flex-start;
+  }
+
+  .level-indicator {
+    font-size: 0.75rem;
+  }
+
+  .matches-count-inline {
+    display: block;
+    font-size: 0.7rem;
+  }
+
+  .xp-bar-wrapper {
+    height: 16px;
+    border-width: 2px;
+  }
+
+  .xp-progress-bar {
+    border-right-width: 2px;
+  }
+
+  .stats-footer {
+    display: none;
+  }
 }

@@ -31,6 +31,10 @@ export class EventsController {
     @Query('mes') mes?: string,
     @Query('anio') anio?: string,
     @Query('sort') sort?: string,
+    @Query('tipo_evento') tipo_evento?: string,
+    @Query('lat') lat?: string,
+    @Query('lng') lng?: string,
+    @Query('radio_km') radio_km?: string,
   ) {
     return this.eventsService.findAll({
       page: page ? parseInt(page, 10) : 1,
@@ -40,7 +44,11 @@ export class EventsController {
       id_deporte: id_deporte ? parseInt(id_deporte, 10) : undefined,
       mes,
       anio,
-      sort
+      sort,
+      tipo_evento,
+      lat: lat ? parseFloat(lat) : undefined,
+      lng: lng ? parseFloat(lng) : undefined,
+      radio_km: radio_km ? parseFloat(radio_km) : undefined,
     });
   }
 

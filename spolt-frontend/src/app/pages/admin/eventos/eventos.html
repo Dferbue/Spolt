@@ -24,6 +24,8 @@
         <option value="deporte">⚽ Deporte (A-Z)</option>
         <option value="titulo">🔤 Título (A-Z)</option>
         <option value="estado">✅ Estado</option>
+        <option value="creacion">🆕 Más nuevos (creación)</option>
+        <option value="cercanos">📍 Más cercanos</option>
       </select>
     </div>
   </div>
@@ -157,7 +159,10 @@
                     <span>{{ p.usuario?.nombre_usuario?.charAt(0) | uppercase }}</span>
                   }
                 </div>
-                <span class="ma-p-name">{{ p.usuario?.nombre_usuario }}</span>
+                <div class="ma-p-name-level" style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; line-height: 1.2;">
+                  <span class="ma-p-name">{{ p.usuario?.nombre_usuario }}</span>
+                  <span class="ma-p-level" style="font-size: 0.65rem; font-weight: 900; text-transform: uppercase;" [style.color]="sportColorService.getColor(event.deporte)">Nvl {{ getUserLevel(p, event.id_deporte) }}</span>
+                </div>
               </div>
             }
           </div>
@@ -166,12 +171,18 @@
       </div>
 
       <!-- Panel Derecho: Mapa -->
-      <div class="ma-right-panel">
-        <div class="ma-map-wrapper">
-          <div id="map-details" class="ma-map-view"></div>
+        <div class="ma-right-panel">
+          <div class="ma-map-wrapper">
+            <div id="map-admin-details" class="ma-map-view" style="min-height: 300px; height: 100%; width: 100%;"></div>
+          </div>
+          @if (event.latitud && event.longitud) {
+            <div class="ma-coords-row">
+              <span class="ma-coords-text">📍 {{ event.latitud }}, {{ event.longitud }}</span>
+              <button class="ma-btn-copy" (click)="copiarCoordenadas(event)">📋 Copiar</button>
+            </div>
+          }
+          <button class="ma-btn-close" (click)="cerrarModalDetalles()">CERRAR VENTANA</button>
         </div>
-        <button class="ma-btn-close" (click)="cerrarModalDetalles()">CERRAR VENTANA</button>
-      </div>
       
     </div>
   </div>
