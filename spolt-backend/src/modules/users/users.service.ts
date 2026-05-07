@@ -6,17 +6,23 @@ import { Usuario } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { EmailService } from '../email/email.service';
+import { AppCacheService } from 'src/cache/app-cache.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService , private emailService:EmailService) {}
+  constructor(
+    private prisma: PrismaService,
+    private emailService: EmailService,
+    private cache: AppCacheService,
+  ) {}
 
   /**
    * Crea un nuevo usuario en la base de datos.
    * Realiza validaciones previas para evitar errores de duplicados (P2002 de Prisma).
    */
   async create(createUserDto: CreateUserDto): Promise<Usuario> {
-    const { password, email, nombre_usuario, fecha_nacimiento, ...rest } = createUserDto;
+    const { password, email, nombre_usuario, fecha_nacimiento, ...rest } =
+      createUserDto;
 
     // Verificamos si ya existe un usuario con ese email (para evitar el error 500)
     const existingEmail = await this.prisma.usuario.findUnique({
@@ -32,7 +38,9 @@ export class UsersService {
       where: { nombre_usuario },
     });
     if (existingUsername) {
-      throw new ConflictException(`El nombre de usuario ${nombre_usuario} ya está en uso`);
+      throw new ConflictException(
+        `El nombre de usuario ${nombre_usuario} ya está en uso`,
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -54,6 +62,8 @@ export class UsersService {
       },
     });
 
+    await this.cache.bumpVersion('admin');
+
     // Enviamos el correo de CONFIRMACIÓN (el de bienvenida se envía solo después de confirmar)
     await this.emailService.sendRegistrationConfirmation(
       newUser.email,
@@ -65,9 +75,15 @@ export class UsersService {
     return newUser;
   }
 
-  async findAll(page: number = 1, limit: number = 30, search?: string, role?: string, year?: string) {
+  async findAll(
+    page: number = 1,
+    limit: number = 30,
+    search?: string,
+    role?: string,
+    year?: string,
+  ) {
     const skip = (page - 1) * limit;
-    
+
     const where: any = {};
 
     if (search) {
@@ -85,7 +101,7 @@ export class UsersService {
     if (year) {
       where.fecha_registro = {
         gte: new Date(`${year}-01-01T00:00:00.000Z`),
-        lt: new Date(`${parseInt(year) + 1}-01-01T00:00:00.000Z`)
+        lt: new Date(`${parseInt(year) + 1}-01-01T00:00:00.000Z`),
       };
     }
 
@@ -111,9 +127,9 @@ export class UsersService {
           role: true,
           niveles_deportivos: {
             include: {
-              deporte: true
-            }
-          }
+              deporte: true,
+            },
+          },
         },
       }),
       this.prisma.usuario.count({ where }),
@@ -136,22 +152,27 @@ export class UsersService {
   }
 
   async findOne(userid: number) {
-    return await this.prisma.usuario.findUnique({ where: { id_usuario: userid } });
+    return await this.prisma.usuario.findUnique({
+      where: { id_usuario: userid },
+    });
   }
 
   async updateAccessTime(id: number) {
     return this.prisma.usuario.update({
       where: { id_usuario: id },
       data: { ultimo_acceso: new Date() },
-      select: { id_usuario: true, ultimo_acceso: true }
+      select: { id_usuario: true, ultimo_acceso: true },
     });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto | any) {
     const dataToUpdate: any = { ...updateUserDto };
-    
+
     if (dataToUpdate.password) {
-      dataToUpdate.contrasena_hash = await bcrypt.hash(dataToUpdate.password, 10);
+      dataToUpdate.contrasena_hash = await bcrypt.hash(
+        dataToUpdate.password,
+        10,
+      );
       delete dataToUpdate.password;
     }
 
@@ -166,7 +187,7 @@ export class UsersService {
   }
 
   async remove(id: number) {
-    return await this.prisma.$transaction(async (tx) => {
+    const user = await this.prisma.$transaction(async (tx) => {
       // 1. Buscamos las participaciones confirmadas del usuario para saber de qué eventos restarle el cupo
       const participaciones = await tx.participanteEvento.findMany({
         where: {
@@ -201,6 +222,13 @@ export class UsersService {
         where: { id_usuario: id },
       });
     });
+
+    await Promise.all([
+      this.cache.bumpVersion('admin'),
+      this.cache.bumpVersion('events'),
+    ]);
+
+    return user;
   }
 
   async findById(id: number) {
@@ -209,30 +237,32 @@ export class UsersService {
     });
   }
 
-  //Esta funcion es para obtener solo los datos que queremos mostrar en el perfil de un usuario 
-  async findPerfil(id:number){
+  //Esta funcion es para obtener solo los datos que queremos mostrar en el perfil de un usuario
+  async findPerfil(id: number) {
     return this.prisma.usuario.findUnique({
-      where:{
-        id_usuario:id
+      where: {
+        id_usuario: id,
       },
-      select:{
-        activo:true,
-        biografia:true,
-        email:true,
-        fecha_nacimiento:true,
-        imagen_perfil:true,
-        nombre_completo:true,
-        nombre_usuario:true
-      }
-    })
+      select: {
+        activo: true,
+        biografia: true,
+        email: true,
+        fecha_nacimiento: true,
+        imagen_perfil: true,
+        nombre_completo: true,
+        nombre_usuario: true,
+      },
+    });
   }
-
 
   async updateDeveloper(id: number, data: UpdateUserDto | any) {
     const dataToUpdate: any = { ...data };
 
     if (dataToUpdate.password) {
-      dataToUpdate.contrasena_hash = await bcrypt.hash(dataToUpdate.password, 10);
+      dataToUpdate.contrasena_hash = await bcrypt.hash(
+        dataToUpdate.password,
+        10,
+      );
       delete dataToUpdate.password;
     }
 

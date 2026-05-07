@@ -14,11 +14,13 @@ import { StorageModule } from './modules/storage/storage.module';
 import { SportLevelModule } from './modules/sport-level/sport-level.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AdminModule } from './modules/admin/admin.module';
+import { AppCacheModule } from './cache/app-cache.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
+    AppCacheModule,
     PrismaModule,
     AuthModule,
     UsersModule,
@@ -29,7 +31,7 @@ import { AdminModule } from './modules/admin/admin.module';
     WeatherModule,
     StorageModule,
     SportLevelModule,
-    AdminModule
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
