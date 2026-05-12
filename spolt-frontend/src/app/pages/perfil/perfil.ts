@@ -20,6 +20,7 @@ import { Deportes } from './deportes/deportes';
 export class Perfil {
   private authService = inject(AuthService);
   private router = inject(Router);
+  readonly deleteAccountConfirmationText = 'ELIMINAR MI CUENTA';
 
   constructor(
     private perflService: PerfilService,
@@ -34,6 +35,10 @@ export class Perfil {
   emailChangeRequested = false;
   showLogoutConfirm = false; // Estado para el modal de logout móvil
   showPasswordConfirm = false; // Estado para el modal de confirmación de password
+  showDeleteAccountConfirm = false;
+  deleteAccountInput = '';
+  deleteAccountError = '';
+  deletingAccount = false;
 
   @ViewChild('fileInput') fileInput!: ElementRef;
   selectedFile: File | null = null;
@@ -149,6 +154,54 @@ export class Perfil {
   // Alterna la visibilidad del modal de confirmación de cierre de sesión
   toggleLogoutConfirm() {
     this.showLogoutConfirm = !this.showLogoutConfirm;
+  }
+
+  openDeleteAccountConfirm() {
+    this.showDeleteAccountConfirm = true;
+    this.deleteAccountInput = '';
+    this.deleteAccountError = '';
+    this.cdr.detectChanges();
+  }
+
+  cancelDeleteAccount() {
+    if (this.deletingAccount) return;
+
+    this.showDeleteAccountConfirm = false;
+    this.deleteAccountInput = '';
+    this.deleteAccountError = '';
+    this.cdr.detectChanges();
+  }
+
+  canConfirmDeleteAccount() {
+    return this.deleteAccountInput.trim() === this.deleteAccountConfirmationText && !this.deletingAccount;
+  }
+
+  confirmDeleteAccount() {
+    if (!this.canConfirmDeleteAccount()) return;
+
+    const userId = this.dtoUser?.id_usuario;
+    if (!userId) {
+      this.deleteAccountError = 'No se ha podido identificar tu cuenta. Recarga el perfil e intentalo de nuevo.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.deletingAccount = true;
+    this.deleteAccountError = '';
+    this.cdr.detectChanges();
+
+    this.perflService.deleteAccount(userId).subscribe({
+      next: () => {
+        this.authService.updateProfileState(null);
+        this.authService.clearTokens();
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        this.deletingAccount = false;
+        this.deleteAccountError = err.error?.message || 'No se ha podido eliminar la cuenta.';
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   // Ejecuta el cierre de sesión y redirige al inicio

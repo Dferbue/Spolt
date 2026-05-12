@@ -523,6 +523,55 @@
     transform: translate(-1px, -1px);
 }
 
+.danger-zone {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 3px solid #111;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 5px 5px 0px #111;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.danger-zone-label {
+    color: #ef4444;
+    font-size: 0.72rem;
+    font-weight: 950;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.danger-zone p {
+    margin: 0;
+    color: #555;
+    font-size: 0.85rem;
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+.delete-account-btn {
+    flex-shrink: 0;
+    padding: 0.8rem 1.1rem;
+    border: 3px solid #111;
+    border-radius: 8px;
+    background: #ef4444;
+    color: white;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 950;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px #111;
+}
+
+.delete-account-btn:hover {
+    background: #111;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px #ef4444;
+}
+
 /* LOADING */
 .loading-container {
     display: flex;
@@ -715,9 +764,107 @@
     border-color: #666;
 }
 
+.delete-account-modal {
+    max-width: 460px;
+    text-align: left;
+}
+
+.danger-modal-tag {
+    background: #ef4444;
+    color: white;
+    border: 2px solid #111;
+    border-radius: 6px;
+    box-shadow: 3px 3px 0px #111;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.68rem;
+    font-weight: 950;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.delete-account-copy {
+    margin: 0;
+    color: #555;
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.delete-confirm-label {
+    color: #111;
+    font-size: 0.78rem;
+    font-weight: 950;
+    text-transform: uppercase;
+}
+
+.delete-confirm-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.85rem 1rem;
+    border: 3px solid #111;
+    border-radius: 8px;
+    background: #fff;
+    color: #111;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 900;
+    outline: none;
+}
+
+.delete-confirm-input:focus {
+    border-color: #ef4444;
+    box-shadow: 4px 4px 0px var(--pink, #ff006e);
+}
+
+.delete-confirm-input:disabled {
+    background: #f2f2f2;
+    color: #777;
+}
+
+.delete-account-error {
+    margin: -0.4rem 0 0;
+    color: #dc2626;
+    font-size: 0.82rem;
+    font-weight: 900;
+}
+
+.delete-account-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.ventana-emergente button:disabled,
+.ventana-emergente button:disabled:hover {
+    background: #d1d5db;
+    color: #777;
+    border-color: #999;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 2px 2px 0px #999;
+}
+
 @media (max-width: 600px) {
     .main-content {
         padding-bottom: 90px;
+    }
+
+    .danger-zone {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0.9rem;
+        box-shadow: 4px 4px 0px #111;
+    }
+
+    .delete-account-btn {
+        width: 100%;
+        font-size: 0.75rem;
+    }
+
+    .delete-account-modal {
+        width: calc(100% - 24px);
+        max-width: none;
+        padding: 1.5rem 1.25rem;
     }
 }
 
@@ -810,6 +957,15 @@
         font-size: 0.7rem;
         min-width: unset;
         box-shadow: 3px 3px 0px 0px #111;
+    }
+
+    .danger-zone p,
+    .delete-account-copy {
+        font-size: 0.78rem;
+    }
+
+    .delete-confirm-label {
+        font-size: 0.7rem;
     }
 
     .tabs {

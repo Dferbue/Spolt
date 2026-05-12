@@ -139,6 +139,16 @@
                   📝 DATOS
                 </button>
               </div>
+
+              <div class="danger-zone">
+                <div>
+                  <span class="danger-zone-label">ZONA DE RIESGO</span>
+                  <p>Eliminar tu cuenta borra tu perfil y tu actividad asociada.</p>
+                </div>
+                <button class="delete-account-btn" (click)="openDeleteAccountConfirm()">
+                  ELIMINAR CUENTA
+                </button>
+              </div>
             </div> <!-- Cierre profile-main-info -->
           </div> <!-- Cierre card-body -->
         </div> <!-- Cierre card profile-card-unified -->
@@ -215,6 +225,43 @@
             <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
               <button class="btn-confirm-delete" (click)="confirmPasswordChange()">CONFIRMAR ENVÍO</button>
               <button class="btn-cancel-delete" (click)="cancelPasswordConfirm()">CANCELAR</button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- MODAL PARA ELIMINAR CUENTA -->
+      @if (showDeleteAccountConfirm) {
+        <div class="targetaAmistad-overlay" (click)="cancelDeleteAccount()">
+          <div class="ventana-emergente delete-account-modal" (click)="$event.stopPropagation()">
+            <span class="danger-modal-tag">ACCION IRREVERSIBLE</span>
+            <h3>¿ELIMINAR TU CUENTA?</h3>
+            <p class="delete-account-copy">
+              Se borraran tu perfil, amistades, niveles deportivos, participaciones y eventos creados.
+            </p>
+            <label class="delete-confirm-label" for="deleteAccountInput">
+              Escribe "{{ deleteAccountConfirmationText }} " para confirmar
+            </label>
+            <input
+              id="deleteAccountInput"
+              class="delete-confirm-input"
+              type="text"
+              [value]="deleteAccountInput"
+              [disabled]="deletingAccount"
+              (input)="deleteAccountInput = $any($event.target).value"
+              autocomplete="off"
+            />
+            @if (deleteAccountError) {
+              <p class="delete-account-error">{{ deleteAccountError }}</p>
+            }
+            <div class="delete-account-actions">
+              <button
+                class="btn-confirm-delete"
+                [disabled]="!canConfirmDeleteAccount()"
+                (click)="confirmDeleteAccount()">
+                {{ deletingAccount ? 'ELIMINANDO...' : 'ELIMINAR DEFINITIVAMENTE' }}
+              </button>
+              <button class="btn-cancel-delete" [disabled]="deletingAccount" (click)="cancelDeleteAccount()">CANCELAR</button>
             </div>
           </div>
         </div>

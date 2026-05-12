@@ -38,6 +38,11 @@ export class PerfilService {
     return this.http.patch(`${this.apiUrl}/update`, data);
   }
 
+  // Eliminar la cuenta del usuario autenticado
+  deleteAccount(userId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${userId}`);
+  }
+
   // --- Métodos de solicitud (Delegados a Auth) ---
 
   solicitarCambioPassword(email: string): Observable<any> {
