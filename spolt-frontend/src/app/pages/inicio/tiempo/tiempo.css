@@ -180,8 +180,51 @@
 
 /* RESPONSIVO */
 @media (max-width: 768px) {
-  .cell-label {
+  .weather-card {
+    margin: 10px auto;
+    width: 95%; /* Un poco de margen a los lados */
+  }
+
+  .weather-header {
+    padding: 12px 16px;
+  }
+
+  .weather-title {
+    font-size: 14px;
+  }
+
+  .weather-location {
     font-size: 11px;
-    padding: 10px 5px;
+  }
+
+  .cell-label {
+    font-size: 10px;
+    padding: 8px 4px;
+    grid-template-columns: 60px repeat(7, 1fr); /* Reducimos la columna de etiquetas */
+  }
+
+  .matrix-row {
+    grid-template-columns: 65px repeat(7, 1fr);
+  }
+
+  .cell-head strong {
+    font-size: 12px;
+  }
+
+  .cell-head small {
+    font-size: 10px;
+  }
+
+  .cell-icon-box .icon {
+    font-size: 28px;
+  }
+
+  .temp-max, .temp-min, .cell-rain, .wind-label {
+    font-size: 12px;
+  }
+
+  .wind-label small {
+    font-size: 9px;
   }
 }
+

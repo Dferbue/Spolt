@@ -7,8 +7,11 @@ import cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // In production behind Nginx, requests come from the same origin,
+  // so CORS is only needed for development.
+  const isProduction = process.env.NODE_ENV === 'production';
   app.enableCors({
-    origin: 'http://localhost:4200',
+    origin: isProduction ? true : 'http://localhost:4200',
     credentials: true,
   });
 
@@ -35,4 +38,3 @@ async function bootstrap() {
   console.log(`[Application] Server is running at: http://localhost:${port}/${prefix}`);
 }
 bootstrap();
-

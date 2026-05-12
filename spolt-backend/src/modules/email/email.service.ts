@@ -1,34 +1,39 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as crypto from "crypto";
 
 @Injectable()
 export class EmailService {
-  //Metemos la intancia del mailerSercice
-  constructor(private mailerService:MailerService){}
+  private frontendUrl: string;
 
-  //Creamos el emial de vienvenida
-  async emailWelcome(data:any){
-    await this.mailerService.sendMail({
-      to:data.email,
-      subject:"Bien venido a Spolt",
-      template:'./welcome', //Esto es la platilla que vamos a usar para madar el email
-
-      //Las varibles que le vas a mandar a la plantilla
-      context:{
-        name:data.name
-      } 
-    })
+  constructor(
+    private mailerService: MailerService,
+    private configService: ConfigService
+  ) {
+    this.frontendUrl = this.configService.get<string>('FRONTEND_URL', 'http://localhost:4200');
   }
 
-  // Método para generar un token seguro (puedes usarlo aquí o en el AuthService)
+  // Método para generar un token seguro
   generateToken(): string {
     return crypto.randomBytes(32).toString('hex');
   }
 
+  // Correo de bienvenida
+  async emailWelcome(data: any) {
+    await this.mailerService.sendMail({
+      to: data.email,
+      subject: "Bienvenido a Spolt",
+      template: './welcome',
+      context: {
+        name: data.name
+      } 
+    });
+  }
+
   // Correo para restablecer la contraseña
   async sendPasswordResetEmail(email: string, name: string, token: string) {
-    const resetUrl = `http://localhost:4200/reset-password?token=${token}`;
+    const resetUrl = `${this.frontendUrl}/reset-password?token=${token}`;
     
     await this.mailerService.sendMail({
       to: email,
@@ -41,9 +46,9 @@ export class EmailService {
     });
   }
 
-  // Correo de confirmación de registro (antes de crear la cuenta definitivamente)
+  // Correo de confirmación de registro
   async sendRegistrationConfirmation(email: string, name: string, token: string) {
-    const confirmUrl = `http://localhost:4200/confirm-register?token=${token}`;
+    const confirmUrl = `${this.frontendUrl}/confirm-register?token=${token}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -58,7 +63,7 @@ export class EmailService {
 
   // Correo para confirmar cambio de email
   async sendEmailChangeConfirmation(newEmail: string, name: string, token: string) {
-    const confirmationUrl = `http://localhost:4200/confirm-email?token=${token}`;
+    const confirmationUrl = `${this.frontendUrl}/confirm-email?token=${token}`;
     
     await this.mailerService.sendMail({
       to: newEmail,
@@ -72,4 +77,3 @@ export class EmailService {
     });
   }
 }
-
