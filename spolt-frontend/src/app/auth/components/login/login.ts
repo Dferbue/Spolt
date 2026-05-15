@@ -77,8 +77,17 @@ export class Login {
     const email = this.forgotForm.value.email;
     this.authService.forgotPassword(email).subscribe({
       next: (res) => {
-        this.forgotMsg = 'Si el correo existe, te hemos enviado un enlace para restablecer la contraseña.';
+        this.forgotMsg = 'Enlace de recuperación enviado. Revisa tu correo.';
         this.isSubmittingForgot = false;
+        // Dejamos el modal abierto para que vea la notificación, y lo cerramos a los 3 segundos
+        setTimeout(() => {
+          this.showForgotModal = false;
+        }, 3000);
+
+        // Limpiamos el mensaje de la pantalla principal tras 10 segundos
+        setTimeout(() => {
+          this.forgotMsg = '';
+        }, 10000);
       },
       error: (err) => {
         // En un caso real, por seguridad no se suele decir si el correo existe o no,

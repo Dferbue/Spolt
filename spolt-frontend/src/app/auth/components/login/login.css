@@ -242,3 +242,72 @@ label {
   border: 2px solid #111;
   cursor: pointer;
 }
+
+/* Notification Banner */
+.pixel-banner {
+  padding: 1rem 1.5rem;
+  border: 3px solid black;
+  font-weight: 900;
+  font-size: 0.9rem;
+  text-align: center;
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  margin-bottom: 20px;
+  animation: slideDown 0.3s ease-out;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pixel-banner.success {
+  background: #10b981;
+  color: white;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   NOTIFICACIÓN DE ENVÍO (Estilo Amigos)
+========================================= */
+.mensaje-envio {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: #000;
+    color: white;
+    border: 3px solid var(--pink, #ff006e);
+    padding: 1rem 2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    z-index: 10001; /* Asegurar que sale por encima del modal */
+    box-shadow: 6px 6px 0px var(--pink, #ff006e);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 600px) {
+    .mensaje-envio {
+        bottom: auto;
+        top: 1rem;
+        right: 1rem;
+        left: 1rem;
+        padding: 0.65rem 1rem;
+        font-size: 0.72rem;
+        box-shadow: 4px 4px 0px var(--pink, #ff006e);
+    }
+}

@@ -189,4 +189,18 @@
     .main-content {
         padding-bottom: 90px;
     }
+
+    .brand-header-box {
+        width: 100%;
+        box-sizing: border-box;
+        justify-content: center;
+        padding: 12px 20px;
+        gap: 20px;
+    }
+
+    .brand-title {
+        font-size: 24px;
+        letter-spacing: -1px;
+        text-align: center;
+    }
 }

@@ -4,7 +4,7 @@
     justify-content: center;
     align-items: center;
     background-color: #000;
-    padding: 20px;
+    padding: 120px 20px 40px;
 }
 
 .auth-container {
@@ -142,4 +142,10 @@
     flex-direction: column;
     gap: 10px;
     margin-top: 20px;
+}
+
+@media (max-width: 850px) {
+    .auth-layout {
+        padding-top: 80px;
+    }
 }

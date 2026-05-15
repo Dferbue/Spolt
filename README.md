@@ -1,9 +1,10 @@
 # 🏅 Spolt — Red Social Deportiva
 
-Spolt es una aplicación web de tipo red social orientada al deporte. Permite a los usuarios registrarse, crear y unirse a eventos deportivos, gestionar amistades y comunicarse a través de conversaciones.
+Spolt es una aplicación web de tipo red social orientada al deporte. Permite a los usuarios registrarse, crear y unirse a eventos deportivos, gestionar amistades y comunicarse a través de conversaciones. Además, la plataforma cuenta con un panel de administración, integración de datos meteorológicos para los eventos y un sistema de firma de contratos para organizadores.
 
 ## 📋 Tabla de Contenidos
 
+- [Características Principales](#-características-principales)
 - [Tecnologías](#-tecnologías)
 - [Requisitos Previos](#-requisitos-previos)
 - [Estructura del Proyecto](#-estructura-del-proyecto)
@@ -15,7 +16,19 @@ Spolt es una aplicación web de tipo red social orientada al deporte. Permite a 
 - [Variables de Entorno](#-variables-de-entorno)
 - [Base de Datos](#-base-de-datos)
 - [Endpoints de la API](#-endpoints-de-la-api)
+- [Despliegue en Producción](#-despliegue-en-producción)
 - [Scripts Disponibles](#-scripts-disponibles)
+
+---
+
+## 🌟 Características Principales
+
+- **Gestión de Eventos Deportivos**: Crea, únete y gestiona eventos con información meteorológica integrada.
+- **Red Social y Comunicación**: Sistema de amistades, perfiles de usuario y mensajería en tiempo real.
+- **Panel de Administración**: Herramientas avanzadas para la moderación de la plataforma (jerarquía de roles Admin/CEO).
+- **Firma de Contratos**: Flujo de firma digital interactivo para organizadores y propietarios, respaldado por MinIO.
+- **Diseño Neo-Brutalista**: Interfaz responsiva, moderna y con gran contraste visual.
+- **Arquitectura Robusta y Escalable**: Backend en NestJS, almacenamiento S3 y despliegue orquestado con Nginx y Docker.
 
 ---
 
@@ -30,6 +43,7 @@ Spolt es una aplicación web de tipo red social orientada al deporte. Permite a 
 | **Almacenamiento** | MinIO (S3 compatible)       | latest    |
 | **Cache/Colas** | Redis                          | 7.2.4     |
 | **Autenticación** | JWT (access + refresh tokens) | —       |
+| **Despliegue/Proxy** | Docker, Nginx             | latest    |
 | **Lenguaje** | TypeScript                        | 5.x       |
 
 ---
@@ -52,7 +66,7 @@ Antes de empezar, asegúrate de tener instalado:
 
 ## 📁 Estructura del Proyecto
 
-```
+```text
 Spolt/
 ├── spolt-backend/          # API REST (NestJS + Prisma)
 │   ├── prisma/
@@ -61,29 +75,33 @@ Spolt/
 │   ├── src/
 │   │   ├── main.ts         # Punto de entrada del servidor
 │   │   ├── modules/
-│   │   │   ├── auth/       # Autenticación (login, register, JWT)
-│   │   │   ├── users/      # Gestión de usuarios y perfiles
-│   │   │   ├── events/     # Eventos deportivos
+│   │   │   ├── admin/      # Rutas y métricas de administración
+│   │   │   ├── auth/       # Autenticación (login, JWT, recuperación)
+│   │   │   ├── email/      # Servicio de envío de correos
+│   │   │   ├── events/     # Gestión de eventos deportivos
 │   │   │   ├── frindships/ # Sistema de amistades
-│   │   │   ├── conversations/ # Conversaciones
-│   │   │   ├── messages/   # Mensajes
-│   │   │   └── sports/     # Deportes
-│   │   └── prisma/         # Servicio Prisma (inyectable)
-│   ├── docker-compose.yml  # PostgreSQL, MinIO, Redis
-│   ├── .env                # Variables de entorno
+│   │   │   ├── sport-level/# Nivel, XP y gamificación
+│   │   │   ├── sports/     # Catálogo de deportes
+│   │   │   ├── storage/    # Integración con MinIO (contratos)
+│   │   │   ├── users/      # Gestión de usuarios y perfiles
+│   │   │   └── weather/    # Pronósticos de clima
+│   │   └── prisma/         # Servicio Prisma
+│   ├── docker-compose.yml  # Infra de dev (PostgreSQL, MinIO, Redis)
 │   └── package.json
 │
-├── spolt-frontend/         # SPA (Angular 21)
+├── spolt-frontend/         # SPA (Angular)
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── auth/       # Login, Register, Guards, Interceptors
-│   │   │   ├── layout/     # Header, Sidebar
-│   │   │   └── pages/      # Inicio, Eventos, Amigos, Perfil, Welcome
-│   │   └── environments/   # Configuración por entorno
-│   ├── proxy.conf.json     # Proxy para redirigir /api al backend
+│   │   │   ├── auth/       # Login, registro, Guards, interceptores
+│   │   │   ├── layout/     # Componentes base (Header, Sidebar)
+│   │   │   └── pages/      # admin, amigos, eventos, inicio, legal, perfil, welcome
+│   │   └── environments/   # Variables por entorno (dev, prod)
+│   ├── proxy.conf.json     # Proxy de desarrollo hacia backend
 │   └── package.json
 │
-└── README.md               # Este archivo
+├── docker-compose.yml      # Orquestación global en Producción (Nginx, BD, etc)
+├── nginx.conf              # Configuración de proxy inverso
+└── README.md               # Documentación
 ```
 
 ---
@@ -192,40 +210,15 @@ La aplicación se abrirá en: **http://localhost:4200**
 
 ## 🔐 Variables de Entorno
 
-El backend utiliza un archivo `.env` en la carpeta `spolt-backend/`. A continuación se describen todas las variables:
+El backend requiere un archivo `.env` en la carpeta `spolt-backend/` para configurar los servicios y accesos. Debes configurar las siguientes secciones clave en tu entorno:
 
-```env
-# ─── Base de datos ───────────────────────────────
-DB_USER=postgres                    # Usuario de PostgreSQL
-DB_PASSWORD=postgres                # Contraseña de PostgreSQL
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/property_db?schema=public
+- **Base de datos**: Credenciales y URL de conexión para PostgreSQL (`DB_USER`, `DB_PASSWORD`, `DATABASE_URL`).
+- **MinIO**: Credenciales y bucket para el almacenamiento de archivos y contratos (`MINIO_ENDPOINT`, `MINIO_ROOT_USER`, etc.).
+- **Redis**: Host y puerto para el sistema de cache y colas (`REDIS_HOST`, `REDIS_PORT`).
+- **Aplicación**: Puerto, entorno y prefijo de API (`PORT`, `NODE_ENV`, `API_PREFIX`).
+- **Autenticación (JWT)**: Secretos para los tokens de acceso y refresco (`JWT_SECRET`, `JWT_REFRESH_SECRET`).
 
-# ─── MinIO (almacenamiento de archivos) ──────────
-MINIO_ENDPOINT=localhost
-MINIO_ROOT_USER=minioadmin
-MINIO_ROOT_PASSWORD=minioadmin
-MINIO_BUCKET_NAME=contracts
-MINIO_ACCESS_KEY=minioadmin
-MINIO_SECRET_KEY=minioadmin
-
-# ─── Redis ───────────────────────────────────────
-REDIS_HOST=localhost
-REDIS_PORT=6379
-
-# ─── Aplicación ──────────────────────────────────
-PORT=3001                           # Puerto del servidor
-NODE_ENV=development
-API_PREFIX=api/v1/                  # Prefijo global de la API
-
-# ─── Autenticación (JWT) ─────────────────────────
-BCRYPT_SALT=10                      # Salt rounds para bcrypt
-JWT_SECRET="my_super_secret_key"    # Clave secreta del access token
-JWT_EXPIRATION=3600s                # Duración del access token (1 hora)
-JWT_REFRESH_SECRET="my_super_secret_refresh_key"  # Clave del refresh token
-JWT_REFRESH_EXPIRATION=7d           # Duración del refresh token (7 días)
-```
-
-> ⚠️ **Importante:** En un entorno de producción, las claves `JWT_SECRET` y `JWT_REFRESH_SECRET` deben cambiarse por valores seguros y largos.
+> ⚠️ **Importante:** Por razones de seguridad, nunca compartas tus claves secretas o contraseñas en repositorios públicos. Asegúrate de utilizar credenciales fuertes y seguras, especialmente en entornos de producción.
 
 ---
 
@@ -237,14 +230,12 @@ La base de datos PostgreSQL contiene las siguientes tablas:
 
 | Tabla                        | Descripción                                      |
 |------------------------------|--------------------------------------------------|
-| `usuarios`                   | Usuarios registrados en la plataforma            |
-| `amistades`                  | Relaciones de amistad entre usuarios             |
-| `deportes`                   | Catálogo de deportes disponibles                 |
-| `eventos_deportivos`         | Eventos deportivos creados por los usuarios      |
-| `participantes_evento`       | Relación usuarios ↔ eventos (inscripciones)      |
-| `conversaciones`             | Conversaciones individuales o de grupo           |
-| `participantes_conversacion` | Usuarios que participan en cada conversación     |
-| `mensajes`                   | Mensajes enviados en las conversaciones          |
+| `usuarios`                   | Registros de usuarios, control de roles (Admin/CEO), firmas legales y tokens. |
+| `amistades`                  | Relaciones de amistad entre usuarios y estados (pendiente, aceptada, bloqueada). |
+| `deportes`                   | Catálogo de deportes disponibles en la plataforma. |
+| `niveles_deportivos`         | Progresión de nivel, experiencia y partidos jugados de cada usuario por deporte. |
+| `eventos_deportivos`         | Eventos (partidos, torneos) con ubicación geográfica y estado (abierto, finalizado). |
+| `participantes_evento`       | Relación de los usuarios inscritos en cada evento deportivo. |
 
 ### Exportar la base de datos
 
@@ -294,10 +285,15 @@ Los endpoints marcados con 🔒 requieren autenticación (enviar el header `Auth
 | Método | Ruta              | Descripción                     | Auth |
 |--------|-------------------|---------------------------------|------|
 | POST   | `/auth/register`  | Registrar un nuevo usuario      | ❌   |
+| POST   | `/auth/confirm-register` | Confirmar registro via token | ❌ |
 | POST   | `/auth/login`     | Iniciar sesión (devuelve tokens)| ❌   |
 | POST   | `/auth/logout`    | Cerrar sesión                   | 🔒   |
 | POST   | `/auth/refresh`   | Refrescar el access token       | 🔒   |
-| GET    | `/auth/profile`   | Obtener perfil del usuario autenticado | 🔒 |
+| GET    | `/auth/profile`   | Obtener perfil autenticado      | 🔒   |
+| POST   | `/auth/forgot-password` | Solicitar reseteo de contraseña | ❌ |
+| POST   | `/auth/reset-password` | Confirmar nueva contraseña | ❌   |
+| POST   | `/auth/request-email-change`| Solicitar cambio de email | 🔒 |
+| POST   | `/auth/confirm-email-change`| Confirmar cambio de email | ❌ |
 
 ### Users (`/users`)
 
@@ -305,10 +301,12 @@ Los endpoints marcados con 🔒 requieren autenticación (enviar el header `Auth
 |--------|------------------|------------------------------------------|------|
 | POST   | `/users`         | Crear un usuario                         | ❌   |
 | GET    | `/users`         | Listar todos los usuarios                | ❌   |
-| GET    | `/users/perfil`  | Obtener datos del perfil (campos seleccionados) | 🔒 |
+| GET    | `/users/perfil`  | Obtener datos del perfil propio          | 🔒   |
 | GET    | `/users/:id`     | Obtener un usuario por ID                | 🔒   |
-| PATCH  | `/users/:id`     | Actualizar datos del usuario             | 🔒   |
-| DELETE | `/users/:id`     | Eliminar un usuario                      | ❌   |
+| PATCH  | `/users/ping`    | Actualizar última conexión               | 🔒   |
+| PATCH  | `/users/update`  | Actualizar datos propios (perfil)        | 🔒   |
+| PATCH  | `/users/:id`     | Actualizar usuario por ID                | 🔒   |
+| DELETE | `/users/:id`     | Eliminar un usuario                      | 🔒   |
 
 ### Events (`/events`)
 
@@ -316,24 +314,70 @@ Los endpoints marcados con 🔒 requieren autenticación (enviar el header `Auth
 |--------|----------------------------|--------------------------------------|------|
 | POST   | `/events`                  | Crear un evento deportivo            | 🔒   |
 | GET    | `/events`                  | Listar todos los eventos             | ❌   |
+| GET    | `/events/count-active`     | Contar eventos activos               | ❌   |
 | GET    | `/events/friends`          | Eventos de tus amigos                | 🔒   |
 | GET    | `/events/my-events`        | Tus propios eventos creados          | 🔒   |
 | GET    | `/events/participante`     | Eventos en los que participas        | 🔒   |
 | POST   | `/events/:id/join`         | Unirse a un evento                   | 🔒   |
 | DELETE | `/events/:id/leave`        | Salir de un evento                   | 🔒   |
-| PATCH  | `/events/:id`              | Actualizar un evento                 | ❌   |
-| DELETE | `/events/:id`              | Eliminar un evento                   | ❌   |
+| PATCH  | `/events/:id`              | Actualizar un evento                 | 🔒   |
+| PATCH  | `/events/:id/finalizar`    | Marcar un evento como finalizado     | 🔒   |
+| DELETE | `/events/:id`              | Eliminar un evento                   | 🔒   |
 
 ### Friendships (`/frindships`)
 
 | Método | Ruta                        | Descripción                          | Auth |
 |--------|-----------------------------|--------------------------------------|------|
-| POST   | `/frindships/:id`           | Enviar solicitud de amistad          | 🔒   |
+| POST   | `/frindships/:username`     | Enviar solicitud de amistad          | 🔒   |
 | PATCH  | `/frindships/accept/:id`    | Aceptar solicitud de amistad         | 🔒   |
 | GET    | `/frindships`               | Listar todas tus amistades           | 🔒   |
 | GET    | `/frindships/recived`       | Ver solicitudes recibidas            | 🔒   |
 | GET    | `/frindships/send`          | Ver solicitudes enviadas             | 🔒   |
+| GET    | `/frindships/admin/:id`     | Ver amistades de un usuario (Admin)  | 🔒   |
 | DELETE | `/frindships/:id`           | Eliminar una amistad                 | 🔒   |
+
+### Sports (`/sports`)
+
+| Método | Ruta              | Descripción                     | Auth |
+|--------|-------------------|---------------------------------|------|
+| GET    | `/sports`         | Obtener todos los deportes      | ❌   |
+| POST   | `/sports`         | Crear un deporte nuevo          | 🔒   |
+| PATCH  | `/sports/:id`     | Actualizar deporte              | 🔒   |
+| DELETE | `/sports/:id`     | Eliminar deporte                | 🔒   |
+
+### Sport Levels (`/sport-level`)
+
+| Método | Ruta              | Descripción                     | Auth |
+|--------|-------------------|---------------------------------|------|
+| GET    | `/sport-level/me` | Obtener progreso en deportes    | 🔒   |
+
+### Weather (`/weather`)
+
+| Método | Ruta              | Descripción                     | Auth |
+|--------|-------------------|---------------------------------|------|
+| GET    | `/weather/forecast`| Obtener pronóstico de clima    | 🔒   |
+
+### Storage (`/storage`)
+
+| Método | Ruta              | Descripción                     | Auth |
+|--------|-------------------|---------------------------------|------|
+| GET    | `/storage/:objectName`| Obtener archivo de MinIO    | 🔒   |
+| POST   | `/storage/upload` | Subir archivo a MinIO           | 🔒   |
+
+### Admin (`/admin`)
+
+| Método | Ruta              | Descripción                     | Auth |
+|--------|-------------------|---------------------------------|------|
+| GET    | `/admin/stats`    | Estadísticas globales           | 🔒   |
+
+---
+
+## 🌍 Despliegue en Producción
+
+El proyecto está preparado para desplegarse en producción mediante una orquestación multi-contenedor (Multi-stage Docker).
+Se utiliza **Nginx** como servidor web y proxy inverso para servir los estáticos del frontend de Angular y redirigir las peticiones de la API de manera segura hacia el backend de NestJS. 
+
+Toda la infraestructura en producción (PostgreSQL, MinIO, Redis, Backend y Nginx) debe estar debidamente configurada para garantizar la correcta interconectividad entre contenedores y la persistencia de datos (por ejemplo, firmas de contratos de propietarios almacenadas en MinIO).
 
 ---
 
@@ -373,12 +417,14 @@ npx prisma db push        # Sincroniza el esquema sin crear migración
 
 ## 🔄 Resumen Rápido de Arranque
 
+### 💻 Modo Desarrollo (Local)
+
 ```bash
 # 1. Clonar el repositorio
 git clone <URL_DEL_REPOSITORIO>
 cd Spolt
 
-# 2. Levantar los contenedores Docker
+# 2. Levantar los contenedores Docker locales (BD, Redis, MinIO)
 cd spolt-backend
 docker compose up -d
 
@@ -396,6 +442,21 @@ npm install
 npm start
 
 # 6. Abrir el navegador en http://localhost:4200
+```
+
+### 🌍 Modo Producción (con Nginx)
+
+```bash
+# 1. Clonar el repositorio
+git clone <URL_DEL_REPOSITORIO>
+cd Spolt
+
+# 2. Levantar toda la infraestructura y compilar la aplicación 
+# (Frontend, Backend, Nginx, PostgreSQL, MinIO, Redis)
+docker compose up -d --build
+
+# 3. Abrir el navegador (la aplicación estará expuesta por Nginx)
+# http://localhost (o el dominio configurado)
 ```
 
 ---

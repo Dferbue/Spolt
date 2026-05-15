@@ -5,10 +5,11 @@ import { EventosService } from '../service/eventos.service';
 import { HttpClient } from '@angular/common/http';
 import { CustomCalendar } from '../../../shared/components/custom-calendar/custom-calendar';
 import { LocationPicker, LocationData } from '../../../shared/components/location-picker/location-picker';
+import { CustomTimePicker } from '../../../shared/components/custom-time-picker/custom-time-picker';
 
 @Component({
   selector: 'app-create-event',
-  imports: [FormsModule, CustomCalendar, LocationPicker],
+  imports: [FormsModule, CustomCalendar, LocationPicker, CustomTimePicker],
   templateUrl: './create-event.html',
   styleUrl: './create-event.css',
 })

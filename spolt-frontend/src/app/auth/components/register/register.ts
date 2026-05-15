@@ -1,11 +1,12 @@
 import { Component, output, Input } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { AuthService, RegisterDto } from '../../services/auth.service';
 import { CustomCalendar } from '../../../shared/components/custom-calendar/custom-calendar';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, CustomCalendar],
+  imports: [ReactiveFormsModule, CustomCalendar, RouterModule],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
@@ -24,7 +25,8 @@ export class Register {
       nombre_usuario: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
-      fecha_nacimiento: ['', Validators.required]
+      fecha_nacimiento: ['', Validators.required],
+      terms: [false, Validators.requiredTrue]
     });
   }
 
@@ -35,8 +37,12 @@ export class Register {
     }else{
       this.message = "";
       this.serverError = "";
-      const register:RegisterDto = this.registerForm.value;
-      this.sendRegister.emit(register);
+      const { terms, ...formData } = this.registerForm.value;
+      const registerData: RegisterDto = {
+        ...formData,
+        aceptado_terminos: terms
+      };
+      this.sendRegister.emit(registerData);
     }
   }
 }

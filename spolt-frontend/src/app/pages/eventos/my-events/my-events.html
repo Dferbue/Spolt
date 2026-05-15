@@ -227,14 +227,19 @@
               </div>
             </div>
 
+            <div class="filtro-group">
+              <label class="filtro-label">Fecha</label>
+              <app-custom-calendar [(ngModel)]="edit_fecha_evento" theme="light" position="top" size="small"></app-custom-calendar>
+            </div>
+
             <div class="filtro-group row-group">
               <div class="sub-group">
-                <label class="filtro-label">Fecha</label>
-                <app-custom-calendar [(ngModel)]="edit_fecha_evento" theme="light" position="top" size="small"></app-custom-calendar>
+                <label class="filtro-label">Hora Inicio</label>
+                <app-custom-time-picker [(ngModel)]="edit_hora_inicio"></app-custom-time-picker>
               </div>
               <div class="sub-group">
-                <label class="filtro-label">Hora</label>
-                <input type="time" class="filtro-input min" [(ngModel)]="edit_hora_inicio">
+                <label class="filtro-label">Hora Fin</label>
+                <app-custom-time-picker [(ngModel)]="edit_hora_fin"></app-custom-time-picker>
               </div>
             </div>
 

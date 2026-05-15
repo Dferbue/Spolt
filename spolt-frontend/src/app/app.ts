@@ -5,6 +5,8 @@ import { HeaderComponent } from './layout/header/header.component';
 import { FooterComponent } from './layout/footer/footer.component';
 import { filter } from 'rxjs';
 import { AuthService } from './auth/services/auth.service';
+import { GeolocationService } from './shared/services/geolocation.service';
+import { GeoPermissionDialog } from './shared/components/geo-permission-dialog/geo-permission-dialog';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +16,7 @@ import { AuthService } from './auth/services/auth.service';
     RouterModule,
     HeaderComponent,
     FooterComponent,
-
+    GeoPermissionDialog
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
@@ -22,20 +24,22 @@ import { AuthService } from './auth/services/auth.service';
 export class App implements OnInit, OnDestroy {
   private router = inject(Router);
   private authService = inject(AuthService);
+  public geoService = inject(GeolocationService);
   showGlobalLayout = true;
   private pingInterval: any;
 
   constructor() {
+    // Escuchar cambios de navegación
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
-      // Hide global header/footer for app routes
-      const appRoutes = ['/inicio', '/eventos', '/amigos', '/perfil', '/admin'];
-      this.showGlobalLayout = !appRoutes.some(route => event.urlAfterRedirects.startsWith(route));
+    ).subscribe(() => {
+      this.updateLayoutState();
     });
   }
 
   ngOnInit() {
+    this.updateLayoutState();
+    
     // Latido cada 2 minutos para mantener el estado online
     this.pingInterval = setInterval(() => {
       if (this.authService.isLoggedIn()) {
@@ -44,6 +48,22 @@ export class App implements OnInit, OnDestroy {
         });
       }
     }, 2 * 60 * 1000);
+  }
+
+  private updateLayoutState() {
+    const url = this.router.url;
+    // Mostramos el layout global en la raíz, rutas públicas y legales
+    this.showGlobalLayout = 
+      url === '/' || 
+      url === '' || 
+      url.startsWith('/#') || 
+      url.startsWith('/?') ||
+      url.startsWith('/login') ||
+      url.startsWith('/register') ||
+      url.startsWith('/reset-password') ||
+      url.startsWith('/confirm-email') ||
+      url.startsWith('/confirm-register') ||
+      url.startsWith('/legal');
   }
 
   ngOnDestroy() {

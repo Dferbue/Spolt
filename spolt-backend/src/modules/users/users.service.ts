@@ -21,7 +21,7 @@ export class UsersService {
    * Realiza validaciones previas para evitar errores de duplicados (P2002 de Prisma).
    */
   async create(createUserDto: CreateUserDto): Promise<Usuario> {
-    const { password, email, nombre_usuario, fecha_nacimiento, ...rest } =
+    const { password, email, nombre_usuario, fecha_nacimiento, aceptado_terminos, ...rest } =
       createUserDto;
 
     // Verificamos si ya existe un usuario con ese email (para evitar el error 500)
@@ -59,17 +59,25 @@ export class UsersService {
         contrasena_hash: hashedPassword,
         email_verificado: false,
         email_token: emailToken,
+        aceptado_terminos,
+        fecha_aceptacion_terminos: new Date(),
       },
     });
 
     await this.cache.bumpVersion('admin');
 
     // Enviamos el correo de CONFIRMACIÓN (el de bienvenida se envía solo después de confirmar)
-    await this.emailService.sendRegistrationConfirmation(
-      newUser.email,
-      newUser.nombre_usuario,
-      emailToken,
-    );
+    try {
+      await this.emailService.sendRegistrationConfirmation(
+        newUser.email,
+        newUser.nombre_usuario,
+        emailToken,
+      );
+    } catch (error) {
+      console.error('Error sending registration confirmation email:', error);
+      // No lanzamos error aquí para que el usuario se cree, pero el sistema fallará al enviar el email
+      // En un sistema real, querríamos manejar esto mejor (ej. reintentos)
+    }
 
     //Devolvemos el usuario que hemos creado
     return newUser;

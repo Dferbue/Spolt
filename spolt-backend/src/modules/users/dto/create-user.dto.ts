@@ -1,6 +1,10 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength, IsDateString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength, IsDateString, IsBoolean } from 'class-validator';
 
 export class CreateUserDto {
+  @IsNotEmpty()
+  @IsBoolean()
+  aceptado_terminos: boolean;
+
   @IsNotEmpty()
   @IsString()
   nombre_usuario: string;

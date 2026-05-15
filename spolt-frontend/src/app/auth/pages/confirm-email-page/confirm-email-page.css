@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 2rem;
+  padding: 120px 2rem 4rem;
   background-color: #000000;
   font-family: 'Inter', sans-serif;
 }
@@ -161,5 +161,11 @@
   
   .glitch {
     font-size: 2rem;
+  }
+}
+
+@media (max-width: 850px) {
+  .page-container {
+    padding-top: 80px;
   }
 }

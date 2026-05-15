@@ -18,10 +18,21 @@ export class WeatherService implements OnModuleInit {
     try {
       await this.loadMunicipios();
     } catch (error) {
-      this.logger.warn(
-        'No se pudo cargar la lista de municipios, se usará Madrid por defecto.',
-        error.message,
-      );
+      // Silencioso por defecto para no llenar la terminal de errores de red/API
+    }
+  }
+
+  // Helper para hacer fetch con timeout
+  private async fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs: number = 8000) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(url, { ...options, signal: controller.signal as any });
+      clearTimeout(id);
+      return response;
+    } catch (err) {
+      clearTimeout(id);
+      throw err;
     }
   }
 
@@ -32,7 +43,7 @@ export class WeatherService implements OnModuleInit {
 
     // Pedimos el maestro de municipios
     const url = `https://opendata.aemet.es/opendata/api/maestro/municipios?api_key=${apiKey}`;
-    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    const res = await this.fetchWithTimeout(url, { headers: { Accept: 'application/json' } }, 10000);
     if (!res.ok) throw new Error('Error al conectar con maestro de AEMET');
 
     const val = await res.json();
@@ -40,7 +51,7 @@ export class WeatherService implements OnModuleInit {
       throw new Error('No se encontro URL de datos de municipios');
 
     // Descargamos el JSON masivo
-    const resData = await fetch(val.datos);
+    const resData = await this.fetchWithTimeout(val.datos, {}, 10000);
     this.municipios = await resData.json();
     this.logger.log(
       `Cargados ${this.municipios.length} municipios en memoria.`,
@@ -57,10 +68,7 @@ export class WeatherService implements OnModuleInit {
       try {
         await this.loadMunicipios();
       } catch (error) {
-        this.logger.warn(
-          'Fallo lazy loading municipios, usando Madrid',
-          error.message,
-        );
+        // Silencioso
       }
     }
 
@@ -125,40 +133,24 @@ export class WeatherService implements OnModuleInit {
     );
 
     return this.cache.getOrSet(key, ttlMs, async () => {
-      try {
-        // Primera petición a AEMET: Solicita el acceso a los datos
-        const aemetUrl = `https://opendata.aemet.es/opendata/api/prediccion/especifica/municipio/diaria/${municipioCode}`;
-        const response1 = await fetch(`${aemetUrl}?api_key=${apiKey}`, {
-          headers: { Accept: 'application/json' },
-        });
-
-        if (!response1.ok) {
-          throw new Error(`Error en la API de AEMET: ${response1.status}`);
-        }
-
-        const authData = await response1.json();
-
-        // Si AEMET devuelve 404 o clave inválida, el 'estado' será un error
-        if (authData.estado === 401 || authData.estado === 429) {
-          throw new Error(`AEMET Error: ${authData.descripcion}`);
-        }
-
-        if (!authData.datos) {
-          throw new Error(
-            'La respuesta de AEMET no contiene la URL de los datos',
-          );
-        }
-
-        // Segunda petición: Desacargar el archivo JSON real desde la URL generada
-        const response2 = await fetch(authData.datos);
-        const rawWeatherData = await response2.json();
-
-        // Transformamos los datos complejos al formato simple de tu frontend
-        return this.transformAemetData(rawWeatherData[0]);
-      } catch (error) {
-        this.logger.error('Error al obtener datos de AEMET', error);
-        throw error;
+      const aemetUrl = `https://opendata.aemet.es/opendata/api/prediccion/especifica/municipio/diaria/${municipioCode}`;
+      
+      // Si AEMET falla, lanzamos el error para que NO se guarde en la caché (evitando quedarnos sin clima 30 mins)
+      const res = await this.fetchWithTimeout(`${aemetUrl}?api_key=${apiKey}`, { headers: { Accept: 'application/json' } }, 10000);
+      if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+      
+      const authData = await res.json();
+      if (authData.estado === 401 || authData.estado === 429) {
+        throw new Error(`AEMET Error: ${authData.descripcion}`);
       }
+      if (!authData.datos) throw new Error('AEMET_NO_DATOS');
+      
+      const response2 = await this.fetchWithTimeout(authData.datos, {}, 10000);
+      const rawWeatherData = await response2.json();
+      return this.transformAemetData(rawWeatherData[0]);
+    }).catch(() => {
+      // Atrapamos el error FUERA de la caché para devolver un array vacío al controlador, pero de forma silenciosa en consola
+      return [];
     });
   }
 

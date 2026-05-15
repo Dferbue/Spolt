@@ -228,3 +228,17 @@
   }
 }
 
+@media (max-width: 600px) {
+  .weather-title {
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+
+  .weather-location {
+    font-size: 9px;
+  }
+
+  .weather-header {
+    padding: 10px 12px;
+  }
+}

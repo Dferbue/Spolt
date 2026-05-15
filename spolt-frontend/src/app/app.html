@@ -7,3 +7,10 @@
 @if (showGlobalLayout) {
   <app-footer class="theme-dark"></app-footer>
 }
+
+@if (geoService.showPermissionDialog()) {
+  <app-geo-permission-dialog
+    (onAccept)="geoService.handlePermissionChoice(true)"
+    (onDecline)="geoService.handlePermissionChoice(false)"
+  ></app-geo-permission-dialog>
+}

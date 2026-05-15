@@ -19,6 +19,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
             user: config.get('MAIL_USER'),
             pass: config.get('MAIL_PASSWORD'),
           },
+          tls: {
+            rejectUnauthorized: false, // Ayuda en algunos entornos de VPS
+          },
+          connectionTimeout: 10000, // 10 segundos
+          greetingTimeout: 10000,
+          socketTimeout: 15000,
         },
         defaults: {
           from: `"Spolt" <${config.get('MAIL_USER')}>`,

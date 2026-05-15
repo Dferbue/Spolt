@@ -5,7 +5,7 @@
 }
 
 /* El carrusel mobile se oculta en desktop */
-.carousel-container {
+.carousel-container, .mobile-carousel {
     display: none;
 }
 

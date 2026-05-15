@@ -66,6 +66,17 @@
             }
           </div>
 
+          <div class="input-block checkbox-block">
+            <label class="checkbox-container">
+              <input type="checkbox" formControlName="terms">
+              <span>Acepto los <a routerLink="/legal/terminos" target="_blank" class="legal-link">Términos y Condiciones</a> y la <a routerLink="/legal/privacidad" target="_blank" class="legal-link">Política de Privacidad</a></span>
+            </label>
+            @let terms = registerForm.get('terms');
+            @if (terms?.touched && terms?.invalid) {
+              <div class="pixel-error">* DEBES ACEPTAR PARA CONTINUAR</div>
+            }
+          </div>
+
           @if (serverError) {
             <div class="pixel-error" style="margin-bottom: 20px; font-weight: bold;">
               * ERROR: {{ serverError }}

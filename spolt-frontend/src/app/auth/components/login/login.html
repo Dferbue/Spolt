@@ -1,6 +1,11 @@
+@if (forgotMsg) {
+  <div class="mensaje-envio">
+    ✅ {{ forgotMsg }}
+  </div>
+}
+
 <div class="login-box pixel-frame">
   <h3 class="pixel-title">{{ message }}</h3>
-  
   <div class="form-container">
     <form [formGroup]="loginForm" (ngSubmit)="login()">
       <div class="input-block">

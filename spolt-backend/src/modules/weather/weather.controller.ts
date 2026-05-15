@@ -11,16 +11,16 @@ export class WeatherController {
     const lat = latStr ? parseFloat(latStr) : 40.4168;
     const lon = lonStr ? parseFloat(lonStr) : -3.7038;
 
-    try {
-      const forecast = await this.weatherService.getSevenDayForecast(lat, lon);
-      return { available: true, forecast };
-    } catch (error) {
-       console.error('WeatherService fallback triggered:', error.message);
-       return { 
-         available: false, 
-         reason: 'weather_service_unavailable', 
-         forecast: [] 
-       };
+    const forecast = await this.weatherService.getSevenDayForecast(lat, lon);
+    
+    if (!forecast || forecast.length === 0) {
+      return { 
+        available: false, 
+        reason: 'weather_service_unavailable', 
+        forecast: [] 
+      };
     }
+
+    return { available: true, forecast };
   }
 }

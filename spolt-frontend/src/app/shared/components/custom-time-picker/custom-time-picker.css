@@ -1,0 +1,218 @@
+/* ── Trigger ── */
+.time-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 0;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #e0e0e0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111;
+  transition: border-bottom-color 0.2s;
+  text-align: left;
+}
+.time-trigger:hover,
+.time-trigger:focus {
+  border-bottom-color: #ff006e;
+  outline: none;
+}
+.time-trigger-icon { opacity: 0.35; font-size: 0.9rem; }
+.time-trigger-value { flex: 1; }
+.time-trigger-value.placeholder { color: #bbb; font-weight: 400; }
+.time-trigger-arrow { opacity: 0.25; font-size: 0.6rem; }
+
+/* ── Overlay ── */
+.tp-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 16px;
+}
+
+/* ── Modal ── */
+.tp-modal {
+  width: 100%;
+  max-width: 280px;
+  background: #fff;
+  border: 2px solid #e8e8e8;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: tpPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes tpPop {
+  from { transform: scale(0.9); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ── Header ── */
+.tp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tp-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #333;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.tp-x {
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.tp-x:hover { color: #ff006e; }
+
+/* ── Main controls row ── */
+.tp-inputs-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 20px 16px;
+}
+
+.tp-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.tp-unit-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Arrow buttons */
+.tp-arrow {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px 20px;
+  line-height: 1;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+  font-family: inherit;
+}
+.tp-arrow:hover { color: #ff006e; background: #fff5f8; }
+.tp-arrow:active { transform: scale(1.2); }
+
+/* Number input */
+.tp-field-input {
+  width: 80px;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #111;
+  text-align: center;
+  background: #fafafa;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 8px 4px;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  appearance: textfield;
+  -moz-appearance: textfield;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.tp-field-input:focus {
+  border-color: #ff006e;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(255,0,110,0.08);
+}
+.tp-field-input::-webkit-inner-spin-button,
+.tp-field-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.tp-colon {
+  font-size: 2.2rem;
+  font-weight: 300;
+  color: #ccc;
+  padding-bottom: 28px; /* offset for the unit label */
+  user-select: none;
+}
+
+/* ── Quick presets ── */
+.tp-presets {
+  display: flex;
+  gap: 6px;
+  padding: 0 20px 20px;
+}
+
+.tp-preset-btn {
+  flex: 1;
+  padding: 7px 4px;
+  background: #fafafa;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 8px;
+  color: #999;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  font-variant-numeric: tabular-nums;
+}
+.tp-preset-btn:hover,
+.tp-preset-btn.active {
+  background: #fff5f8;
+  border-color: #ff006e;
+  color: #ff006e;
+}
+
+/* ── Confirm ── */
+.tp-confirm {
+  width: 100%;
+  padding: 16px;
+  background: #ff006e;
+  color: #fff;
+  border: none;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 0.5px;
+  transition: background 0.15s;
+}
+.tp-confirm:hover { background: #e0005e; }
+.tp-confirm:active { background: #c00050; }
+
+/* ── Mobile ── */
+@media (max-width: 360px) {
+  .tp-field-input { font-size: 2.2rem; width: 68px; }
+  .tp-colon { font-size: 1.8rem; }
+}

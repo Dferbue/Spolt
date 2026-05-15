@@ -17,8 +17,8 @@ async function bootstrap() {
 
   app.use(cookieParser());
   const configService = app.get(ConfigService);
-  const port = process.env.PORT ?? 3000;
-  const prefix = configService.get<string>('API_PREFIX', 'api');
+  const port = process.env.PORT ?? 3001;
+  const prefix = configService.get<string>('API_PREFIX', 'api/v1');
   app.setGlobalPrefix(prefix);
 
   app.useGlobalPipes(

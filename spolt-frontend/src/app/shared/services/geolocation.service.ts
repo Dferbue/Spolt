@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 export interface UserLocation {
   lat: number;
@@ -12,10 +12,15 @@ export class GeolocationService {
   private readonly DEFAULT_LAT = 40.41;
   private readonly DEFAULT_LNG = -3.70;
   private readonly DEFAULT_NAME = 'Madrid';
+  
+  showPermissionDialog = signal(false);
+  private permissionResolve?: (v: boolean) => void;
 
-  getUserLocation(): Promise<UserLocation> {
+  async getUserLocation(): Promise<UserLocation> {
+    const hasPermission = await this.requestPermission();
+    
     return new Promise((resolve) => {
-      if (!navigator.geolocation) {
+      if (!navigator.geolocation || !hasPermission) {
         resolve({ lat: this.DEFAULT_LAT, lng: this.DEFAULT_LNG });
         return;
       }
@@ -37,6 +42,44 @@ export class GeolocationService {
         }
       );
     });
+  }
+
+  private async requestPermission(): Promise<boolean> {
+    if (sessionStorage.getItem('spolt_location_declined') === 'true') {
+      return false; // El usuario ya lo rechazó en esta sesión, no insistimos
+    }
+
+    if (navigator.permissions && navigator.permissions.query) {
+      try {
+        const status = await navigator.permissions.query({ name: 'geolocation' });
+        if (status.state === 'granted') {
+          return true; // Ya tiene permiso, no mostramos nuestro modal
+        }
+        if (status.state === 'denied') {
+          return false; // Denegado desde el navegador, no mostramos el modal
+        }
+        // Si el estado es 'prompt', procedemos a mostrar nuestro modal
+      } catch (e) {
+        // En caso de que el navegador no soporte la consulta específica, continuamos
+      }
+    }
+
+    return new Promise((resolve) => {
+      this.permissionResolve = resolve;
+      this.showPermissionDialog.set(true);
+    });
+  }
+
+  handlePermissionChoice(accept: boolean) {
+    this.showPermissionDialog.set(false);
+    if (!accept) {
+      // Guardamos en la sesión que no quiere dar permisos, para no molestar más
+      sessionStorage.setItem('spolt_location_declined', 'true');
+    }
+    if (this.permissionResolve) {
+      this.permissionResolve(accept);
+      this.permissionResolve = undefined;
+    }
   }
 
   async reverseGeocode(lat: number, lng: number): Promise<string> {

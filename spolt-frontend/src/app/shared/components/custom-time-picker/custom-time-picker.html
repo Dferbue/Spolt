@@ -1,0 +1,81 @@
+<div class="custom-time-picker">
+  <!-- Trigger -->
+  <button type="button" class="time-trigger" (click)="openPicker()">
+    <span class="time-trigger-icon">🕐</span>
+    <span class="time-trigger-value" [class.placeholder]="!currentValue()">
+      {{ getFormattedCurrent() }}
+    </span>
+    <span class="time-trigger-arrow">▾</span>
+  </button>
+
+  <!-- Modal -->
+  @if (isOpen()) {
+    <div class="tp-overlay" (click)="closePicker()">
+      <div class="tp-modal" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="tp-header">
+          <span class="tp-title">Hora</span>
+          <button type="button" class="tp-x" (click)="closePicker()">✕</button>
+        </div>
+
+        <!-- Controls: arrow + input + arrow -->
+        <div class="tp-inputs-row">
+
+          <!-- Hours -->
+          <div class="tp-unit">
+            <button type="button" class="tp-arrow up" (click)="adjustHour(1)">▲</button>
+            <input
+              class="tp-field-input"
+              type="number"
+              min="0" max="23"
+              [value]="selectedHour()"
+              (input)="onHourInput($event)"
+              (keydown.enter)="confirmSelection()"
+              placeholder="00"
+            >
+            <button type="button" class="tp-arrow down" (click)="adjustHour(-1)">▼</button>
+            <span class="tp-unit-label">h</span>
+          </div>
+
+          <div class="tp-colon">:</div>
+
+          <!-- Minutes -->
+          <div class="tp-unit">
+            <button type="button" class="tp-arrow up" (click)="adjustMinute(5)">▲</button>
+            <input
+              class="tp-field-input"
+              type="number"
+              min="0" max="59"
+              [value]="selectedMinute()"
+              (input)="onMinuteInput($event)"
+              (keydown.enter)="confirmSelection()"
+              placeholder="00"
+            >
+            <button type="button" class="tp-arrow down" (click)="adjustMinute(-5)">▼</button>
+            <span class="tp-unit-label">min</span>
+          </div>
+
+        </div>
+
+        <!-- Quick presets -->
+        <div class="tp-presets">
+          @for (m of [0, 15, 30, 45]; track m) {
+            <button type="button"
+              class="tp-preset-btn"
+              [class.active]="selectedMinute() === m"
+              (click)="setMinute(m)">
+              :{{ formatUnit(m) }}
+            </button>
+          }
+        </div>
+
+        <!-- Confirm -->
+        <button type="button" class="tp-confirm" (click)="confirmSelection()">
+          Confirmar — {{ formatUnit(selectedHour()) }}:{{ formatUnit(selectedMinute()) }}
+        </button>
+
+      </div>
+    </div>
+  }
+</div>

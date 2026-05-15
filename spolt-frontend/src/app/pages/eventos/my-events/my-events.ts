@@ -9,11 +9,12 @@ import { SportColorService } from '../../../shared/services/sport-color.service'
 import { GeolocationService } from '../../../shared/services/geolocation.service';
 import { CustomCalendar } from '../../../shared/components/custom-calendar/custom-calendar';
 import { LocationPicker, LocationData } from '../../../shared/components/location-picker/location-picker';
+import { CustomTimePicker } from '../../../shared/components/custom-time-picker/custom-time-picker';
 
 @Component({
   selector: 'app-my-events',
   standalone: true,
-  imports: [CommonModule, ListEvents, FormsModule, CustomCalendar, LocationPicker],
+  imports: [CommonModule, ListEvents, FormsModule, CustomCalendar, LocationPicker, CustomTimePicker],
   templateUrl: './my-events.html',
   styleUrl: './my-events.css',
   encapsulation: ViewEncapsulation.None,

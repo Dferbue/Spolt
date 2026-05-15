@@ -116,31 +116,31 @@ export class AuthService {
   //  Lógica de recuperación de contraseña 
 
   async forgotPassword(email: string) {
-    const user = await this.usersService.findByEmail(email);
-    if (!user) {
-      // Por seguridad, a veces es mejor no revelar si el email existe
-      // Pero en apps privadas es común lanzar error
-      throw new NotFoundException('No existe un usuario con ese correo electrónico');
-    }
+    console.log(`[AuthService] Forgot password request for: ${email}`);
+    
+    // Buscamos al usuario de forma asíncrona
+    this.usersService.findByEmail(email).then(async (user) => {
+      if (!user) {
+        console.log(`[AuthService] User not found: ${email}`);
+        return;
+      }
 
-    // Generar token y expiración (1 hora)
-    const token = crypto.randomBytes(32).toString('hex');
-    const expires = new Date();
-    expires.setHours(expires.getHours() + 1);
+      const token = crypto.randomBytes(32).toString('hex');
+      const expires = new Date();
+      expires.setHours(expires.getHours() + 1);
 
-    // Guardar en base de datos
-    await this.prisma.usuario.update({
-      where: { id_usuario: user.id_usuario },
-      data: {
-        reset_token: token,
-        reset_token_expires: expires,
-      },
+      await this.prisma.usuario.update({
+        where: { id_usuario: user.id_usuario },
+        data: { reset_token: token, reset_token_expires: expires },
+      });
+
+      console.log(`[AuthService] Sending reset email to: ${email}`);
+      await this.emailService.sendPasswordResetEmail(user.email, user.nombre_usuario, token);
+    }).catch(err => {
+      console.error('[AuthService] Error in forgotPassword background process:', err);
     });
 
-    // Enviar email
-    await this.emailService.sendPasswordResetEmail(user.email, user.nombre_usuario, token);
-
-    return { message: 'Se ha enviado un correo de recuperación' };
+    return { message: 'Enlace de recuperación enviado. Revisa tu correo.' };
   }
 
   async resetPassword(token: string, newPassword: string) {

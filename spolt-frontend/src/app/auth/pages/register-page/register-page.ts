@@ -1,11 +1,11 @@
 import { Component, signal, inject } from '@angular/core';
 import { Register } from "../../components/register/register";
 import { RegisterDto, AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-register-page',
-  imports: [Register],
+  imports: [Register, RouterLink],
   templateUrl: './register-page.html',
   styleUrl: './register-page.css',
 })
@@ -25,7 +25,8 @@ export class RegisterPage {
     nombre_usuario: "", 
     email: "",
     password: "",
-    fecha_nacimiento: ""
+    fecha_nacimiento: "",
+    aceptado_terminos: false
   });
 
   // 3. Método principal que se ejecuta cuando el <app-register> emite el evento

@@ -13,6 +13,7 @@ export interface RegisterDto {
   email: string;
   password: string;
   fecha_nacimiento: string;
+  aceptado_terminos: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

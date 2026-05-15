@@ -106,5 +106,17 @@ export const routes: Routes = [
     loadComponent: () => import('./auth/pages/confirm-register-page/confirm-register-page')
       .then(m => m.ConfirmRegisterPage)
   },
+  {
+    path: 'legal/privacidad',
+    loadComponent: () => import('./pages/legal/privacidad/privacidad').then(m => m.Privacidad)
+  },
+  {
+    path: 'legal/terminos',
+    loadComponent: () => import('./pages/legal/terminos/terminos').then(m => m.Terminos)
+  },
+  {
+    path: 'legal/aviso-legal',
+    loadComponent: () => import('./pages/legal/aviso-legal/aviso-legal').then(m => m.AvisoLegal)
+  },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
