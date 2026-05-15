@@ -80,9 +80,11 @@ export class Eventos implements OnInit {
   public anios = ['2024', '2025', '2026'];
 
   ngOnInit() {
-    this.geoService.getUserLocation().then(loc => {
-      this.userLat.set(loc.lat);
-      this.userLng.set(loc.lng);
+    this.geoService.getUserLocation(true).then(loc => {
+      if (loc) {
+        this.userLat.set(loc.lat);
+        this.userLng.set(loc.lng);
+      }
       this.loadEventos();
     }).catch(() => {
       this.loadEventos();
@@ -300,4 +302,3 @@ export class Eventos implements OnInit {
     }
   }
 }
-

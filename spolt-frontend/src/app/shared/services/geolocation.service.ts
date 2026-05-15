@@ -12,55 +12,77 @@ export class GeolocationService {
   private readonly DEFAULT_LAT = 40.41;
   private readonly DEFAULT_LNG = -3.70;
   private readonly DEFAULT_NAME = 'Madrid';
-  
+  private currentLocation = signal<UserLocation | null>(null);
+  private inFlightLocationRequest?: Promise<UserLocation | null>;
+
   showPermissionDialog = signal(false);
   private permissionResolve?: (v: boolean) => void;
 
-  async getUserLocation(): Promise<UserLocation> {
-    const hasPermission = await this.requestPermission();
-    
-    return new Promise((resolve) => {
-      if (!navigator.geolocation || !hasPermission) {
-        resolve({ lat: this.DEFAULT_LAT, lng: this.DEFAULT_LNG });
-        return;
-      }
+  async getUserLocation(forceRefresh = false): Promise<UserLocation | null> {
+    if (!forceRefresh && this.currentLocation()) {
+      return this.currentLocation();
+    }
 
+    if (this.inFlightLocationRequest) {
+      return this.inFlightLocationRequest;
+    }
+
+    const hasPermission = await this.requestPermission();
+    if (!navigator.geolocation || !hasPermission) {
+      return null;
+    }
+
+    this.inFlightLocationRequest = new Promise((resolve) => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          resolve({
+          const location = {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
-          });
+          };
+          this.currentLocation.set(location);
+          this.inFlightLocationRequest = undefined;
+          resolve(location);
         },
         () => {
-          resolve({ lat: this.DEFAULT_LAT, lng: this.DEFAULT_LNG });
+          const cachedLocation = this.currentLocation();
+          this.inFlightLocationRequest = undefined;
+          resolve(cachedLocation);
         },
         {
-          enableHighAccuracy: false,
-          timeout: 10000,
-          maximumAge: 3600000,
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0,
         }
       );
     });
+
+    return this.inFlightLocationRequest;
+  }
+
+  getCachedLocation(): UserLocation | null {
+    return this.currentLocation();
+  }
+
+  clearCachedLocation(): void {
+    this.currentLocation.set(null);
   }
 
   private async requestPermission(): Promise<boolean> {
     if (sessionStorage.getItem('spolt_location_declined') === 'true') {
-      return false; // El usuario ya lo rechazó en esta sesión, no insistimos
+      return false;
     }
 
     if (navigator.permissions && navigator.permissions.query) {
       try {
         const status = await navigator.permissions.query({ name: 'geolocation' });
         if (status.state === 'granted') {
-          return true; // Ya tiene permiso, no mostramos nuestro modal
+          return true;
         }
         if (status.state === 'denied') {
-          return false; // Denegado desde el navegador, no mostramos el modal
+          return false;
         }
-        // Si el estado es 'prompt', procedemos a mostrar nuestro modal
-      } catch (e) {
-        // En caso de que el navegador no soporte la consulta específica, continuamos
+      } catch {
+        // Navegador sin soporte de Permissions API o implementación parcial.
       }
     }
 
@@ -73,8 +95,8 @@ export class GeolocationService {
   handlePermissionChoice(accept: boolean) {
     this.showPermissionDialog.set(false);
     if (!accept) {
-      // Guardamos en la sesión que no quiere dar permisos, para no molestar más
       sessionStorage.setItem('spolt_location_declined', 'true');
+      this.clearCachedLocation();
     }
     if (this.permissionResolve) {
       this.permissionResolve(accept);
@@ -87,21 +109,21 @@ export class GeolocationService {
       const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es`;
       const response = await fetch(url);
       const data = await response.json();
-      
+
       if (!data || !data.address) {
         return data?.name || 'Tu ubicación';
       }
 
       const addr = data.address;
-      return addr.city || 
-             addr.town || 
-             addr.village || 
-             addr.municipality || 
+      return addr.city ||
+             addr.town ||
+             addr.village ||
+             addr.municipality ||
              addr.suburb ||
              addr.city_district ||
-             addr.county || 
-             addr.state || 
-             data.name || 
+             addr.county ||
+             addr.state ||
+             data.name ||
              'Tu ubicación';
     } catch {
       return 'Tu ubicación';
@@ -134,7 +156,7 @@ export class GeolocationService {
   }
 
   calcularDistancia(lat1: number, lng1: number, lat2: number, lng2: number): number {
-    const R = 6371; // Radio de la Tierra en km
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lng2 - lng1) * Math.PI / 180;
     const a =

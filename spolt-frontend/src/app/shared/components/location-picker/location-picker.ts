@@ -58,8 +58,14 @@ export class LocationPicker implements OnInit, OnDestroy {
 
     if (lat == null || lng == null) {
       const location = await this.geoService.getUserLocation();
-      lat = location.lat;
-      lng = location.lng;
+      if (location) {
+        lat = location.lat;
+        lng = location.lng;
+      } else {
+        const fallbackLocation = this.geoService.getDefaultLocation();
+        lat = fallbackLocation.lat;
+        lng = fallbackLocation.lng;
+      }
     }
 
     this.searchSubscription = this.searchSubject.pipe(

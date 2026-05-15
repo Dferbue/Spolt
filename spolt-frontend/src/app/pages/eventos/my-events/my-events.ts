@@ -204,9 +204,11 @@ export class MyEvents implements OnInit {
 
   ngOnInit() {
     // Primero obtenemos la ubicación del usuario y luego cargamos los eventos
-    this.geoService.getUserLocation().then(loc => {
-      this.userLat.set(loc.lat);
-      this.userLng.set(loc.lng);
+    this.geoService.getUserLocation(true).then(loc => {
+      if (loc) {
+        this.userLat.set(loc.lat);
+        this.userLng.set(loc.lng);
+      }
       this.refreshData();
     });
   }

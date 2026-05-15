@@ -36,10 +36,19 @@ export class Tiempo implements OnInit {
 
   private async getUserLocation(): Promise<void> {
     this.isLoadingLocation.set(true);
-    const { lat, lng } = await this.geoService.getUserLocation();
+    const location = await this.geoService.getUserLocation(true);
     this.isLoadingLocation.set(false);
-    this.fetchWeatherFromBackend(lat, lng);
-    this.locationName.set(await this.geoService.reverseGeocode(lat, lng));
+
+    if (!location) {
+      this.locationName.set('Ubicación no disponible');
+      this.error.set('Activa la ubicación del navegador para ver el tiempo real de tu zona');
+      this.forecast.set([]);
+      this.loading.set(false);
+      return;
+    }
+
+    this.fetchWeatherFromBackend(location.lat, location.lng);
+    this.locationName.set(await this.geoService.reverseGeocode(location.lat, location.lng));
   }
 
   // Obtenemos el tiempo a través de nuestro propio backend (conexión segura a AEMET)
