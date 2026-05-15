@@ -26,8 +26,9 @@ export class EventosService {
     lng?: number;
     radio_km?: number;
     sort?: string;
+    solo_disponibles?: boolean;
   }) {
-    const { page = 1, limit = 30, search, id_deporte, tipo_evento, fecha_desde, fecha_hasta, lat, lng, radio_km, sort } = params;
+    const { page = 1, limit = 30, search, id_deporte, tipo_evento, fecha_desde, fecha_hasta, lat, lng, radio_km, sort, solo_disponibles } = params;
     let url = `${this.apiUrl}?page=${page}&limit=${limit}`;
 
     if (search) url += `&search=${encodeURIComponent(search)}`;
@@ -36,6 +37,7 @@ export class EventosService {
     if (fecha_desde) url += `&fecha_desde=${fecha_desde}`;
     if (fecha_hasta) url += `&fecha_hasta=${fecha_hasta}`;
     if (sort) url += `&sort=${sort}`;
+    if (solo_disponibles) url += `&solo_disponibles=true`;
     
     if (lat != null && lng != null && radio_km != null) {
       url += `&lat=${lat}&lng=${lng}&radio_km=${radio_km}`;
@@ -94,4 +96,3 @@ export class EventosService {
     return this.http.patch<any>(`${this.apiUrl}/${idEvento}/finalizar`, {});
   }
 }
-

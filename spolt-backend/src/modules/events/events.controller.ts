@@ -30,11 +30,14 @@ export class EventsController {
     @Query('id_deporte') id_deporte?: string,
     @Query('mes') mes?: string,
     @Query('anio') anio?: string,
+    @Query('fecha_desde') fecha_desde?: string,
+    @Query('fecha_hasta') fecha_hasta?: string,
     @Query('sort') sort?: string,
     @Query('tipo_evento') tipo_evento?: string,
     @Query('lat') lat?: string,
     @Query('lng') lng?: string,
     @Query('radio_km') radio_km?: string,
+    @Query('solo_disponibles') solo_disponibles?: string,
   ) {
     return this.eventsService.findAll({
       page: page ? parseInt(page, 10) : 1,
@@ -44,11 +47,14 @@ export class EventsController {
       id_deporte: id_deporte ? parseInt(id_deporte, 10) : undefined,
       mes,
       anio,
+      fecha_desde,
+      fecha_hasta,
       sort,
       tipo_evento,
       lat: lat ? parseFloat(lat) : undefined,
       lng: lng ? parseFloat(lng) : undefined,
       radio_km: radio_km ? parseFloat(radio_km) : undefined,
+      solo_disponibles: solo_disponibles === 'true',
     });
   }
 
@@ -118,4 +124,3 @@ export class EventsController {
     return this.eventsService.finalizarEvento(+id, Number(userId));
   }
 }
-

@@ -107,8 +107,7 @@ export class UnirseEventos {
 
 
 
-  // Función que aplica filtros a listas de eventos disponibles (solo abiertos)
-  private aplicarFiltrosALista(eventos: EventInterface[]): EventInterface[] {
+  private aplicarFiltrosBase(eventos: EventInterface[], options?: { soloAbiertos?: boolean; aplicarDistancia?: boolean }): EventInterface[] {
     let resultado = eventos;
 
     const busqueda = this.filtroBusqueda().toLowerCase().trim();
@@ -126,8 +125,9 @@ export class UnirseEventos {
     const tipo = this.filtroTipoEvento();
     if (tipo) resultado = resultado.filter(e => e.tipo_evento === tipo);
 
-    // Solo eventos abiertos
-    resultado = resultado.filter(e => e.estado === 'abierto' || !e.estado);
+    if (options?.soloAbiertos) {
+      resultado = resultado.filter(e => e.estado === 'abierto' || !e.estado);
+    }
 
     if (this.filtroPlazasLibres()) {
       resultado = resultado.filter(e => {
@@ -142,59 +142,34 @@ export class UnirseEventos {
     const fechaHasta = this.filtroFechaHasta();
     if (fechaHasta) resultado = resultado.filter(e => new Date(e.fecha_evento) <= new Date(fechaHasta));
 
-    // Filtro de distancia local (para asegurar consistencia)
-    const lat = this.userLat();
-    const lng = this.userLng();
-    const radio = this.filtroDistanciaKm();
-    if (lat != null && lng != null && radio != null) {
-      resultado = resultado.filter(e => {
-        if (e.latitud == null || e.longitud == null) return false;
-        const dist = this.geoService.calcularDistancia(lat, lng, e.latitud, e.longitud);
-        return dist <= radio;
-      });
+    if (options?.aplicarDistancia) {
+      const lat = this.userLat();
+      const lng = this.userLng();
+      const radio = this.filtroDistanciaKm();
+      if (lat != null && lng != null && radio != null) {
+        resultado = resultado.filter(e => {
+          if (e.latitud == null || e.longitud == null) return false;
+          const dist = this.geoService.calcularDistancia(lat, lng, e.latitud, e.longitud);
+          return dist <= radio;
+        });
+      }
     }
 
     return this.ordenarLista(resultado);
   }
 
+  // Función que aplica filtros a listas de eventos disponibles (solo abiertos)
+  private aplicarFiltrosALista(eventos: EventInterface[]): EventInterface[] {
+    return this.aplicarFiltrosBase(eventos, { soloAbiertos: true, aplicarDistancia: true });
+  }
+
   // Función para la tab de eventos a los que estás unido (sin filtro de estado)
   private aplicarFiltrosUnidos(eventos: EventInterface[]): EventInterface[] {
-    let resultado = eventos;
+    return this.aplicarFiltrosBase(eventos, { aplicarDistancia: false });
+  }
 
-    const busqueda = this.filtroBusqueda().toLowerCase().trim();
-    if (busqueda) {
-      resultado = resultado.filter(e =>
-        e.titulo.toLowerCase().includes(busqueda) ||
-        (e.ubicacion && e.ubicacion.toLowerCase().includes(busqueda)) ||
-        (e.descripcion && e.descripcion.toLowerCase().includes(busqueda))
-      );
-    }
-
-    const deporte = this.filtroDeporte();
-    if (deporte) resultado = resultado.filter(e => e.id_deporte === deporte);
-
-    const tipo = this.filtroTipoEvento();
-    if (tipo) resultado = resultado.filter(e => e.tipo_evento === tipo);
-
-    const fechaDesde = this.filtroFechaDesde();
-    if (fechaDesde) resultado = resultado.filter(e => new Date(e.fecha_evento) >= new Date(fechaDesde));
-
-    const fechaHasta = this.filtroFechaHasta();
-    if (fechaHasta) resultado = resultado.filter(e => new Date(e.fecha_evento) <= new Date(fechaHasta));
-
-    // Filtro de distancia local
-    const lat = this.userLat();
-    const lng = this.userLng();
-    const radio = this.filtroDistanciaKm();
-    if (lat != null && lng != null && radio != null) {
-      resultado = resultado.filter(e => {
-        if (e.latitud == null || e.longitud == null) return false;
-        const dist = this.geoService.calcularDistancia(lat, lng, e.latitud, e.longitud);
-        return dist <= radio;
-      });
-    }
-
-    return this.ordenarLista(resultado);
+  private aplicarFiltrosAmigos(eventos: EventInterface[]): EventInterface[] {
+    return this.aplicarFiltrosBase(eventos, { soloAbiertos: true, aplicarDistancia: false });
   }
 
   // Función de ordenación compartida
@@ -247,10 +222,15 @@ export class UnirseEventos {
   public joinedIds = computed(() => this.lisEventosEnLosQueParticipamos().map(e => Number(e.id_evento || e.id)));
 
   // Tab Públicos: solo muestra lo que viene del servidor (ya paginado)
-  public listaEventos = computed(() => this.rawListaEventos());
+  public listaEventos = computed(() =>
+    this.rawListaEventos().filter(e => {
+      const eventId = Number(e.id_evento || e.id);
+      return !this.joinedIds().includes(eventId) && this.isEventStillAvailable(e);
+    })
+  );
 
   // Tab Amigos: filtrado + paginación local
-  private _amigosBase = computed(() => this.aplicarFiltrosALista(
+  private _amigosBase = computed(() => this.aplicarFiltrosAmigos(
     this.rawListEventosAmigos().filter(e => !this.joinedIds().includes(Number(e.id_evento || e.id)))
   ));
   public totalPaginasAmigos = computed(() => Math.max(1, Math.ceil(this._amigosBase().length / this.ITEMS_POR_PAGINA)));
@@ -281,7 +261,8 @@ export class UnirseEventos {
       lat: this.userLat() ?? undefined,
       lng: this.userLng() ?? undefined,
       radio_km: this.filtroDistanciaKm(),
-      sort: this.ordenarPor()
+      sort: this.ordenarPor(),
+      solo_disponibles: true,
     }).subscribe((res: any) => {
       const data = res?.data || res || [];
       const meta = res?.meta;
@@ -330,6 +311,32 @@ export class UnirseEventos {
     }));
   }
 
+  private isEventStillAvailable(evento: EventInterface): boolean {
+    if (evento.estado && evento.estado !== 'abierto') return false;
+
+    const fechaHoraInicio = this.getEventStartDate(evento);
+    return fechaHoraInicio.getTime() >= Date.now();
+  }
+
+  private getEventStartDate(evento: EventInterface): Date {
+    const fecha = new Date(evento.fecha_evento);
+    const hora = evento.hora_inicio ? new Date(evento.hora_inicio) : null;
+
+    if (!hora || Number.isNaN(hora.getTime())) {
+      return fecha;
+    }
+
+    const fechaHora = new Date(fecha);
+    fechaHora.setHours(
+      hora.getUTCHours(),
+      hora.getUTCMinutes(),
+      hora.getUTCSeconds(),
+      hora.getUTCMilliseconds(),
+    );
+
+    return fechaHora;
+  }
+
 
 
   //Inizializamos los datos
@@ -357,6 +364,12 @@ export class UnirseEventos {
         if (evento) {
           this.lisEventosEnLosQueParticipamos.update(list => [...list, evento]);
         }
+        this.rawListaEventos.update(list =>
+          list.filter(e => Number(e.id_evento || e.id) !== id_evento)
+        );
+        this.rawListEventosAmigos.update(list =>
+          list.filter(e => Number(e.id_evento || e.id) !== id_evento)
+        );
         setTimeout(() => this.mensajeEnvio.set(''), 3000); 
       },
       error:(err: any)=>{

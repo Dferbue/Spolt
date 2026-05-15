@@ -1,7 +1,7 @@
 <div class="app-layout">
   <app-sidebar></app-sidebar>
 
-  <div class="main-content">
+  <div class="main-content" appMobileSwipeNav>
     <app-header-aplicarion pageName="PERFIL"></app-header-aplicarion>
 
     <main class="page-content">
@@ -10,7 +10,7 @@
 
         
           <!-- TABS DE NAVEGACIÓN PRINCIPAL -->
-          <div class="tabs">
+          <div class="tabs" data-swipe-ignore>
             <div class="tab" [class.active]="mainTabActive === 'perfil'" (click)="cambiarMainTab('perfil')">
               PERFIL
             </div>

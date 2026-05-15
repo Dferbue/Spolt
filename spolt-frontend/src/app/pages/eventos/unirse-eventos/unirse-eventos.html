@@ -1,5 +1,5 @@
 <div class="page-content" style="padding-top: 0;">
-  <div class="header-actions" style="margin-bottom: 2rem; justify-content: flex-start; margin-top: -1rem; min-height: 50px; gap: 1rem;">
+  <div class="header-actions" data-swipe-ignore style="margin-bottom: 2rem; justify-content: flex-start; margin-top: -1rem; min-height: 50px; gap: 1rem;">
     <button class="btn-filtros" (click)="abrirFiltros()">
       <span>⚙ FILTROS</span>
       @if (filtrosActivos() > 0) {
@@ -17,7 +17,7 @@
     </select>
   </div>
 
-  <div class="tabs">
+  <div class="tabs" data-swipe-ignore>
     <div class="tab" [class.active]="tabActiva() === 'public'" (click)="mostrar('public')">
       <h2>Públicos</h2>
     </div>
@@ -298,4 +298,3 @@
     </div>
   }
 </div>
-

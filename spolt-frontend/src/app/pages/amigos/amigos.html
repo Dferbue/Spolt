@@ -1,11 +1,11 @@
 <div class="app-layout">
   <app-sidebar></app-sidebar>
 
-  <div class="main-content">
+  <div class="main-content" appMobileSwipeNav>
     <app-header-aplicarion pageName="AMIGOS"></app-header-aplicarion>
 
     <div class="page-content">
-      <div class="header-actions">
+      <div class="header-actions" data-swipe-ignore>
         <div class="title-box">
           <h1>Amistades</h1>
         </div>
@@ -37,7 +37,7 @@
         </div>
       </div>
 
-      <div class="tabs">
+      <div class="tabs" data-swipe-ignore>
         <div class="tab" [class.active]="tabActiva() === 'amigos'" (click)="mostrar('amigos')">
           <h2>Amigos</h2>
         </div>

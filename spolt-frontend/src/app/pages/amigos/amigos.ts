@@ -8,11 +8,12 @@ import { ListFriends } from './list-friends/list-friends';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Signal } from '@angular/core';
 import { AmistadAction } from './models/asmitadAction';
+import { MobileSwipeNavDirective } from '../../shared/directives/mobile-swipe-nav.directive';
 
 @Component({
   selector: 'app-amigos',
   standalone: true,
-  imports: [CommonModule, Sidebar, HeaderAplicarion, ListFriends],
+  imports: [CommonModule, Sidebar, HeaderAplicarion, ListFriends, MobileSwipeNavDirective],
   templateUrl: './amigos.html',
   styleUrl: './amigos.css',
 })
@@ -118,5 +119,4 @@ export class Amigos {
     }
   }
 }
-
 

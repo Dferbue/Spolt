@@ -8,11 +8,12 @@ import { AuthService } from '../../auth/services/auth.service';
 import { EditData } from './components/edit-data/edit-data';
 import { EditEmail } from './components/edit-email/edit-email';
 import { Deportes } from './deportes/deportes';
+import { MobileSwipeNavDirective } from '../../shared/directives/mobile-swipe-nav.directive';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [CommonModule, Sidebar, HeaderAplicarion, EditData, EditEmail, Deportes],
+  imports: [CommonModule, Sidebar, HeaderAplicarion, EditData, EditEmail, Deportes, MobileSwipeNavDirective],
 
   templateUrl: './perfil.html',
   styleUrl: './perfil.css',

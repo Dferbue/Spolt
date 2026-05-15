@@ -75,6 +75,7 @@ export class EventsService implements OnModuleInit {
       lat?: number;
       lng?: number;
       radio_km?: number;
+      solo_disponibles?: boolean;
     } = {},
   ) {
     const {
@@ -92,6 +93,7 @@ export class EventsService implements OnModuleInit {
       lat,
       lng,
       radio_km,
+      solo_disponibles,
     } = params;
 
     const version = await this.cache.getVersion('events');
@@ -114,12 +116,14 @@ export class EventsService implements OnModuleInit {
         lat,
         lng,
         radio_km,
+        solo_disponibles,
       }),
     );
     const ttlMs = this.configService.get<number>('CACHE_TTL_EVENTS_MS', 30000);
 
     return this.cache.getOrSet(key, ttlMs, async () => {
       const where: any = {};
+      const andConditions: any[] = [];
 
       if (estado) {
         where.estado = estado;
@@ -140,6 +144,10 @@ export class EventsService implements OnModuleInit {
           { ubicacion: { contains: search } },
           { deporte: { nombre: { contains: search } } },
         ];
+      }
+
+      if (solo_disponibles) {
+        andConditions.push(this.buildAvailableEventsWhere());
       }
 
       if (fecha_desde || fecha_hasta) {
@@ -175,6 +183,10 @@ export class EventsService implements OnModuleInit {
             lt: endDate,
           };
         }
+      }
+
+      if (andConditions.length > 0) {
+        where.AND = andConditions;
       }
 
       let orderBy: any = { fecha_evento: 'asc' };
@@ -303,6 +315,35 @@ export class EventsService implements OnModuleInit {
         Math.cos((lat2 * Math.PI) / 180) *
         Math.sin(dLon / 2) ** 2;
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  private buildAvailableEventsWhere() {
+    const now = new Date();
+    const todayUtc = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+    );
+    const currentTimeUtc = new Date(
+      Date.UTC(
+        1970,
+        0,
+        1,
+        now.getUTCHours(),
+        now.getUTCMinutes(),
+        now.getUTCSeconds(),
+        now.getUTCMilliseconds(),
+      ),
+    );
+
+    return {
+      estado: 'abierto',
+      OR: [
+        { fecha_evento: { gt: todayUtc } },
+        {
+          fecha_evento: todayUtc,
+          hora_inicio: { gte: currentTimeUtc },
+        },
+      ],
+    };
   }
 
   //Creamos una funcion que nos traiga los eventos que ha creado ese usuario

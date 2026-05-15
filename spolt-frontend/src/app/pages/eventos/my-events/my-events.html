@@ -1,5 +1,5 @@
 <div class="my-events-container">
-  <div class="header-actions-row">
+  <div class="header-actions-row" data-swipe-ignore>
     <button class="btn-filtros" (click)="abrirFiltros()">
       <span>⚙ FILTROS</span>
       @if (filtrosActivos() > 0) {
@@ -17,7 +17,7 @@
     </select>
   </div>
 
-  <div class="tabs">
+  <div class="tabs" data-swipe-ignore>
     <div class="tab" [class.active]="tabActiva() === 'creados'" (click)="cambiarTab('creados')">
       <h2>Creados</h2>
     </div>

@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { Sidebar } from '../../layout/sidebar/sidebar';
 import { HeaderAplicarion } from '../../layout/header-aplicarion/header-aplicarion';
+import { MobileSwipeNavDirective } from '../../shared/directives/mobile-swipe-nav.directive';
 import { filter, map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-eventos',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, Sidebar, HeaderAplicarion],
+  imports: [CommonModule, RouterOutlet, Sidebar, HeaderAplicarion, MobileSwipeNavDirective],
   templateUrl: './eventos.html',
   styleUrl: './eventos.css',
 })
