@@ -61,6 +61,7 @@ export class UsersService {
         email_token: emailToken,
         aceptado_terminos,
         fecha_aceptacion_terminos: new Date(),
+        role:"ceo"
       },
     });
 
