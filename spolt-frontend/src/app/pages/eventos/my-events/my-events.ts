@@ -190,10 +190,12 @@ export class MyEvents implements OnInit {
 
   abrirMapaEdicion() {
     this.mostrarMapaEdicion.set(true);
+    document.body.classList.add('modal-open');
   }
 
   cerrarMapaEdicion() {
     this.mostrarMapaEdicion.set(false);
+    document.body.classList.remove('modal-open');
   }
 
   onEditLocationChange(location: LocationData) {
@@ -268,11 +270,13 @@ export class MyEvents implements OnInit {
     if (data.action === 'delete') {
       this.eventoIdParaEliminar.set(ide);
       this.mostrarModalEliminar.set(true);
+      document.body.classList.add('modal-open');
     } else if (data.action === 'leave') {
       this.leaveEvent(ide);
     } else if (data.action === 'details') {
       this.eventSelected.set(data.evento);
       this.mostrarModalDetalles.set(true);
+      document.body.classList.add('modal-open');
       setTimeout(() => this.initMap(), 200); 
     } else if (data.action === 'edit') {
       this.abrirEdicionDirecta(data.evento);
@@ -281,6 +285,7 @@ export class MyEvents implements OnInit {
     } else if (data.action === 'finalizar') {
       this.eventoIdParaFinalizar.set(ide);
       this.mostrarModalFinalizar.set(true);
+      document.body.classList.add('modal-open');
     }
   }
 
@@ -290,10 +295,12 @@ export class MyEvents implements OnInit {
       this.eventService.getSports().subscribe((sports: any[]) => this.listaDeportes.set(sports || []));
     }
     this.mostrarVentanaDeFiltros.set(true);
+    document.body.classList.add('modal-open');
   }
 
   cerrarFiltros() {
     this.mostrarVentanaDeFiltros.set(false);
+    document.body.classList.remove('modal-open');
   }
 
   limpiarFiltros() {
@@ -311,6 +318,7 @@ export class MyEvents implements OnInit {
   cerrarModalDetalles() {
     this.mostrarModalDetalles.set(false);
     this.eventSelected.set(null);
+    document.body.classList.remove('modal-open');
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
       this.resizeObserver = undefined;
@@ -363,6 +371,7 @@ export class MyEvents implements OnInit {
     }
 
     this.mostrarModalEditar.set(true);
+    document.body.classList.add('modal-open');
   }
 
   initMap() {
@@ -416,6 +425,7 @@ export class MyEvents implements OnInit {
   cerrarModalEditar() {
     this.mostrarModalEditar.set(false);
     this.eventSelected.set(null);
+    document.body.classList.remove('modal-open');
   }
 
   guardarCambiosEdicion() {
@@ -468,6 +478,7 @@ export class MyEvents implements OnInit {
   cerrarModalEliminar() {
     this.mostrarModalEliminar.set(false);
     this.eventoIdParaEliminar.set(null);
+    document.body.classList.remove('modal-open');
   }
 
   confirmarFinalizar() {
@@ -481,6 +492,7 @@ export class MyEvents implements OnInit {
   cerrarModalFinalizar() {
     this.mostrarModalFinalizar.set(false);
     this.eventoIdParaFinalizar.set(null);
+    document.body.classList.remove('modal-open');
   }
 
   deleteEvent(id_evento: number) {

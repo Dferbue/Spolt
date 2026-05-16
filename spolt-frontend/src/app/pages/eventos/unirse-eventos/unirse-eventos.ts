@@ -85,12 +85,13 @@ export class UnirseEventos {
     // Cargamos la lista de deportes del servidor si aún no los tenemos
     if (this.listaDeportes().length === 0) {
       this.eventService.getSports().subscribe((data: any[]) => this.listaDeportes.set(data || []));
-    }
     this.mostrarVentanaDeFiltros.set(true);
+    document.body.classList.add('modal-open');
   }
 
   cerrarFiltros() {
     this.mostrarVentanaDeFiltros.set(false);
+    document.body.classList.remove('modal-open');
     this.refreshData();
   }
 
@@ -250,6 +251,15 @@ export class UnirseEventos {
   // Cargar página específica de eventos públicos (server-side)
   cargarPaginaPublicos(pagina: number) {
     this.paginaActual.set(pagina);
+
+    // Si no se ha podido obtener la ubicación, no cargamos eventos públicos
+    if (this.userLat() === null || this.userLng() === null) {
+      this.rawListaEventos.set([]);
+      this.totalItems.set(0);
+      this.totalPaginas.set(1);
+      return;
+    }
+
     this.eventService.getAllEvents({
       page: pagina,
       limit: this.ITEMS_POR_PAGINA,
@@ -408,9 +418,11 @@ export class UnirseEventos {
     }else if(data.action=== "leave"){
       this.eventoIdParaSalir.set(ide);
       this.mostrarModalSalir.set(true);
+      document.body.classList.add('modal-open');
     }else if (data.action === "details") {
       this.eventSelected.set(data.evento);
       this.mostrarModalDetalles.set(true);
+      document.body.classList.add('modal-open');
       setTimeout(() => this.initMap(), 200);
     }
   }
@@ -419,6 +431,7 @@ export class UnirseEventos {
   cerrarModalDetalles() {
     this.mostrarModalDetalles.set(false);
     this.eventSelected.set(null);
+    document.body.classList.remove('modal-open');
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
       this.resizeObserver = undefined;
@@ -506,5 +519,6 @@ export class UnirseEventos {
   cerrarModalSalir() {
     this.mostrarModalSalir.set(false);
     this.eventoIdParaSalir.set(null);
+    document.body.classList.remove('modal-open');
   }
 }

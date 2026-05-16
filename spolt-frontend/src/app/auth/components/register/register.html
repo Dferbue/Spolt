@@ -61,8 +61,11 @@
               formControlName="fecha_nacimiento"
             ></app-custom-calendar>
             @let fecha_nacimiento = registerForm.get('fecha_nacimiento');
-            @if (fecha_nacimiento?.touched && fecha_nacimiento?.invalid) {
+            @if (fecha_nacimiento?.touched && fecha_nacimiento?.hasError('required')) {
               <div class="pixel-error">* REQUIRED</div>
+            }
+            @if (fecha_nacimiento?.touched && fecha_nacimiento?.hasError('futureDate')) {
+              <div class="pixel-error">* INVALID PAST DATE</div>
             }
           </div>
 

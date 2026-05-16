@@ -19,6 +19,7 @@ export class EditData {
   loading = false;
   serverError = '';
   successMsg = '';
+  todayDate = new Date().toISOString().split('T')[0];
 
   constructor(
     private fb: FormBuilder,

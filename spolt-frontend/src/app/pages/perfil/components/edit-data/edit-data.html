@@ -16,7 +16,7 @@
 
       <div class="form-group" style="margin-bottom: 2px;">
         <label class="form-label" style="font-size: 0.72rem; color: #111; font-weight: 950; text-transform: uppercase; margin-bottom: 6px; display: block;">FECHA DE NACIMIENTO</label>
-        <input type="date" class="form-input" formControlName="fecha_nacimiento" style="width: 100%; padding: 11px; border: 3px solid #111; border-radius: 8px; font-weight: 700; outline: none;" />
+        <input type="date" class="form-input" formControlName="fecha_nacimiento" [max]="todayDate" style="width: 100%; padding: 11px; border: 3px solid #111; border-radius: 8px; font-weight: 700; outline: none;" />
       </div>
 
       @if (serverError) {

@@ -12,7 +12,7 @@ export class MobileSwipeNavDirective {
   private readonly swipeNavigation = inject(MobileSwipeNavigationService);
 
   private readonly mobileMediaQuery = window.matchMedia('(max-width: 600px)');
-  private readonly maxPreviewOffset = 42;
+  private readonly maxPreviewOffset = 80;
   private readonly minHorizontalIntent = 14;
   private readonly swipeThreshold = 72;
   private readonly maxSwipeDurationMs = 700;
@@ -93,7 +93,7 @@ export class MobileSwipeNavDirective {
 
     const previewOffset = Math.max(
       -this.maxPreviewOffset,
-      Math.min(this.maxPreviewOffset, deltaX * 0.22),
+      Math.min(this.maxPreviewOffset, deltaX * 0.45),
     );
 
     this.setTransform(previewOffset);
@@ -167,13 +167,13 @@ export class MobileSwipeNavDirective {
       return;
     }
 
-    this.setTransition('transform 180ms ease');
-    this.setTransform(deltaX < 0 ? -28 : 28);
+    this.setTransition('transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1)');
+    this.setTransform(deltaX < 0 ? -this.maxPreviewOffset : this.maxPreviewOffset);
 
     window.setTimeout(() => {
       this.router.navigateByUrl(targetRoute);
       this.resetTransform();
-    }, 110);
+    }, 150);
 
     this.resetGesture();
   }
@@ -212,12 +212,16 @@ export class MobileSwipeNavDirective {
   }
 
   private resetTransform(): void {
-    this.setTransition('transform 180ms ease');
+    this.setTransition('transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1)');
     this.setTransform(0);
   }
 
   private setTransform(offsetX: number): void {
-    this.elementRef.nativeElement.style.transform = `translate3d(${offsetX}px, 0, 0)`;
+    if (offsetX === 0) {
+      this.elementRef.nativeElement.style.transform = '';
+    } else {
+      this.elementRef.nativeElement.style.transform = `translate3d(${offsetX}px, 0, 0)`;
+    }
   }
 
   private setTransition(value: string): void {

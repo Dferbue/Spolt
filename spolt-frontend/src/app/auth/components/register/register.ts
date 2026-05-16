@@ -1,8 +1,19 @@
 import { Component, output, Input } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AuthService, RegisterDto } from '../../services/auth.service';
 import { CustomCalendar } from '../../../shared/components/custom-calendar/custom-calendar';
+
+export function pastDateValidator(control: AbstractControl): ValidationErrors | null {
+  if (!control.value) return null;
+  const inputDate = new Date(control.value);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (inputDate > today) {
+    return { futureDate: true };
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-register',
@@ -25,7 +36,7 @@ export class Register {
       nombre_usuario: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
-      fecha_nacimiento: ['', Validators.required],
+      fecha_nacimiento: ['', [Validators.required, pastDateValidator]],
       terms: [false, Validators.requiredTrue]
     });
   }

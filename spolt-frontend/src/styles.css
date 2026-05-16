@@ -449,5 +449,6 @@ body.modal-open .page-content,
 body.modal-open .page-container,
 body.modal-open .view-container {
     z-index: 99999 !important;
+    position: relative !important;
     overflow: visible !important;
 }
