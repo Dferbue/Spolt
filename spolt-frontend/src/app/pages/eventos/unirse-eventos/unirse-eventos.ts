@@ -85,6 +85,7 @@ export class UnirseEventos {
     // Cargamos la lista de deportes del servidor si aún no los tenemos
     if (this.listaDeportes().length === 0) {
       this.eventService.getSports().subscribe((data: any[]) => this.listaDeportes.set(data || []));
+    }
     this.mostrarVentanaDeFiltros.set(true);
     document.body.classList.add('modal-open');
   }
