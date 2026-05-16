@@ -80,16 +80,19 @@ export class Eventos implements OnInit {
   public anios = ['2024', '2025', '2026'];
 
   ngOnInit() {
-    this.geoService.getUserLocation(true).then(loc => {
+    // Cargamos eventos inmediatamente para no bloquear la UI
+    this.loadEventos();
+    this.loadDeportes();
+
+    // Intentamos obtener la ubicación en segundo plano para el ordenamiento por cercanía
+    this.geoService.getUserLocation(false).then(loc => {
       if (loc) {
         this.userLat.set(loc.lat);
         this.userLng.set(loc.lng);
+        // Opcional: recargar si queremos que el orden por cercanía se aplique al instante
+        // this.loadEventos();
       }
-      this.loadEventos();
-    }).catch(() => {
-      this.loadEventos();
-    });
-    this.loadDeportes();
+    }).catch(err => console.warn('No se pudo obtener la ubicación para admin:', err));
   }
 
   loadEventos() {
