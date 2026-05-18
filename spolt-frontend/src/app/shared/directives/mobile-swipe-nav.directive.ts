@@ -13,8 +13,8 @@ export class MobileSwipeNavDirective {
 
   private readonly mobileMediaQuery = window.matchMedia('(max-width: 600px)');
   private readonly maxPreviewOffset = 80;
-  private readonly minHorizontalIntent = 14;
-  private readonly swipeThreshold = 72;
+  private readonly minHorizontalIntent = 24;
+  private readonly swipeThreshold = 120;
   private readonly maxSwipeDurationMs = 700;
 
   private startX = 0;
@@ -80,7 +80,7 @@ export class MobileSwipeNavDirective {
         return;
       }
 
-      if (absX < absY * 1.2) {
+      if (absX < absY * 2.0) {
         return;
       }
 
@@ -149,7 +149,7 @@ export class MobileSwipeNavDirective {
     const isValidSwipe =
       this.horizontalGesture &&
       absX >= this.swipeThreshold &&
-      absX > absY * 1.2 &&
+      absX > absY * 2.0 &&
       duration <= this.maxSwipeDurationMs;
 
     if (!isValidSwipe) {

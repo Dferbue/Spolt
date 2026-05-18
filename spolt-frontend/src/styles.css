@@ -352,6 +352,10 @@ body {
     animation: fadeIn 0.3s;
 }
 
+.targetaAmistad {
+    z-index: 999999999 !important;
+}
+
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
