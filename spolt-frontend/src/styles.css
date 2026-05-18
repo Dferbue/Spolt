@@ -446,8 +446,7 @@ body.modal-open {
 /* Elevamos los contenedores principales cuando hay un modal abierto para que superen sidebars/footers */
 body.modal-open .main-content,
 body.modal-open .page-content,
-body.modal-open .page-container,
-body.modal-open .view-container {
+body.modal-open .page-container {
     z-index: 99999 !important;
     position: relative !important;
     overflow: visible !important;
