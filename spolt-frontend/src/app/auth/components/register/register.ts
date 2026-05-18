@@ -28,6 +28,12 @@ export class Register {
   @Input() serverError = "";
   public sendRegister = output<RegisterDto>();
 
+  showPassword = false;
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
+
   constructor(
     private authService: AuthService,
     private fb: FormBuilder

@@ -25,13 +25,18 @@
       
       <div class="input-block">
         <label for="password" >PASSWORD</label>
-        <input 
-          type="password" 
-          id="password"
-          placeholder="********"
-          formControlName="password" 
-          class="pixel-input"
-        />
+        <div class="password-wrapper">
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            id="password"
+            placeholder="********"
+            formControlName="password" 
+            class="pixel-input"
+          />
+          <button type="button" class="toggle-password-btn" (click)="togglePassword()">
+            {{ showPassword ? 'OCULTAR' : 'MOSTRAR' }}
+          </button>
+        </div>
         @let password = loginForm.get('password');
         @if (password?.touched && password?.invalid) {
           <div class="pixel-error">* MIN 8 CHARS</div>

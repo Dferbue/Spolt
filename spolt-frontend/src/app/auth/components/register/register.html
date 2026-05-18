@@ -40,14 +40,19 @@
 
           <div class="input-block">
             <label for="password">PASSWORD</label>
-            <input
-              type="password"
-              placeholder="********"
-              id="password"
-              formControlName="password"
-              class="pixel-input"
-              required
-            />
+            <div class="password-wrapper">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                placeholder="********"
+                id="password"
+                formControlName="password"
+                class="pixel-input"
+                required
+              />
+              <button type="button" class="toggle-password-btn" (click)="togglePassword()">
+                {{ showPassword ? 'OCULTAR' : 'MOSTRAR' }}
+              </button>
+            </div>
             @let password = registerForm.get('password');
             @if (password?.touched && password?.invalid) {
               <div class="pixel-error">* MIN 8 CHARS</div>

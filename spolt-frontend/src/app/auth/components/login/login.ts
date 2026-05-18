@@ -14,6 +14,12 @@ export class Login {
   @Input() loading = false;
   @Input() serverError = "";
   public sendLogin = output<LoginDto>();
+  
+  showPassword = false;
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
 
   constructor(
     private authService: AuthService,
