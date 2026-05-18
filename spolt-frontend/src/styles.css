@@ -348,7 +348,7 @@ body {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.7); 
-    z-index: 999999998;
+    z-index: 999999998 !important;
     animation: fadeIn 0.3s;
 }
 
@@ -367,7 +367,7 @@ body {
     border-radius: 12px;
     box-shadow: 8px 8px 0px var(--pink, #ff006e);
     padding: 1.5rem 1.8rem;
-    z-index: 999999999;
+    z-index: 999999999 !important;
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
