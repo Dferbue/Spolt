@@ -45,7 +45,12 @@
           <h2>Enviadas</h2>
         </div>
         <div class="tab" [class.active]="tabActiva() === 'recibidas'" (click)="mostrar('recibidas')">
-          <h2>Recibidas</h2>
+          <h2 style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            Recibidas
+            @if (listSolicitudesRecividas()?.length) {
+              <span class="tab-badge">{{ listSolicitudesRecividas().length }}</span>
+            }
+          </h2>
         </div>
       </div>
 

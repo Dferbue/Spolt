@@ -25,8 +25,13 @@ export class UsersService {
       createUserDto;
 
     // Verificamos si ya existe un usuario con ese email (para evitar el error 500)
-    const existingEmail = await this.prisma.usuario.findUnique({
-      where: { email },
+    const existingEmail = await this.prisma.usuario.findFirst({
+      where: { 
+        email: {
+          equals: email,
+          mode: 'insensitive'
+        }
+      },
     });
     if (existingEmail) {
       // ConflictException envía un código 409 al frontend automáticamente
@@ -34,8 +39,13 @@ export class UsersService {
     }
 
     // 2. Verificamos si el nombre de usuario ya está pillado
-    const existingUsername = await this.prisma.usuario.findUnique({
-      where: { nombre_usuario },
+    const existingUsername = await this.prisma.usuario.findFirst({
+      where: { 
+        nombre_usuario: {
+          equals: nombre_usuario,
+          mode: 'insensitive'
+        }
+      },
     });
     if (existingUsername) {
       throw new ConflictException(
@@ -154,8 +164,13 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-    return this.prisma.usuario.findUnique({
-      where: { email },
+    return this.prisma.usuario.findFirst({
+      where: { 
+        email: {
+          equals: email,
+          mode: 'insensitive'
+        }
+      },
     });
   }
 

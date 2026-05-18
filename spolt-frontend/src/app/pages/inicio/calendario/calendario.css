@@ -266,6 +266,8 @@
   font-size: 13px;
   color: #666666;
   margin-top: 4px;
+  display: flex;
+  align-items: center;
 }
 
 .joined-indicator {
@@ -348,6 +350,47 @@
   font-size: 11px;
   color: #666666;
   margin-top: 2px;
+  display: flex;
+  align-items: center;
+}
+
+.event-sport-tag {
+  display: inline-block;
+  padding: 2px 6px;
+  border: 1.5px solid #000000;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 950;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin-right: 6px;
+  box-shadow: 1.5px 1.5px 0px #000000;
+  text-shadow: 1px 1px 0px rgba(0,0,0,0.3);
+}
+
+.btn-go-event {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  background: #ff006e;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 950;
+  width: 36px;
+  height: 36px;
+  border: 2px solid #000000;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0px #000000;
+  transition: transform 0.1s, box-shadow 0.1s;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.btn-go-event:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px #000000;
 }
 
 /* RESPONSIVO */

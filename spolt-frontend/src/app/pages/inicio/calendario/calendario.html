@@ -62,9 +62,13 @@
                 <div class="event-color-bar" [style.background]="ev.color"></div>
                 <div class="event-content">
                   <div class="event-name">{{ ev.name }}</div>
-                  <div class="event-time">{{ ev.time }}</div>
+                  <div class="event-time">
+                    <span class="event-sport-tag" [style.background]="ev.color">{{ ev.sport }}</span>
+                    {{ ev.time }}
+                  </div>
                 </div>
                 <div class="joined-indicator" title="Unido">★</div>
+                <a class="btn-go-event" [routerLink]="['/eventos/mis-eventos']" [queryParams]="{tab: 'unidos'}" fragment="evento-{{ev.id}}" title="Ir al evento">➦</a>
               </div>
             }
           }
@@ -89,8 +93,12 @@
               <div class="mini-dot" [style.background]="ev.color"></div>
               <div class="upcoming-details">
                 <div class="upcoming-name">{{ ev.name }}</div>
-                <div class="upcoming-meta">{{ formatDateLabel(ev.date) }} · {{ ev.time }}</div>
+                <div class="upcoming-meta">
+                  <span class="event-sport-tag" [style.background]="ev.color">{{ ev.sport }}</span>
+                  {{ formatDateLabel(ev.date) }} · {{ ev.time }}
+                </div>
               </div>
+              <a class="btn-go-event" [routerLink]="['/eventos/mis-eventos']" [queryParams]="{tab: 'unidos'}" fragment="evento-{{ev.id}}" title="Ir al evento">➦</a>
             </div>
           }
         </div>

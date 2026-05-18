@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal, ViewEncapsulation, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { EventosService } from '../service/eventos.service';
 import { CreateEvent, EventInterface, eventAction } from '../models/createEvent';
 import { FormsModule } from '@angular/forms';
@@ -20,6 +21,7 @@ import { CustomTimePicker } from '../../../shared/components/custom-time-picker/
   encapsulation: ViewEncapsulation.None,
 })
 export class MyEvents implements OnInit {
+  private readonly route = inject(ActivatedRoute);
   private readonly eventService = inject(EventosService);
   public readonly sportColorService = inject(SportColorService);
   private readonly geoService = inject(GeolocationService);
@@ -205,6 +207,12 @@ export class MyEvents implements OnInit {
   }
 
   ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      if (params['tab'] === 'unidos' || params['tab'] === 'creados') {
+        this.tabActiva.set(params['tab']);
+      }
+    });
+
     // Primero obtenemos la ubicación del usuario y luego cargamos los eventos
     this.geoService.getUserLocation(true).then(loc => {
       if (loc) {
@@ -258,6 +266,21 @@ export class MyEvents implements OnInit {
 
   private checkLoading() {
     this.loading.set(false);
+    setTimeout(() => {
+      this.route.fragment.subscribe(fragment => {
+        if (fragment) {
+          const element = document.getElementById(fragment);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.style.transition = 'box-shadow 0.3s';
+            element.style.boxShadow = '0 0 15px 5px var(--pink, #ff006e)';
+            setTimeout(() => {
+              element.style.boxShadow = '';
+            }, 2000);
+          }
+        }
+      });
+    }, 300);
   }
 
   cambiarTab(tab: 'creados' | 'unidos') {

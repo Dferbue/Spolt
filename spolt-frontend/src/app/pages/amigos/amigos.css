@@ -235,6 +235,20 @@
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+.tab-badge {
+    background-color: #111;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 950;
+    border: 2px solid #fff;
+    box-shadow: 2px 2px 0px var(--pink, #ff006e);
+    min-width: 14px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
 .tab.active {
     background-color: var(--pink, #ff006e);
     color: white;

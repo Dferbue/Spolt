@@ -256,6 +256,27 @@
     transform: scale(1.1);
 }
 
+.friends-badge {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    background: #ff006e;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 950;
+    padding: 0 5px;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    border: 1.5px solid #ffffff;
+    pointer-events: none;
+    box-shadow: 1.5px 1.5px 0px #000000;
+    z-index: 10;
+}
+
 
 /* =========================================
    RESPONSIVE: TABLET (600px - 850px)

@@ -9,9 +9,12 @@ export class FrindshipsService {
   // Funcion para crear la amistad entre 2 usuarios
   async create(payload: { id_solicitante: number; username: string }) {
     // Buscar al usuario receptor por su nombre de usuario
-    const receptor = await this.prisma.usuario.findUnique({
+    const receptor = await this.prisma.usuario.findFirst({
       where: {
-        nombre_usuario: payload.username,
+        nombre_usuario: {
+          equals: payload.username,
+          mode: 'insensitive',
+        },
       },
     });
 
