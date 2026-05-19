@@ -140,6 +140,10 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/confirm-register`, { token });
   }
 
+  resendVerification(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/resend-verification`, { email });
+  }
+
   pingOnline(): Observable<any> {
     return this.http.patch(`/api/v1/users/ping`, {});
   }

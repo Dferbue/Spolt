@@ -269,6 +269,33 @@ export class AuthService {
 
     return { message: 'Cuenta verificada correctamente. Ya puedes iniciar sesión.' };
   }
+
+  // Reenvío del correo de verificación de registro
+
+  async resendVerification(email: string) {
+    const user = await this.usersService.findByEmail(email);
+
+    // Respondemos siempre con el mismo mensaje para no revelar si el email existe
+    if (!user) {
+      return { message: 'Si el correo existe y no está verificado, recibirás un nuevo enlace.' };
+    }
+
+    if (user.email_verificado) {
+      return { message: 'Esta cuenta ya ha sido verificada. Puedes iniciar sesión.' };
+    }
+
+    // Generar nuevo token
+    const token = crypto.randomBytes(32).toString('hex');
+
+    await this.prisma.usuario.update({
+      where: { id_usuario: user.id_usuario },
+      data: { email_token: token },
+    });
+
+    await this.emailService.sendRegistrationConfirmation(user.email, user.nombre_usuario, token);
+
+    return { message: 'Si el correo existe y no está verificado, recibirás un nuevo enlace.' };
+  }
 }
 
 

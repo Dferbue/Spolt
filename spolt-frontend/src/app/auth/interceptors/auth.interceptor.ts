@@ -13,7 +13,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
   const router = inject(Router);
 
   // No interceptar las peticiones de auth (login, register, refresh) para evitar bucles
-  if (req.url.includes('/auth/login') || req.url.includes('/auth/register') || req.url.includes('/auth/refresh') || req.url.includes('/auth/confirm-register')) {
+  if (req.url.includes('/auth/login') || req.url.includes('/auth/register') || req.url.includes('/auth/refresh') || req.url.includes('/auth/confirm-register') || req.url.includes('/auth/resend-verification')) {
     return next(req.clone({ withCredentials: true }));
   }
 

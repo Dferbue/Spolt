@@ -121,6 +121,12 @@ export class AuthController {
     return await this.authService.confirmRegistration(token);
   }
 
+  @Post('resend-verification')
+  @HttpCode(HttpStatus.OK)
+  async resendVerification(@Body('email') email: string) {
+    return await this.authService.resendVerification(email);
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
   async getUserProfile(@Req() req: any) {

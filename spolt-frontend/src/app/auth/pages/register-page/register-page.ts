@@ -13,14 +13,17 @@ export class RegisterPage {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  // 2. Estado del componente:
-  // Variable para mostrar errores en caso de que el backend los devuelva (ej. "El usuario ya existe").
   errorMessage = "";
   loading = signal(false);
   registroExitoso = signal(false);
-  
-  // Usamos un Signal para almacenar el estado del formulario de registro.
-  // Lo inicializamos vacío pero con la estructura de RegisterDto que espera NestJS.
+  registeredEmail = signal('');
+
+  // Estado del reenvío
+  resendLoading = signal(false);
+  resendMessage = signal('');
+  resendError = signal(false);
+  resendCooldown = signal(false);
+
   readonly registerSignal = signal<RegisterDto>({ 
     nombre_usuario: "", 
     email: "",
@@ -29,32 +32,46 @@ export class RegisterPage {
     aceptado_terminos: false
   });
 
-  // 3. Método principal que se ejecuta cuando el <app-register> emite el evento
   register(credentials: RegisterDto) {
-    // Actualizamos el Signal con los datos que nos ha pasado el componente hijo
     this.registerSignal.set(credentials);
-    
     this.errorMessage = "";
     this.loading.set(true);
 
-    // Llamamos al método "register" de nuestro AuthService pasándole los datos.
-    // .subscribe() es lo que realmente hace que se dispare la petición HTTP ('POST /auth/register')
     this.authService.register(credentials).subscribe({
-      
-      // Bloque NEXT: Se ejecuta solo si el servidor responde que TODO FUE BIEN (código 201)
       next: (response) => {
         this.loading.set(false);
         this.registroExitoso.set(true);
+        this.registeredEmail.set(credentials.email);
         console.log('Registro exitoso:', response);
       },
-      
-      // Bloque ERROR: Se ejecuta si el servidor devuelve algún error (código 400, 409, 500...)
       error: (err) => {
         this.loading.set(false);
         console.error('Error en el registro:', err);
-        // Intentamos leer el mensaje original que escupe el servidor NestJS (ej. "Email already exists").
-        // Si no logramos leerlo, ponemos un texto genérico.
         this.errorMessage = err.error?.message || 'Error al crear la cuenta. Revisa tus datos e inténtalo de nuevo.';
+      }
+    });
+  }
+
+  resendVerification() {
+    if (this.resendCooldown()) return;
+
+    this.resendLoading.set(true);
+    this.resendMessage.set('');
+    this.resendError.set(false);
+
+    this.authService.resendVerification(this.registeredEmail()).subscribe({
+      next: (res) => {
+        this.resendLoading.set(false);
+        this.resendMessage.set(res.message || '¡Correo reenviado! Revisa tu bandeja de entrada y la carpeta de spam.');
+        this.resendError.set(false);
+        // Cooldown de 30 segundos para evitar spam
+        this.resendCooldown.set(true);
+        setTimeout(() => this.resendCooldown.set(false), 30000);
+      },
+      error: (err) => {
+        this.resendLoading.set(false);
+        this.resendMessage.set(err.error?.message || 'Error al reenviar el correo. Inténtalo de nuevo.');
+        this.resendError.set(true);
       }
     });
   }
