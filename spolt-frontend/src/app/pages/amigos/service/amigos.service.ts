@@ -21,11 +21,15 @@ export class amigosService {
       return this.authService.getProfile();
     }
 
-    //Enviamos un solicutuda de amistad
+    //Enviamos un solicutuda de amistad por nombre de usuario
     sendFriendsShip(userName:string){
       return this.http.post<any>(`${this.apiUrl}/${userName}`,{}); //Los metodos post requieren simpre del body por eso {}
     }
     
+    //Enviamos solicitud de amistad por código Spolt
+    sendFriendsShipByCode(code:string) {
+      return this.http.post<any>(`${this.apiUrl}/code/${code}`, {});
+    }
 
     //Nos traemos las solicutudes de amistad que hemos recivido
     getSolicitudesAmistad(){

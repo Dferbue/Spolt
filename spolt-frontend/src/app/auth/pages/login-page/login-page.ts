@@ -38,8 +38,14 @@ export class LoginPage {
           this.authService.setTokens(response.accessToken, response.refreshToken);
         }
         
-        // 5. Redirigimos al usuario a la página de inicio tras el éxito
-        this.router.navigate(['/inicio']); 
+        // 5. Redirigimos al usuario
+        const pendingInvite = localStorage.getItem('pendingInvite');
+        if (pendingInvite) {
+          localStorage.removeItem('pendingInvite');
+          this.router.navigate(['/u', pendingInvite]);
+        } else {
+          this.router.navigate(['/inicio']); 
+        }
       },
       error: (err) => {
         this.loading.set(false);

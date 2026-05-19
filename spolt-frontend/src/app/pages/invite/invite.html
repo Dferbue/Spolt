@@ -1,0 +1,96 @@
+<div class="invite-page">
+
+  @if (loading()) {
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">> CARGANDO PERFIL...</p>
+    </div>
+  }
+
+  @if (!loading() && notFound()) {
+    <div class="not-found-card">
+      <div class="not-found-icon">💀</div>
+      <h1>CÓDIGO NO ENCONTRADO</h1>
+      <p>Este código Spolt no existe o ha sido eliminado.</p>
+      <a routerLink="/" class="btn-primary">IR AL INICIO</a>
+    </div>
+  }
+
+  @if (!loading() && profileData()) {
+    <div class="invite-wrapper">
+      <!-- Logo -->
+      <div class="spolt-logo">SPOLT</div>
+
+      <!-- Tarjeta de invitación -->
+      <div class="invite-card">
+        <div class="card-accent"></div>
+
+        <!-- Avatar -->
+        <div class="avatar-area">
+          @if (profileData().imagen_perfil) {
+            <img [src]="profileData().imagen_perfil" alt="Avatar" class="avatar-img" />
+          } @else {
+            <div class="avatar-placeholder">
+              <span>{{ profileData().nombre_usuario?.charAt(0)?.toUpperCase() }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Info -->
+        <div class="user-info">
+          <h1 class="username">@{{ profileData().nombre_usuario }}</h1>
+          @if (profileData().biografia) {
+            <p class="bio">{{ profileData().biografia }}</p>
+          }
+          <p class="invite-text">
+            Te ha invitado a ser su amigo en <strong>Spolt</strong>
+          </p>
+        </div>
+
+        <!-- Código -->
+        <div class="code-badge">{{ profileData().codigo_usuario }}</div>
+
+        <!-- Botón principal -->
+        @if (!actionDone()) {
+          <button
+            class="btn-add-friend"
+            [disabled]="actionLoading()"
+            (click)="addFriend()">
+            @if (actionLoading()) {
+              <span class="btn-spinner"></span>
+              ENVIANDO...
+            } @else if (!isLoggedIn()) {
+              ➕ CREAR CUENTA Y AGREGAR
+            } @else {
+              ➕ AGREGAR AMIGO
+            }
+          </button>
+
+          @if (!isLoggedIn()) {
+            <button class="btn-secondary" (click)="goToLogin()">
+              Ya tengo cuenta — INICIAR SESIÓN
+            </button>
+          }
+        } @else {
+          <div class="action-success">
+            <span class="success-icon">✅</span>
+            <p>{{ actionMessage() }}</p>
+            <a routerLink="/amigos" class="btn-primary">VER MIS AMIGOS</a>
+          </div>
+        }
+
+        <!-- Mensaje de error -->
+        @if (actionError() && actionMessage()) {
+          <div class="action-error">
+            ⚠️ {{ actionMessage() }}
+          </div>
+        }
+      </div>
+
+      <p class="footer-text">
+        ¿Aún no tienes Spolt? <a routerLink="/register">Regístrate gratis</a>
+      </p>
+    </div>
+  }
+
+</div>

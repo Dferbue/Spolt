@@ -102,6 +102,25 @@
                     </div>
                   </div>
 
+                  <!-- BLOQUE CÓDIGO SPOLT -->
+                  @if (dtoUser.codigo_usuario) {
+                  <div class="segment">
+                    <div class="segment-label">TU CÓDIGO SPOLT</div>
+                    <div class="segment-content">
+                      <p style="font-size: 0.82rem; color: #666; font-weight: 600; margin: 0 0 10px;">Comparte este código o enlace para que tus amigos puedan agregarte.</p>
+                      <div class="spolt-code-row">
+                        <span class="spolt-code-value">{{ dtoUser.codigo_usuario }}</span>
+                        <button class="spolt-code-btn" (click)="copyCode()" title="Copiar código">
+                          {{ codeCopied ? '✓ COPIADO' : '📋 COPIAR' }}
+                        </button>
+                      </div>
+                      <button class="spolt-share-btn" (click)="shareInviteLink()">
+                        🔗 COMPARTIR ENLACE DE INVITACIÓN
+                      </button>
+                    </div>
+                  </div>
+                  }
+
                   <div class="segment">
                     <div class="segment-label">BIOGRAFÍA</div>
                     <div class="segment-content">

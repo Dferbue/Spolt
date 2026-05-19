@@ -52,6 +52,44 @@ export class FrindshipsService {
     });
   }
 
+  // Envia una solicitud de amistad usando el código Spolt del receptor (ej: SPOLT-BX4K7M)
+  async createByCode(payload: { id_solicitante: number; codigo: string }) {
+    const receptor = await this.prisma.usuario.findUnique({
+      where: { codigo_usuario: payload.codigo.toUpperCase() },
+    });
+
+    if (!receptor) {
+      throw new NotFoundException('No se encontró ningún usuario con ese código Spolt');
+    }
+
+    const id_receptor = receptor.id_usuario;
+
+    if (payload.id_solicitante === id_receptor) {
+      throw new BadRequestException('No puedes enviarte una solicitud a ti mismo');
+    }
+
+    const existingFriendship = await this.prisma.amistad.findFirst({
+      where: {
+        OR: [
+          { id_usuario_solicitante: payload.id_solicitante, id_usuario_receptor: id_receptor },
+          { id_usuario_solicitante: id_receptor, id_usuario_receptor: payload.id_solicitante },
+        ],
+      },
+    });
+
+    if (existingFriendship) {
+      throw new BadRequestException('Ya existe una solicitud o amistad entre estos usuarios');
+    }
+
+    return await this.prisma.amistad.create({
+      data: {
+        id_usuario_solicitante: payload.id_solicitante,
+        id_usuario_receptor: id_receptor,
+        estado: 'pendiente',
+      },
+    });
+  }
+
   //Obtenemos las amistades del usuario que ya estna aceptadas
   async findAllFriends(id_usuario: number) {
     return await this.prisma.amistad.findMany({

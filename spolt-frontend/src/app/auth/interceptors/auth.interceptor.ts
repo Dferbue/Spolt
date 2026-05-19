@@ -13,7 +13,16 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
   const router = inject(Router);
 
   // No interceptar las peticiones de auth (login, register, refresh) para evitar bucles
-  if (req.url.includes('/auth/login') || req.url.includes('/auth/register') || req.url.includes('/auth/refresh') || req.url.includes('/auth/confirm-register') || req.url.includes('/auth/resend-verification')) {
+  // Tampoco interceptar las rutas públicas (invitaciones por código)
+  const publicRoutes = [
+    '/auth/login',
+    '/auth/register',
+    '/auth/refresh',
+    '/auth/confirm-register',
+    '/auth/resend-verification',
+    '/users/code/', // Página pública de invitación por código Spolt
+  ];
+  if (publicRoutes.some(route => req.url.includes(route))) {
     return next(req.clone({ withCredentials: true }));
   }
 

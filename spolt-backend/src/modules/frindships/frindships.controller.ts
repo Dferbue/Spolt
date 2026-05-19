@@ -7,12 +7,21 @@ import { FrindshipsService } from './frindships.service';
 export class FrindshipsController {
   constructor(private readonly frindshipsService: FrindshipsService) { }
 
-  //Creamos la amistad
+  //Creamos la amistad por nombre de usuario
   @Post(':username')
   create(@Req() req: any, @Param('username') username: string) {
     return this.frindshipsService.create({
       id_solicitante: req.user.id_usuario,
       username: username,
+    });
+  }
+
+  // Enviar solicitud de amistad usando el código Spolt del receptor (ej: SPOLT-BX4K7M)
+  @Post('code/:code')
+  createByCode(@Req() req: any, @Param('code') code: string) {
+    return this.frindshipsService.createByCode({
+      id_solicitante: req.user.id_usuario,
+      codigo: code,
     });
   }
 

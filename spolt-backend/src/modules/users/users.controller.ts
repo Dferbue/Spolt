@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, Query, UnauthorizedException, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, Query, UnauthorizedException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -29,6 +29,15 @@ export class UsersController {
   @Get("perfil")
   findPerfil(@Req() req:any) {
     return this.usersService.findPerfil(req.user.id_usuario);
+  }
+
+  // Endpoint PÚBLICO para obtener los datos de un usuario por su código Spolt
+  // Lo necesita la página de invitación (/u/:code) sin que el visitante tenga que estar logueado
+  @Get('code/:code')
+  async findByCode(@Param('code') code: string) {
+    const user = await this.usersService.findByCode(code);
+    if (!user) throw new NotFoundException('No se encontró ningún usuario con ese código');
+    return user;
   }
 
   @UseGuards(AuthGuard('jwt'))

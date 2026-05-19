@@ -55,19 +55,24 @@ export class Amigos {
   }
 
   //Creamos la funcion para crear la amistad 
-  sendFrindsShip(userName: string) {
-    //Esta comporbacion esta para no saturar el servidor con peticiones
-    if (!userName) {
-      return
-    }
-    this.amigosService.sendFriendsShip(userName).subscribe({
+  sendFrindsShip(inputValue: string) {
+    if (!inputValue) return;
+
+    const isCode = inputValue.toUpperCase().startsWith('SPOLT-');
+    
+    const requestObservable = isCode 
+      ? this.amigosService.sendFriendsShipByCode(inputValue)
+      : this.amigosService.sendFriendsShip(inputValue);
+
+    requestObservable.subscribe({
       next: (response) => {
-        this.mensajeEnvio.set('✅ Solicitud enviada con éxito a ' + userName);
+        this.mensajeEnvio.set(`✅ Solicitud enviada con éxito a ${inputValue}`);
         this.refreshData(); // Recargamos para reflejar la solicitud en "Enviadas"
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       },
       error: (err) => {
-        this.mensajeEnvio.set('❌ Error al enviar la solicitud');
+        const errorMsg = err.error?.message || 'Error al enviar la solicitud';
+        this.mensajeEnvio.set(`❌ ${errorMsg}`);
         setTimeout(() => this.mensajeEnvio.set(''), 3000);
       }
     })

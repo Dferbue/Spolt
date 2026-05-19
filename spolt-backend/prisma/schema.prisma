@@ -33,6 +33,8 @@ model Usuario {
   reset_token_expires DateTime?
   new_email           String? @db.VarChar(100)
   
+  codigo_usuario  String?   @unique @db.VarChar(20)
+
   // Consentimiento Legal
   aceptado_terminos   Boolean   @default(false)
   fecha_aceptacion_terminos DateTime? @default(now())

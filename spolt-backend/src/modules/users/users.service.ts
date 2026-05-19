@@ -58,6 +58,9 @@ export class UsersService {
     // Generar token de confirmación de email
     const emailToken = crypto.randomBytes(32).toString('hex');
 
+    // Generar código único de usuario (ej: SPOLT-BX4K7M)
+    const codigoUsuario = await this.generateUniqueCode();
+
     // Preparamos la creación del registro
     const newUser = await this.prisma.usuario.create({
       data: {
@@ -71,6 +74,7 @@ export class UsersService {
         email_token: emailToken,
         aceptado_terminos,
         fecha_aceptacion_terminos: new Date(),
+        codigo_usuario: codigoUsuario,
       },
     });
 
@@ -260,6 +264,42 @@ export class UsersService {
     });
   }
 
+  // Búsqueda pública de usuario por código Spolt (para la página de invitación)
+  async findByCode(codigo: string) {
+    return this.prisma.usuario.findUnique({
+      where: { codigo_usuario: codigo.toUpperCase() },
+      select: {
+        id_usuario: true,
+        nombre_usuario: true,
+        imagen_perfil: true,
+        biografia: true,
+        codigo_usuario: true,
+      },
+    });
+  }
+
+  // Generador de código único tipo SPOLT-XXXXXX
+  // Usa consonantes + dígitos (sin vocales) para evitar palabras ofensivas
+  private async generateUniqueCode(): Promise<string> {
+    const chars = 'BCDFGHJKLMNPQRSTVWXYZ23456789';
+    let code: string;
+    let exists = true;
+
+    while (exists) {
+      let random = '';
+      for (let i = 0; i < 6; i++) {
+        random += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      code = `SPOLT-${random}`;
+      const user = await this.prisma.usuario.findUnique({
+        where: { codigo_usuario: code },
+      });
+      exists = !!user;
+    }
+
+    return code!;
+  }
+
   //Esta funcion es para obtener solo los datos que queremos mostrar en el perfil de un usuario
   async findPerfil(id: number) {
     return this.prisma.usuario.findUnique({
@@ -274,6 +314,7 @@ export class UsersService {
         imagen_perfil: true,
         nombre_completo: true,
         nombre_usuario: true,
+        codigo_usuario: true,
       },
     });
   }

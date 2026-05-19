@@ -118,5 +118,10 @@ export const routes: Routes = [
     path: 'legal/aviso-legal',
     loadComponent: () => import('./pages/legal/aviso-legal/aviso-legal').then(m => m.AvisoLegal)
   },
+  {
+    // Página pública de invitación por código Spolt (ej: spoltweb.com/u/SPOLT-BX4K7M)
+    path: 'u/:code',
+    loadComponent: () => import('./pages/invite/invite').then(m => m.InvitePage)
+  },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];

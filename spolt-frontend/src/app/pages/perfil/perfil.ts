@@ -45,6 +45,7 @@ export class Perfil {
   selectedFile: File | null = null;
   selectedFilePreview: string | null = null;
   showImageConfirm = false;
+  codeCopied = false; // Estado del botón "Copiar código"
 
   // Inicializa el componente cargando los datos del usuario
   ngOnInit() {
@@ -285,5 +286,39 @@ export class Perfil {
         this.cancelImageUpload();
       }
     });
+  }
+  // Copia el código Spolt del usuario al portapapeles
+  copyCode() {
+    const code = this.dtoUser?.codigo_usuario;
+    if (!code) return;
+    navigator.clipboard.writeText(code).then(() => {
+      this.codeCopied = true;
+      this.cdr.detectChanges();
+      setTimeout(() => {
+        this.codeCopied = false;
+        this.cdr.detectChanges();
+      }, 2500);
+    });
+  }
+
+  // Comparte el enlace de invitación usando la API nativa del navegador
+  shareInviteLink() {
+    const code = this.dtoUser?.codigo_usuario;
+    if (!code) return;
+    const inviteUrl = `${window.location.origin}/u/${code}`;
+    const username = this.dtoUser?.nombre_usuario || 'alguien';
+
+    if (navigator.share) {
+      navigator.share({
+        title: `¡Agrégame en Spolt!`,
+        text: `¡Únete a Spolt y agrégame como amigo! Mi código es: ${code}`,
+        url: inviteUrl,
+      });
+    } else {
+      // Fallback: copiar el enlace al portapapeles
+      navigator.clipboard.writeText(inviteUrl).then(() => {
+        alert(`Enlace copiado: ${inviteUrl}`);
+      });
+    }
   }
 }
