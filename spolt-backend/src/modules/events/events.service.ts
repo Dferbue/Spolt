@@ -629,6 +629,8 @@ export class EventsService implements OnModuleInit {
       fecha_evento: evento.fecha_evento,
       hora_inicio: evento.hora_inicio,
       ubicacion: evento.ubicacion,
+      latitud: evento.latitud ? Number(evento.latitud) : null,
+      longitud: evento.longitud ? Number(evento.longitud) : null,
       numero_max_participantes: evento.numero_max_participantes,
       numero_participantes_actuales: evento.numero_participantes_actuales,
       estado: evento.estado,

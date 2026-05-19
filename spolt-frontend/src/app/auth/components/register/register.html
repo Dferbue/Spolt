@@ -17,8 +17,11 @@
               required
             />
             @let nombre_usuario = registerForm.get('nombre_usuario');
-            @if (nombre_usuario?.touched && nombre_usuario?.invalid) {
+            @if (nombre_usuario?.touched && nombre_usuario?.hasError('required')) {
               <div class="pixel-error">* REQUIRED</div>
+            }
+            @if (nombre_usuario?.touched && nombre_usuario?.hasError('pattern')) {
+              <div class="pixel-error">* NO SPACES ALLOWED</div>
             }
           </div>
 

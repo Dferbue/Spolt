@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength, IsDateString, IsBoolean } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength, IsDateString, IsBoolean, Matches } from 'class-validator';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -7,6 +7,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
+  @Matches(/^\S+$/, { message: 'El nombre de usuario no puede contener espacios' })
   nombre_usuario: string;
 
   @IsNotEmpty()

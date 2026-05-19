@@ -39,7 +39,7 @@ export class Register {
     private fb: FormBuilder
   ) {
     this.registerForm = this.fb.group({
-      nombre_usuario: ['', Validators.required],
+      nombre_usuario: ['', [Validators.required, Validators.pattern(/^\S+$/)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       fecha_nacimiento: ['', [Validators.required, pastDateValidator]],

@@ -126,15 +126,19 @@ export class InviteEventPage implements OnInit {
     const event = this.eventData();
     if (!event) return;
 
-    if (this.map) {
-      this.map.remove();
+    const mapContainer = document.getElementById('map-details');
+    if (!mapContainer) {
+      setTimeout(() => this.initMap(), 100);
+      return;
     }
 
-    const mapContainer = document.getElementById('map-details');
-    if (!mapContainer) return;
+    if (this.map) {
+      this.map.remove();
+      this.map = undefined;
+    }
 
-    const lat = event.latitud || 40.4168; 
-    const lng = event.longitud || -3.7038;
+    const lat = event.latitud != null ? Number(event.latitud) : 40.4168; 
+    const lng = event.longitud != null ? Number(event.longitud) : -3.7038;
 
     this.map = L.map('map-details').setView([lat, lng], 17);
 
