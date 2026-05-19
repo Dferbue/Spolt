@@ -140,6 +140,15 @@
             </div>
           </div>
 
+          @if (event.codigo_evento) {
+            <div style="margin-top: 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; background: #fff0f5; padding: 8px 12px; border-radius: 8px; border: 1px solid #ffb3d1; width: fit-content;">
+              <span style="font-size: 0.85rem; font-weight: 700; color: #ff006e; font-family: monospace;">🎟️ {{ event.codigo_evento }}</span>
+              <button (click)="copiarCodigoEvento(event.codigo_evento)" style="background: none; border: none; cursor: pointer; color: #ff006e; font-size: 1rem; padding: 0; display: flex; align-items: center; justify-content: center;" title="Copiar enlace de invitación">
+                📋
+              </button>
+            </div>
+          }
+
           <!-- Biografía -->
           <div class="ma-bio-section">
             <h4>Biografía</h4>

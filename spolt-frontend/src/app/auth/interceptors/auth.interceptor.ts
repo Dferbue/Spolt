@@ -21,6 +21,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
     '/auth/confirm-register',
     '/auth/resend-verification',
     '/users/code/', // Página pública de invitación por código Spolt
+    '/events/code/', // Página pública de invitación a eventos por código Spolt
   ];
   if (publicRoutes.some(route => req.url.includes(route))) {
     return next(req.clone({ withCredentials: true }));

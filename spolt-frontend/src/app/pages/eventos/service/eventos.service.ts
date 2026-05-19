@@ -95,4 +95,14 @@ export class EventosService {
   finalizarEvent(idEvento: number) {
     return this.http.patch<any>(`${this.apiUrl}/${idEvento}/finalizar`, {});
   }
+
+  // Traer los detalles públicos de un evento por código
+  getEventByCode(code: string) {
+    return this.http.get<any>(`${this.apiUrl}/code/${code}`);
+  }
+
+  // Unirse a un evento usando un código de invitación
+  joinEventByCode(code: string) {
+    return this.http.post<any>(`${this.apiUrl}/join/code/${code}`, {});
+  }
 }

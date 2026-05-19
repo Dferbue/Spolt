@@ -517,6 +517,15 @@ export class UnirseEventos {
     });
   }
 
+  copiarCodigoEvento(codigo: string) {
+    if (!codigo) return;
+    const url = `${window.location.origin}/e/${codigo}`;
+    navigator.clipboard.writeText(url).then(() => {
+      this.mensajeEnvio.set('✅ Enlace de invitación copiado al portapapeles');
+      setTimeout(() => this.mensajeEnvio.set(''), 2500);
+    });
+  }
+
   cerrarModalSalir() {
     this.mostrarModalSalir.set(false);
     this.eventoIdParaSalir.set(null);

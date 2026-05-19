@@ -150,6 +150,7 @@ model EventoDeportivo {
   numero_max_participantes     Int
   numero_participantes_actuales Int          @default(0)
   estado                       EstadoEvento @default(abierto)
+  codigo_evento                String?      @unique @db.VarChar(20)
   fecha_creacion               DateTime     @default(now())
 
   // Relaciones

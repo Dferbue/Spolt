@@ -13,6 +13,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { SportLevelService } from '../sport-level/sport-level.service';
 import { Cron } from '@nestjs/schedule';
 import { AppCacheService } from 'src/cache/app-cache.service';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class EventsService implements OnModuleInit {
@@ -28,6 +29,33 @@ export class EventsService implements OnModuleInit {
   // Conteo ligero para el dashboard admin
   async countActive(): Promise<number> {
     return this.prisma.eventoDeportivo.count({ where: { estado: 'abierto' } });
+  }
+
+  // Genera un código único alfanumérico sin vocales para invitaciones
+  private async generateUniqueCode(): Promise<string> {
+    let isUnique = false;
+    let finalCode = '';
+
+    while (!isUnique) {
+      const randomBytes = crypto.randomBytes(6).toString('base64');
+      const cleanString = randomBytes
+        .replace(/[^A-Za-z0-9]/g, '')
+        .toUpperCase()
+        .replace(/[AEIOU01]/g, '');
+      
+      const uniqueCode = cleanString.substring(0, 6).padEnd(6, 'X');
+      finalCode = `SPEV-${uniqueCode}`;
+
+      const existing = await this.prisma.eventoDeportivo.findUnique({
+        where: { codigo_evento: finalCode },
+      });
+
+      if (!existing) {
+        isUnique = true;
+      }
+    }
+
+    return finalCode;
   }
 
   async create(createEventDto: CreateEventDto, id_creador: number) {
@@ -51,6 +79,7 @@ export class EventsService implements OnModuleInit {
         hora_inicio: new Date(`1970-01-01T${hora_inicio}`),
         hora_fin: hora_fin ? new Date(`1970-01-01T${hora_fin}`) : null,
         id_creador,
+        codigo_evento: await this.generateUniqueCode(),
       },
     });
 
@@ -568,6 +597,59 @@ export class EventsService implements OnModuleInit {
     await this.cache.bumpVersion('events');
 
     return participation;
+  }
+
+  // Obtener detalles públicos de un evento por su código
+  async findEventByCode(codigo_evento: string) {
+    const evento = await this.prisma.eventoDeportivo.findUnique({
+      where: { codigo_evento: codigo_evento.toUpperCase() },
+      include: {
+        creador: {
+          select: {
+            id_usuario: true,
+            nombre_usuario: true,
+            imagen_perfil: true,
+          },
+        },
+        deporte: true,
+      },
+    });
+
+    if (!evento) {
+      throw new NotFoundException('No se ha encontrado el evento con ese código');
+    }
+
+    // Información limitada para vista pública (sin mostrar listas de participantes enteras)
+    return {
+      id_evento: evento.id_evento,
+      codigo_evento: evento.codigo_evento,
+      titulo: evento.titulo,
+      descripcion: evento.descripcion,
+      tipo_evento: evento.tipo_evento,
+      fecha_evento: evento.fecha_evento,
+      hora_inicio: evento.hora_inicio,
+      ubicacion: evento.ubicacion,
+      numero_max_participantes: evento.numero_max_participantes,
+      numero_participantes_actuales: evento.numero_participantes_actuales,
+      estado: evento.estado,
+      creador: evento.creador,
+      deporte: evento.deporte,
+    };
+  }
+
+  // Unirse a un evento directamente por su código
+  async unirseEventoPorCodigo(id_usuario: number, codigo_evento: string) {
+    const evento = await this.prisma.eventoDeportivo.findUnique({
+      where: { codigo_evento: codigo_evento.toUpperCase() },
+      select: { id_evento: true },
+    });
+
+    if (!evento) {
+      throw new NotFoundException('No se ha encontrado el evento con ese código');
+    }
+
+    // Reutiliza la lógica robusta existente
+    return this.unirseEvento(id_usuario, evento.id_evento);
   }
 
   //Creamos la funcion para abandonar el evento

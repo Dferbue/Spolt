@@ -123,5 +123,10 @@ export const routes: Routes = [
     path: 'u/:code',
     loadComponent: () => import('./pages/invite/invite').then(m => m.InvitePage)
   },
+  {
+    // Página pública de invitación a evento (ej: spoltweb.com/e/SPEV-XXXXXX)
+    path: 'e/:code',
+    loadComponent: () => import('./pages/invite-event/invite-event').then(m => m.InviteEventPage)
+  },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];

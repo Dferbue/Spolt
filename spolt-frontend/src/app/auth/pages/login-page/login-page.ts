@@ -40,9 +40,14 @@ export class LoginPage {
         
         // 5. Redirigimos al usuario
         const pendingInvite = localStorage.getItem('pendingInvite');
+        const pendingEventInvite = localStorage.getItem('pendingEventInvite');
+        
         if (pendingInvite) {
           localStorage.removeItem('pendingInvite');
           this.router.navigate(['/u', pendingInvite]);
+        } else if (pendingEventInvite) {
+          localStorage.removeItem('pendingEventInvite');
+          this.router.navigate(['/e', pendingEventInvite]);
         } else {
           this.router.navigate(['/inicio']); 
         }

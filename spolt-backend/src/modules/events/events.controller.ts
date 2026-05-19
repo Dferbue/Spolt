@@ -85,6 +85,20 @@ export class EventsController {
     return this.eventsService.unirseEvento(Number(userId), +id);
   }
 
+  // Obtener un evento público por su código (sin autenticación)
+  @Get('code/:code')
+  getEventByCode(@Param('code') code: string) {
+    return this.eventsService.findEventByCode(code);
+  }
+
+  // Unirse a un evento por su código
+  @UseGuards(AuthGuard('jwt'))
+  @Post('join/code/:code')
+  joinEventByCode(@Param('code') code: string, @Req() req: any) {
+    const userId = req.user.id_usuario || req.user['userId'];
+    return this.eventsService.unirseEventoPorCodigo(Number(userId), code);
+  }
+
 
   //Salir de eventos
   @UseGuards(AuthGuard('jwt'))

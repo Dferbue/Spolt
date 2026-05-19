@@ -21,6 +21,7 @@ export interface CreateEvent {
 export interface EventInterface{
   id?: number;
   id_evento?: number; // Real id de Prisma
+  codigo_evento?: string;
   id_creador: number;
   id_deporte: number;
   titulo: string;

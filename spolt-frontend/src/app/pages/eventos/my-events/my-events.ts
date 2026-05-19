@@ -594,6 +594,15 @@ export class MyEvents implements OnInit {
     });
   }
 
+  copiarCodigoEvento(codigo: string) {
+    if (!codigo) return;
+    const url = `${window.location.origin}/e/${codigo}`;
+    navigator.clipboard.writeText(url).then(() => {
+      this.mensajeEnvio.set('✅ Enlace de invitación copiado al portapapeles');
+      setTimeout(() => this.mensajeEnvio.set(''), 2500);
+    });
+  }
+
   formatTime(time: string | null | undefined): string {
     if (!time) return '--:--';
     if (time.includes('T')) {
